@@ -12,10 +12,14 @@
     "build": "tsup src",
     "dev": "tsx watch src/index.ts",
     "start": "node -r tsconfig-paths/register dist/index.js",
+    "db:push": "drizzle-kit push:mysql",
+    "db:studio": "npx drizzle-kit studio --host localhost",
+    "db:migration": "drizzle-kit generate:mysql",
     "format": "eslint --fix && prettier --config .prettierrc '**/*.ts' --write"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",
+    "drizzle-kit": "^0.20.6",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
@@ -25,5 +29,9 @@
     "tsx": "^4.6.2",
     "typescript": "^5.3.3",
     "vitest": "^1.0.4"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.29.1",
+    "mysql2": "^3.6.5"
   }
 }
