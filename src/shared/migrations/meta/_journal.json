@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1702332266545,
+      "tag": "0000_dark_triton",
+      "breakpoints": true
+    }
+  ]
+}
