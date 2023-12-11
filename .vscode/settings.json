@@ -1,0 +1,182 @@
+{
+  //EXPLORER
+  "explorer.compactFolders": false,
+  "explorer.confirmUndo": "default",
+  "explorer.confirmDelete": false,
+  //WORKBENCH
+  "workbench.tree.indent": 10,
+  "breadcrumbs.enabled": true,
+  "workbench.editor.labelFormat": "short",
+  "workbench.colorTheme": "Atom One Dark",
+  "workbench.startupEditor": "newUntitledFile",
+  "workbench.iconTheme": "material-icon-theme",
+  //EDITOR
+  "editor.tabSize": 2,
+  "editor.fontSize": 16,
+  "editor.lineHeight": 22,
+  "editor.rulers": [120, 150],
+  "editor.fontLigatures": true,
+  "editor.mouseWheelZoom": true,
+  "editor.fontWeight": "normal",
+  "editor.minimap.enabled": false,
+  "editor.suggestSelection": "first",
+  "editor.accessibilitySupport": "off",
+  "editor.parameterHints.enabled": true,
+  "editor.renderLineHighlight": "gutter",
+  "editor.semanticHighlighting.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.fontFamily": "Jetbrains Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit",
+    "source.organizeImports.rome": "explicit"
+  },
+  "editor.tokenColorCustomizations": {
+    "textMateRules": []
+  },
+  //PRETTIER
+  "prettier.enable": true,
+  "prettier.requireConfig": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  //GIT
+  "git.enableSmartCommit": true,
+  "git.openRepositoryInParentFolders": "never",
+  //TERMINAL
+  "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.gpuAcceleration": "auto",
+  "terminal.integrated.sendKeybindingsToShell": true,
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.tabs.enableAnimation": true,
+  "terminal.integrated.copyOnSelection": true,
+  //WORKBENCH
+  "workbench.colorCustomizations": {
+    "terminal.foreground": "#A3A3A3",
+    "terminalCursor.background": "#A3A3A3",
+    "terminalCursor.foreground": "#A3A3A3",
+    "terminal.ansiBlack": "#1F2022",
+    "terminal.ansiBlue": "#4F97D7",
+    "terminal.ansiBrightBlack": "#585858",
+    "terminal.ansiBrightBlue": "#4F97D7",
+    "terminal.ansiBrightCyan": "#2D9574",
+    "terminal.ansiBrightGreen": "#67B11D",
+    "terminal.ansiBrightMagenta": "#A31DB1",
+    "terminal.ansiBrightRed": "#F2241F",
+    "terminal.ansiBrightWhite": "#F8F8F8",
+    "terminal.ansiBrightYellow": "#B1951D",
+    "terminal.ansiCyan": "#2D9574",
+    "terminal.ansiGreen": "#67B11D",
+    "terminal.ansiMagenta": "#A31DB1",
+    "terminal.ansiRed": "#F2241F",
+    "terminal.ansiWhite": "#A3A3A3",
+    "terminal.ansiYellow": "#B1951D"
+  },
+  //EXTENSIONS
+  "extensions.ignoreRecommendations": true,
+  //FILES
+  "files.autoSave": "afterDelay",
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    ".env.*": "dotenv",
+    ".prettierrc": "json"
+  },
+  "files.exclude": {
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/.hg": true,
+    "**/.svn": true,
+    "**/.git": true,
+    "**/node_modules/**": true
+  },
+  //LANGUAGES
+  "javascript.suggest.autoImports": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "typescript.suggest.autoImports": true,
+  "terminal.integrated.env.osx": {
+    "FIG_NEW_SESSION": "1"
+  },
+  //EMMET
+  "emmet.syntaxProfiles": {
+    "javascript": "jsx"
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  //MATERIAL
+  "material-icon-theme.opacity": 1,
+  "material-icon-theme.activeIconPack": "nest",
+  "material-icon-theme.languages.associations": {
+    "dotenv": "tune"
+  },
+  "material-icon-theme.files.associations": {
+    "tsconfig.json": "tune",
+    "*.webpack.js": "webpack"
+  },
+  "material-icon-theme.folders.associations": {
+    "adapters": "contract",
+    "grpc": "pipe",
+    "kube": "kubernetes",
+    "main": "lib",
+    "websockets": "pipe",
+    "implementations": "core",
+    "protos": "pipe",
+    "entities": "class",
+    "kafka": "pipe",
+    "use-cases": "functions",
+    "migrations": "tools",
+    "schemas": "class",
+    "useCases": "functions",
+    "eslint-config": "tools",
+    "typeorm": "database",
+    "_shared": "shared",
+    "mappers": "meta",
+    "fakes": "mock",
+    "modules": "components",
+    "subscribers": "messages",
+    "domain": "class",
+    "protocols": "contract",
+    "seeds": "template",
+    "infra": "app",
+    "infrastructure": "app",
+    "application": "app",
+    "view-models": "views",
+    "presentation": "template",
+    "dtos": "typescript",
+    "http": "container",
+    "providers": "include",
+    "factories": "class",
+    "repositories": "mappings"
+  },
+  //PRISMA
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  //JSONC
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  //TYPESCRIPT
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  //JAVASCRIPT
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "javascript.format.insertSpaceAfterConstructor": true,
+  "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  //WINDOWS
+  "window.zoomLevel": 2,
+  //ESLINT
+  "workbench.editor.empty.hint": "hidden"
+}

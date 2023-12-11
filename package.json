@@ -1,0 +1,29 @@
+{
+  "name": "templates",
+  "version": "1.0.0",
+  "main": "/dist/index.js",
+  "license": "MIT",
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "vitest",
+    "build": "tsup src",
+    "dev": "tsx watch src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js",
+    "format": "eslint --fix && prettier --config .prettierrc '**/*.ts' --write"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.1",
+    "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.0.1",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  }
+}
