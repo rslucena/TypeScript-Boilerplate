@@ -8,7 +8,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "test": "vitest",
+    "tests": "vitest",
     "build": "tsup src",
     "dev": "tsx watch src/index.ts",
     "start": "node -r tsconfig-paths/register dist/index.js",
@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.29.1",
-    "mysql2": "^3.6.5"
+    "drizzle-zod": "^0.5.1",
+    "mysql2": "^3.6.5",
+    "zod": "^3.22.4"
   }
 }
