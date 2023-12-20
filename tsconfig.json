@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "baseUrl": ".",
     "target": "es2022",
     "module": "commonjs",
@@ -13,5 +14,5 @@
     }
   },
   "include": ["src"],
-  "exclude": ["**/{.git,node_modules, dist}/**"]
+  "exclude": ["**/{.git, .docker, .vscode, node_modules, dist}/**"]
 }
