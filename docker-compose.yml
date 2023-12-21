@@ -11,7 +11,6 @@ services:
     volumes:
       - ./.docker/redis/storage:/data
     restart: always
-    network_mode: host
 
   mysql:
     image: mysql:latest
@@ -29,4 +28,7 @@ services:
       - ./.docker/mysql/scripts:/docker-entrypoint-initdb.d/
       - ./.docker/mysql/storage:/var/lib/mysql:rw
       - ./.docker/mysql/logs:/var/lib/mysql-logs:rw
-    network_mode: host
+
+networks:
+  default:
+    driver: bridge
