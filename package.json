@@ -10,7 +10,7 @@
   "scripts": {
     "tests": "vitest",
     "build": "tsup src",
-    "dev": "tsx watch src/index.ts",
+    "dev": "node --import tsx --watch src/index.ts",
     "start": "node -r tsconfig-paths/register dist/index.js",
     "db:push": "drizzle-kit push:mysql",
     "db:studio": "npx drizzle-kit studio --host localhost",
