@@ -14,5 +14,6 @@
     }
   },
   "include": ["src"],
-  "exclude": ["**/{.git, .docker, .vscode, node_modules, dist}/**"]
+  "exclude": ["**/{.git, .docker, .vscode, node_modules, dist}/**"
+]
 }
