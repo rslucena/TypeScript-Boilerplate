@@ -13,41 +13,25 @@
   "plugins": [],
   "overrides": [
     {
-      "files": [
-        "*.html",
-        "*.hbs",
-        "*.css",
-        ".sass"
-      ],
+      "files": ["*.html", "*.hbs", "*.css", ".sass"],
       "options": {
         "singleQuote": false
       }
     },
     {
-      "files": [
-        "*.json",
-        ".prettierrc",
-        ".swcrc"
-      ],
+      "files": ["*.json", ".prettierrc", ".swcrc"],
       "options": {
         "tabWidth": 2
       }
     },
     {
-      "files": [
-        "*.jsx",
-        "*.tsx",
-        "*.mdx"
-      ],
+      "files": ["*.jsx", "*.tsx", "*.mdx"],
       "options": {
         "jsxSingleQuote": true
       }
     },
     {
-      "files": [
-        "Makefile",
-        "*.mk"
-      ],
+      "files": ["Makefile", "*.mk"],
       "options": {
         "useTabs": true,
         "tabWidth": 2
