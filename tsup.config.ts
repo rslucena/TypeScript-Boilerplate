@@ -1,16 +1,23 @@
+/// <reference types="tsup" />
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  outDir: 'dist',
-  entry: ['src'],
   dts: true,
   clean: true,
-  sourcemap: true,
   bundle: true,
-  watch: true,
   minify: true,
-  tsconfig: './tsconfig.json',
+  metafile: true,
+  platform: 'node',
+  outDir: 'dist',
+  sourcemap: true,
+  minifySyntax: true,
   minifyWhitespace: true,
   minifyIdentifiers: true,
-  minifySyntax: true,
+  tsconfig: './tsconfig.json',
+  env: {
+    NODE_ENV: 'production',
+  },
+  loader: {
+    '.sql': 'file',
+  },
 })
