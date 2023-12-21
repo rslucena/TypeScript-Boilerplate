@@ -1,7 +1,9 @@
+import { identifier } from '@shared/repositories/references'
 import { mysqlTable, text } from 'drizzle-orm/mysql-core'
-import { reffer } from '../repositories/repository'
 
-export const users = mysqlTable('users', {
-  name: text('name'),
-  ...reffer,
+const entity = mysqlTable('users', {
+  name: text('name').notNull().unique(),
+  ...identifier,
 })
+
+export { entity }
