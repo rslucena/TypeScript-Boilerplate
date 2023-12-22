@@ -1,6 +1,6 @@
-# Template
+# Template/Boilerplate
 
-Minimalistic project template to jump start a Node.js back-end application in TypeScript.
+Minimalistic project template/boilerplate to jump start a Node.js back-end application in TypeScript.
 
 ### Typescript
 
