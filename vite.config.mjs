@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     globals: false,
     environment: 'node',
-    exclude: ['node_modules/**', '.docker/**', '.git/**', '.vscode/**', 'dist/**'],
+    exclude: ['node_modules/**', '.docker/**', '.git/**', '.github/**', '.vscode/**', 'dist/**'],
   },
   resolve: {
     alias: [
