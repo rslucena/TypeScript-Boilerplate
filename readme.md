@@ -11,6 +11,10 @@ A programming language that adds static typing to JavaScript. Facilitates the de
 
 ![Drizzle-ORM](https://img.shields.io/badge/-Drizzle--ORM-3178C6?logo=typescript&logoColor=white) An Object-Relational Mapping (ORM) library for TypeScript. Simplifies database interactions.
 
+## Redis
+
+![Redis](https://img.shields.io/badge/-Redis-DC382D?logo=redis&logoColor=white) An in-memory data structure store, widely used as a cache or message broker. Enhances data storage and retrieval efficiency.
+
 ---
 
 To compile the application
