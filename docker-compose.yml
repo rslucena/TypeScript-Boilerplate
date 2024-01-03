@@ -1,24 +1,24 @@
-version: "3.8"
+version: '3.8'
 services:
-
   redis:
-    image: redis:latest
+    image: redis/redis-stack-server:latest
     container_name: ${REDIS_NAME}
     ports:
-      - "6379:6379"
+      - '6379:6379'
     environment:
       REDIS_PASSWORD: ${REDIS_PASS}
     volumes:
       - ./.docker/redis/storage:/data
+      - ./.docker/redis/modules:/usr/lib/redis/modules
     restart: always
 
   mysql:
     image: mysql:latest
     container_name: ${MYSQL_NAME}
     restart: always
-    command: "--character-set-server=utf8mb4"
+    command: '--character-set-server=utf8mb4'
     ports:
-      - "3306:3306"
+      - '3306:3306'
     environment:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
