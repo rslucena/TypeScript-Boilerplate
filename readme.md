@@ -2,6 +2,8 @@
 
 Minimalistic project template/boilerplate to jump start a Node.js back-end application in TypeScript.
 
+[![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml/badge.svg?event=deployment)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml)
+
 ### Typescript
 
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
