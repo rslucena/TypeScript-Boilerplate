@@ -1,6 +1,7 @@
 {
   "name": "templates",
   "version": "1.0.0",
+  "type": "module",
   "main": "/dist/index.js",
   "license": "MIT",
   "engines": {
@@ -34,8 +35,8 @@
   "dependencies": {
     "drizzle-orm": "^0.29.1",
     "drizzle-zod": "^0.5.1",
-    "ioredis": "^5.3.2",
     "mysql2": "^3.6.5",
+    "redis": "^4.6.12",
     "zod": "^3.22.4"
   }
 }

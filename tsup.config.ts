@@ -14,6 +14,7 @@ export default defineConfig({
   minifyWhitespace: true,
   minifyIdentifiers: true,
   tsconfig: './tsconfig.json',
+  format: ['esm', 'iife'],
   env: {
     NODE_ENV: 'production',
   },

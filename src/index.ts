@@ -1,8 +1,13 @@
-import repository from '@shared/repositories/repository'
-import { entity } from '@shared/schemas/users'
-import { and, eq } from 'drizzle-orm'
+import caches from '@shared/caches/actions'
+import { uuid } from '@shared/repositories/references'
 
-repository
-  .select()
-  .from(entity)
-  .where(and(eq(entity.id, 1), eq(entity.id, 2)))
+const uuid1 = uuid({ table: 'users', id: 1 })
+console.debug(uuid1)
+
+const uuid2 = await caches.json.set(uuid1, { test: 2 }, 10000)
+console.debug(uuid2)
+
+const cac = await caches.json.get(uuid1)
+console.debug(cac)
+
+console.debug(await caches.text.get(uuid1))

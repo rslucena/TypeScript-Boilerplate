@@ -1,4 +1,3 @@
-import { uuid } from '@shared/repositories/references'
 import client from './connection'
 import { actions } from './interfaces'
 
@@ -12,7 +11,7 @@ const caches: actions = {
     del: (key) => client.json.del(key),
     get: (key) => client.json.get(key).catch(() => null),
     set: (key, vals, ttl) => set('json', key, vals, ttl),
-  }
+  },
 }
 
 async function set(
