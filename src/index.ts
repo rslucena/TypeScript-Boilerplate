@@ -1,4 +1,4 @@
-import caches from '@shared/caches/actions'
+import caches from '@shared/cache/actions'
 import { uuid } from '@shared/repositories/references'
 
 const uuid1 = uuid({ table: 'users', id: 1 })
