@@ -1,7 +1,7 @@
 import client from './connection'
 import { actions } from './interfaces'
 
-const caches: actions = {
+const cache: actions = {
   text: {
     del: (key) => client.del(key),
     get: (key) => client.get(key).catch(() => null),
@@ -12,6 +12,7 @@ const caches: actions = {
     get: (key) => client.json.get(key).catch(() => null),
     set: (key, vals, ttl) => set('json', key, vals, ttl),
   },
+  ping: () => client.ping(),
 }
 
 async function set(
@@ -28,4 +29,4 @@ async function set(
   return actions[type]()
 }
 
-export default caches
+export default cache

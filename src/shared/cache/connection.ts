@@ -10,6 +10,8 @@ const connection: RedisClientOptions = {
   },
 }
 
+console.log(connection)
+
 const client = createClient(connection)
 client.on('error', (err) => console.debug('Redis Client Error', err))
 

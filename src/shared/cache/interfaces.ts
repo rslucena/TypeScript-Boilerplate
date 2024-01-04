@@ -7,4 +7,5 @@ export interface functions {
 export interface actions {
   text: functions
   json: functions
+  ping: () => Promise<string>
 }
