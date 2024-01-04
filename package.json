@@ -9,7 +9,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "tests": "vitest",
+    "tests": "vitest --mode development",
     "build": "npm run format && tsup src",
     "format": "eslint --fix && prettier ./src/**/* --write --check --config ./.prettierrc",
     "dev": "tsx watch --env-file=.env src/index.ts",
