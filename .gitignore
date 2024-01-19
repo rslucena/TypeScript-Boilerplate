@@ -20,7 +20,6 @@ lib-cov
 *.sqlite3
 *.db
 *.pem
-logs/
 .turbo
 
 # IDE settings
