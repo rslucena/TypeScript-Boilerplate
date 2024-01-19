@@ -33,6 +33,7 @@
     "vitest": "^1.0.4"
   },
   "dependencies": {
+    "@fastify/cors": "^8.5.0",
     "drizzle-orm": "^0.29.1",
     "drizzle-zod": "^0.5.1",
     "fastify": "^4.25.2",
