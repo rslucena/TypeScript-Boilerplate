@@ -79,3 +79,7 @@ api/_assets*
 # Docker
 **/.dockerignore
 !/.dockerignore
+
+# Drizzle
+**/migrations/*.sql
+**/migrations/meta/*
