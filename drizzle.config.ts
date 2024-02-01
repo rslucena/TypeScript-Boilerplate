@@ -6,4 +6,6 @@ export default {
   out: './src/shared/migrations',
   driver: 'mysql2',
   dbCredentials: connection,
+  strict: true,
+  verbose: true
 } satisfies Config
