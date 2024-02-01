@@ -1,8 +1,9 @@
 import * as crypto from 'crypto'
-import { int, timestamp } from 'drizzle-orm/mysql-core'
+import { boolean, int, timestamp } from 'drizzle-orm/mysql-core'
 
 const identifier = {
-  id: int('id').primaryKey().autoincrement(),
+  id: int('id').autoincrement().primaryKey(),
+  activated: boolean('activated').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
   deleteAt: timestamp('delete_at'),

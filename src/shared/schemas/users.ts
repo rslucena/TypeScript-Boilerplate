@@ -1,9 +1,12 @@
 import { identifier } from '@shared/repositories/references'
-import { mysqlTable, text } from 'drizzle-orm/mysql-core'
+import { mysqlTable, varchar } from 'drizzle-orm/mysql-core'
 
-const entity = mysqlTable('users', {
-  name: text('name').notNull().unique(),
-  ...identifier,
-})
+const columns = {
+  name: varchar('name', { length: 50 }).notNull(),
+  lastName: varchar('name', { length: 100 }).notNull(),
+  email: varchar('email', { length: 256 }).unique().notNull(),
+}
 
-export { entity }
+const Users = mysqlTable('users', { ...columns, ...identifier })
+
+export { Users }
