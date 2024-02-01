@@ -9,6 +9,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "packages:health": "npm outdated",
     "tests": "vitest --mode development",
     "build": "npm run format && tsup src",
     "format": "eslint --fix && prettier ./src/**/* --write --check --config ./.prettierrc",
@@ -19,8 +20,8 @@
     "db:studio": "npx drizzle-kit studio --host localhost"
   },
   "devDependencies": {
-    "@types/node": "^20.10.4",
-    "drizzle-kit": "^0.20.6",
+    "@types/node": "^20.11.16",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-drizzle": "^0.2.2",
@@ -30,15 +31,15 @@
     "tsup": "^8.0.1",
     "tsx": "^4.6.2",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^1.2.2"
   },
   "dependencies": {
-    "@fastify/cors": "^8.5.0",
+    "@fastify/cors": "^9.0.1",
     "drizzle-orm": "^0.29.1",
     "drizzle-zod": "^0.5.1",
-    "fastify": "^4.25.2",
-    "mysql2": "^3.6.5",
-    "pino": "^8.17.2",
+    "fastify": "^4.26.0",
+    "mysql2": "^3.9.1",
+    "pino": "^8.18.0",
     "redis": "^4.6.12",
     "zod": "^3.22.4"
   }
