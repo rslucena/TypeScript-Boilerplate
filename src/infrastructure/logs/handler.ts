@@ -38,7 +38,7 @@ const files: references['file'] = {
   },
 }
 
-const console: references['console'] = {
+const terminal: references['console'] = {
   error: (message, props, exit) => console.debug({ message, props }, exit),
   warn: (props, message?) => console.debug({ ...props, message }, false),
   info: (props) => console.debug(props, false),
@@ -50,7 +50,7 @@ const console: references['console'] = {
 
 export const Logs: references = {
   file: files,
-  console: console,
+  console: terminal,
 }
 
 export default Logs
