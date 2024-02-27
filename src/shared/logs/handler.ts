@@ -25,31 +25,32 @@ export const loghandler = pino({
   },
 })
 
+const files: references['file'] = {
+  error: (message, props, exit) => {
+    loghandler.error(props, message)
+    if (exit) process.emit('SIGTERM')
+  },
+  warn: (props, message?) => loghandler.warn(props, message),
+  info: (props) => loghandler.info(props),
+  debug: (props, exit?) => {
+    loghandler.debug(props)
+    if (exit) process.emit('SIGTERM')
+  },
+}
+
+const console: references['console'] = {
+  error: (message, props, exit) => console.debug({ message, props }, exit),
+  warn: (props, message?) => console.debug({ ...props, message }, false),
+  info: (props) => console.debug(props, false),
+  debug: (props, exit?) => {
+    console.debug(props)
+    if (exit) process.emit('SIGTERM')
+  },
+}
+
 export const Logs: references = {
-  file: {
-    error: (message, props, exit) => {
-      loghandler.error(props, message)
-      if (exit) process.emit('SIGTERM')
-    },
-    warn: (props, message?) => loghandler.warn(props, message),
-    info: (props) => loghandler.info(props),
-    debug: (props, exit?) => {
-      loghandler.debug(props)
-      if (exit) process.emit('SIGTERM')
-    },
-  },
-  console: {
-    error: (message, props, exit) => {
-      console.debug(message, props)
-      if (exit) process.emit('SIGTERM')
-    },
-    warn: (props, message?) => console.debug(props, message),
-    info: (props) => console.debug(props),
-    debug: (props, exit?) => {
-      console.debug(props)
-      if (exit) process.emit('SIGTERM')
-    },
-  },
+  file: files,
+  console: console,
 }
 
 export default Logs
