@@ -1,4 +1,4 @@
-import webserver from '@shared/server/web'
+import webserver from '@infrastructure/server/web'
 ;(async () => {
   await webserver()
 })()

@@ -1,4 +1,4 @@
-import { identifier } from '@shared/repositories/references'
+import { identifier } from '@infrastructure/repositories/references'
 import { mysqlTable, varchar } from 'drizzle-orm/mysql-core'
 
 const columns = {

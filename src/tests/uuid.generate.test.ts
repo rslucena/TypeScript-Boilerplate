@@ -1,4 +1,4 @@
-import { uuid } from '@shared/repositories/references'
+import { uuid } from '@infrastructure/repositories/references'
 import { describe, expect, it } from 'vitest'
 
 describe('Test cache functions', () => {

@@ -1,6 +1,6 @@
 import fastifyCors from '@fastify/cors'
-import Logs, { loghandler } from '@shared/logs/handler'
-import cors from '@shared/settings/cors'
+import Logs, { loghandler } from '@infrastructure/logs/handler'
+import cors from '@infrastructure/settings/cors'
 import fastify from 'fastify'
 
 export default async function () {

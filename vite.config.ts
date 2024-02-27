@@ -25,7 +25,7 @@ export default ({ mode }) => {
           replacement: resolve(__dirname, './src/domain'),
         },
         {
-          find: '@shared',
+          find: '@infrastructure',
           replacement: resolve(__dirname, './src/shared'),
         },
         {
