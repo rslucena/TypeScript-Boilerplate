@@ -7,3 +7,5 @@ interface actions {
 interface messages {
   redis: actions
 }
+
+export default messages

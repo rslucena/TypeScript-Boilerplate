@@ -1,4 +1,5 @@
 import { publisher, subscriber } from './connections'
+import messages from './interface'
 
 const queues: messages['redis'] = {
   ping: async () => await subscriber.ping(),
