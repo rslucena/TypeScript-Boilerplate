@@ -3,29 +3,30 @@ import { actions } from './interfaces'
 
 const cache: actions = {
   text: {
-    del: (key) => client.del(key),
-    get: (key) => client.get(key).catch(() => null),
-    set: (key, vals, ttl) => set('text', key, vals, ttl),
+    del: (hash) => client.del(hash),
+    get: (hash) => client.get(hash).catch(() => null),
+    set: (hash, vals, ttl) => set('text', hash, vals, ttl).catch(() => ''),
   },
   json: {
-    del: (key) => client.json.del(key),
-    get: (key) => client.json.get(key).catch(() => null),
-    set: (key, vals, ttl) => set('json', key, vals, ttl),
+    del: (hash) => client.json.del(hash),
+    get: (hash) => client.json.get(hash).catch(() => null),
+    set: (hash, vals, ttl, key) => set('json', hash, vals, ttl, key).catch(() => ''),
   },
   ping: () => client.ping(),
 }
 
 async function set(
   type: 'json' | 'text',
-  key: string,
+  hash: string,
   vals: any,
-  ttl?: number
+  ttl?: number,
+  key?: string
 ): Promise<string | null> {
   const actions = {
-    text: () => client.set(key, vals),
-    json: () => client.json.set(key, '$', vals),
+    text: () => client.set(hash, vals),
+    json: () => client.json.set(hash, key ?? '$', vals),
   }
-  if (ttl) client.expire(key, ttl)
+  if (ttl) client.expire(hash, ttl)
   return actions[type]()
 }
 

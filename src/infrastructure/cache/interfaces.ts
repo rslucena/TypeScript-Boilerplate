@@ -1,7 +1,7 @@
 export interface functions {
-  set: (key: string, vals: any, ttl?: number) => Promise<string | null>
-  get: (Key: string, Force?: boolean) => Promise<any | null>
-  del: (key: string) => Promise<number>
+  set: (hash: string, vals: any, ttl?: number, key?: string) => Promise<string | null>
+  get: (hash: string, Force?: boolean) => Promise<any | null>
+  del: (hash: string) => Promise<number>
 }
 
 export interface actions {
