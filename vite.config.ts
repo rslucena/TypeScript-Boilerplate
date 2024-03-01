@@ -26,7 +26,7 @@ export default ({ mode }) => {
         },
         {
           find: '@infrastructure',
-          replacement: resolve(__dirname, './src/shared'),
+          replacement: resolve(__dirname, './src/infrastructure'),
         },
         {
           find: '@tests',
