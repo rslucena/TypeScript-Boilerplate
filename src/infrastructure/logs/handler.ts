@@ -2,10 +2,9 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import pino from 'pino'
 import { fileURLToPath } from 'url'
-import references from './references'
+import actions from './interfaces'
 
 const folder = `${join(dirname(fileURLToPath(import.meta.url)), '..')}/temp/logs/`
-
 existsSync(folder) ? undefined : mkdirSync(folder)
 existsSync(folder) ? undefined : writeFileSync(`${folder}/webserver.log`, '')
 
@@ -25,7 +24,7 @@ export const loghandler = pino({
   },
 })
 
-const files: references['file'] = {
+const files: actions['file'] = {
   error: (message, props, exit) => {
     loghandler.error(props, message)
     if (exit) process.emit('SIGTERM')
@@ -38,7 +37,7 @@ const files: references['file'] = {
   },
 }
 
-const terminal: references['console'] = {
+const terminal: actions['console'] = {
   error: (message, props, exit) => console.debug({ message, props }, exit),
   warn: (props, message?) => console.debug({ ...props, message }, false),
   info: (props) => console.debug(props, false),
@@ -48,7 +47,7 @@ const terminal: references['console'] = {
   },
 }
 
-export const Logs: references = {
+export const Logs: actions = {
   file: files,
   console: terminal,
 }
