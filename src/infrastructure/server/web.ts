@@ -15,7 +15,7 @@ export default async function () {
 
   web.register(fastifyCors, cors)
 
-  web.get('/', (_request, reply) => reply.code(401).send())
+  web.setNotFoundHandler((_request, reply) => reply.code(503).send())
 
   web.get<{ Querystring: { domain: string } }>('/ping/:domain', (_request, reply) => {
     reply.code(200).send({ pong: 'it worked!' })
