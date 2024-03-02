@@ -1,4 +1,4 @@
-# Template/Boilerplate
+# TypeScript Boilerplate
 
 Minimalistic project template/boilerplate to jump start a Node.js back-end application in TypeScript.
 
