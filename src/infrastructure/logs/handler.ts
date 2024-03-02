@@ -40,7 +40,7 @@ const files: actions['file'] = {
 const terminal: actions['console'] = {
   error: (message, props, exit) => console.debug({ message, props }, exit),
   warn: (props, message?) => console.debug({ ...props, message }, false),
-  info: (props) => console.debug(props, false),
+  info: (props) => console.debug(props),
   debug: (props, exit?) => {
     console.debug(props)
     if (exit) process.emit('SIGTERM')
