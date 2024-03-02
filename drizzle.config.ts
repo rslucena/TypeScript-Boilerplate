@@ -1,11 +1,11 @@
 import type { Config } from 'drizzle-kit'
-import connection from './src/shared/repositories/connection'
+import connection from './src/infrastructure/repositories/connection'
 
 export default {
-  schema: './src/shared/schemas/*',
-  out: './src/shared/migrations',
+  schema: './src/infrastructure/schemas/*',
+  out: './src/infrastructure/migrations',
   driver: 'mysql2',
   dbCredentials: connection,
   strict: true,
-  verbose: true
+  verbose: true,
 } satisfies Config
