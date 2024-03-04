@@ -1,6 +1,9 @@
+import { Logger } from 'pino'
+
 export default interface actions {
   console: methods
   file: methods
+  provider: Logger<never>
 }
 
 interface methods {

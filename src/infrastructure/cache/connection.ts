@@ -1,3 +1,4 @@
+import Logs from '@infrastructure/logs/handler'
 import { RedisClientOptions, createClient } from 'redis'
 
 const connection: RedisClientOptions = {
@@ -11,7 +12,7 @@ const connection: RedisClientOptions = {
 }
 
 const client = createClient(connection)
-client.on('error', (err) => console.debug('Redis Client Error', err))
+client.on('error', (err) => Logs.console.error('Redis Client Error', err, true))
 
 await client.connect()
 

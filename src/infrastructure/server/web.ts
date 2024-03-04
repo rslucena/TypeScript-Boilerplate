@@ -1,6 +1,6 @@
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
-import Logs, { loghandler } from '@infrastructure/logs/handler'
+import Logs from '@infrastructure/logs/handler'
 import cors from '@infrastructure/settings/cors'
 import helmet from '@infrastructure/settings/helmet'
 import fastify from 'fastify'
@@ -8,7 +8,7 @@ import fastify from 'fastify'
 export default async function () {
   //
   const web = fastify({
-    logger: loghandler,
+    logger: Logs.provider,
     caseSensitive: true,
     pluginTimeout: 20_000,
     requestTimeout: 20_000,
@@ -22,7 +22,7 @@ export default async function () {
   web.setNotFoundHandler((_request, reply) => reply.code(503).send())
 
   web.get<{ Querystring: { domain: string } }>('/ping/:domain', (_request, reply) => {
-    reply.code(200).send({ pong: 'it worked!' })
+    reply.code(200).send()
   })
 
   web.listen({ port: Number(process.env.APP_PORT), host: '0.0.0.0' }, (err, anddress) => {

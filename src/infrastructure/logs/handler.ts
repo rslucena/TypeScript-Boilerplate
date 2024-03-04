@@ -8,15 +8,13 @@ const folder = `${join(dirname(fileURLToPath(import.meta.url)), '..')}/temp/logs
 existsSync(folder) ? undefined : mkdirSync(folder)
 existsSync(folder) ? undefined : writeFileSync(`${folder}/webserver.log`, '')
 
-export const loghandler = pino({
+export const handler = pino({
   level: process.env.LOG_LEVEL,
   redact: ['headers.authorization'],
   enabled: process.env.SHOW_LOG === 'true',
-  timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
+  timestamp: () => `,"time":"${new Date().toISOString()}"`,
   formatters: {
-    bindings: (bindings) => {
-      return { ...bindings, node_version: process.versions.node }
-    },
+    bindings: (bindings) => ({ ...bindings, node_version: process.versions.node }),
   },
   transport: {
     target: 'pino/file',
@@ -26,13 +24,13 @@ export const loghandler = pino({
 
 const files: actions['file'] = {
   error: (message, props, exit) => {
-    loghandler.error(props, message)
+    handler.error(props, message)
     if (exit) process.emit('SIGTERM')
   },
-  warn: (props, message?) => loghandler.warn(props, message),
-  info: (props) => loghandler.info(props),
+  warn: (props, message?) => handler.warn(props, message),
+  info: (props) => handler.info(props),
   debug: (props, exit?) => {
-    loghandler.debug(props)
+    handler.debug(props)
     if (exit) process.emit('SIGTERM')
   },
 }
@@ -50,6 +48,7 @@ const terminal: actions['console'] = {
 export const Logs: actions = {
   file: files,
   console: terminal,
+  provider: handler,
 }
 
 export default Logs
