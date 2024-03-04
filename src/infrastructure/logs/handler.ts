@@ -4,7 +4,7 @@ import pino from 'pino'
 import { fileURLToPath } from 'url'
 import actions from './interfaces'
 
-const folder = `${join(dirname(fileURLToPath(import.meta.url)), '..')}/temp/logs/`
+const folder = `${join(dirname(fileURLToPath(import.meta.url)), '..', '..')}/temp/logs/`
 existsSync(folder) ? undefined : mkdirSync(folder)
 existsSync(folder) ? undefined : writeFileSync(`${folder}/webserver.log`, '')
 
