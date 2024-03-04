@@ -1,6 +1,8 @@
 import fastifyCors from '@fastify/cors'
+import fastifyHelmet from '@fastify/helmet'
 import Logs, { loghandler } from '@infrastructure/logs/handler'
 import cors from '@infrastructure/settings/cors'
+import helmet from '@infrastructure/settings/helmet'
 import fastify from 'fastify'
 
 export default async function () {
@@ -14,6 +16,8 @@ export default async function () {
   })
 
   web.register(fastifyCors, cors)
+
+  web.register(fastifyHelmet, helmet)
 
   web.setNotFoundHandler((_request, reply) => reply.code(503).send())
 
