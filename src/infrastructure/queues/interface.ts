@@ -4,8 +4,14 @@ interface actions {
   pub(topic: string, value: any): Promise<void | number>
 }
 
-interface messages {
-  redis: actions
+interface eventemitter {
+  sub(topic: string, callback: (snapshot: any, topic?: string) => Promise<void>): void
+  pub(topic: string, value: any): number
 }
 
-export default messages
+interface triggers {
+  events: eventemitter
+  messages: actions
+}
+
+export default triggers
