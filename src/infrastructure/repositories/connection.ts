@@ -1,9 +1,11 @@
+import isProd from '@infrastructure/settings/env'
+
 const connection = {
-  database: String(process.env.MYSQL_DATABASE),
-  host: String(process.env.MYSQL_SERVER),
-  password: process.env.MYSQL_PASSWORD,
   port: 3306,
-  user: process.env.MYSQL_USER,
+  host: String(process.env.MYSQL_SERVER),
+  password: String(process.env.MYSQL_PASSWORD),
+  user: isProd() ? String(process.env.MYSQL_USER) : 'shadow',
+  database: isProd() ? String(process.env.MYSQL_DATABASE) : 'shadow',
 }
 
 export default connection
