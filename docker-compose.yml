@@ -6,7 +6,7 @@ services:
     ports:
       - '6379:6379'
     environment:
-      REDIS_PASSWORD: ${REDIS_PASS}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - ./.docker/redis/storage:/data
       - ./.docker/redis/modules:/usr/lib/redis/modules
@@ -23,9 +23,9 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ALLOW_EMPTY_PASSWORD: false
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - ./.docker/mysql/scripts:/docker-entrypoint-initdb.d/
       - ./.docker/mysql/storage:/var/lib/mysql:rw
       - ./.docker/mysql/logs:/var/lib/mysql-logs:rw
 
