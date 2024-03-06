@@ -26,6 +26,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: false
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
+      - ./.docker/mysql/scripts:/docker-entrypoint-initdb.d:rw
       - ./.docker/mysql/storage:/var/lib/mysql:rw
       - ./.docker/mysql/logs:/var/lib/mysql-logs:rw
 
