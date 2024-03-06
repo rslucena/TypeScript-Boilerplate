@@ -5,6 +5,7 @@
     "sourceMap": true,
     "target": "es2022",
     "module": "es2022",
+    "declaration": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
@@ -12,9 +13,9 @@
     "paths": {
       "@domain/*": ["./src/domain/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
-      "@tests/*": ["./src/tests/*"],
-    },
+      "@tests/*": ["./src/tests/*"]
+    }
   },
   "include": ["src"],
-  "exclude": ["node_modules/**", ".docker/**", ".git/**", ".github/**", ".vscode/**", "dist/**"],
+  "exclude": ["node_modules/**", ".docker/**", ".git/**", ".github/**", ".vscode/**", "dist/**"]
 }
