@@ -1,5 +1,8 @@
+import { Type } from '@sinclair/typebox'
 import * as crypto from 'crypto'
-import { boolean, int, timestamp } from 'drizzle-orm/mysql-core'
+import { boolean, int, mysqlSchema, timestamp } from 'drizzle-orm/mysql-core'
+
+export const dbschema = mysqlSchema(process.env.NODE_ENV === 'production' ? 'main' : 'shadow')
 
 const identifier = {
   id: int('id').autoincrement().primaryKey(),
@@ -8,6 +11,14 @@ const identifier = {
   updatedAt: timestamp('updated_at').onUpdateNow(),
   deleteAt: timestamp('delete_at'),
 }
+
+const typeBoxIdentifier = Type.Object({
+  id: Type.Integer(),
+  activated: Type.Boolean(),
+  createdAt: Type.Optional(Type.String({ format: 'date-time' })),
+  updatedAt: Type.Optional(Type.String({ format: 'date-time' })),
+  deleteAt: Type.Optional(Type.String({ format: 'date-time' })),
+})
 
 function hash(data: string | object) {
   if (typeof data === 'string') {
@@ -34,4 +45,4 @@ function uuid(): string {
   return parts.join('-')
 }
 
-export { hash, identifier, uuid }
+export { hash, identifier, typeBoxIdentifier, uuid }
