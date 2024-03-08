@@ -1,10 +1,9 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs'
-import { dirname, join } from 'path'
+import * as path from 'path'
 import pino from 'pino'
-import { fileURLToPath } from 'url'
 import actions from './interfaces'
 
-const folder = `${join(dirname(fileURLToPath(import.meta.url)), '..', '..')}/temp/logs/`
+const folder = `${path.resolve('./src')}/temp/logs/`
 existsSync(folder) ? undefined : mkdirSync(folder)
 existsSync(folder) ? undefined : writeFileSync(`${folder}/webserver.log`, '')
 

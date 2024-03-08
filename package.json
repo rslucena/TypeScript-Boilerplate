@@ -5,7 +5,7 @@
   "main": "/dist/index.js",
   "license": "MIT",
   "engines": {
-    "npm": ">=10.0.0",
+    "npm": ">=10.5.0",
     "node": ">=20.0.0"
   },
   "scripts": {
@@ -14,12 +14,13 @@
     "build": "npm run format && tsup src",
     "format": "eslint --fix && prettier ./src/**/* --write --check --config ./.prettierrc",
     "dev": "tsx watch --env-file=.env src/index.ts",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "start": "node --env-file=.env -r tsconfig-paths/register dist/index.js",
     "db:push": "drizzle-kit push:mysql",
     "db:migration": "drizzle-kit generate:mysql",
     "db:studio": "npx drizzle-kit studio --host localhost"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.24",
     "drizzle-kit": "^0.20.14",
     "eslint": "^8.57.0",
@@ -38,6 +39,7 @@
     "@fastify/helmet": "^11.1.1",
     "@fastify/type-provider-typebox": "^4.0.0",
     "@sinclair/typebox": "^0.32.15",
+    "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.29.4",
     "drizzle-typebox": "^0.1.1",
     "fastify": "^4.26.2",
