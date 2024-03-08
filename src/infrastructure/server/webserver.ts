@@ -30,7 +30,8 @@ function start(instance: server): void {
     if (!err) return
     Logs.console.error(err.message, err, true)
   })
-  instance.listen({ port: Number(process.env.APP_PORT), host: '0.0.0.0' }, (err, address) => {
+
+  instance.listen({ port: Number(process.env.PROCESS_PORT), host: '0.0.0.0' }, (err, address) => {
     if (err) Logs.file.error(err.message, err, true)
     Logs.console.info(`Server listening on ${address}`)
     Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`)
