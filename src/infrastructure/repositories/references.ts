@@ -7,17 +7,22 @@ export const dbschema = mysqlSchema(process.env.NODE_ENV === 'production' ? 'mai
 const identifier = {
   id: int('id').autoincrement().primaryKey(),
   activated: boolean('activated').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').onUpdateNow(),
-  deleteAt: timestamp('delete_at'),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).onUpdateNow(),
+  deleteAt: timestamp('delete_at', { mode: 'string' }),
 }
 
 const typeBoxIdentifier = Type.Object({
   id: Type.Integer(),
   activated: Type.Boolean(),
-  createdAt: Type.Optional(Type.String({ format: 'date-time' })),
-  updatedAt: Type.Optional(Type.String({ format: 'date-time' })),
-  deleteAt: Type.Optional(Type.String({ format: 'date-time' })),
+  createdAt: Type.Optional(Type.Number()),
+  updatedAt: Type.Optional(Type.Number()),
+  deleteAt: Type.Optional(Type.Number()),
+})
+
+const withPagination = Type.Object({
+  page: Type.Integer({ default: 0, minimum: 0 }),
+  pageSize: Type.Integer({ default: 10, minimum: 1, maximum: 15 }),
 })
 
 function hash(data: string | object) {
@@ -45,4 +50,4 @@ function uuid(): string {
   return parts.join('-')
 }
 
-export { hash, identifier, typeBoxIdentifier, uuid }
+export { hash, identifier, typeBoxIdentifier, uuid, withPagination }
