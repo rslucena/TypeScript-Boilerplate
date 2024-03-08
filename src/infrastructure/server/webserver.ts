@@ -4,21 +4,8 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Logs from '@infrastructure/logs/handler'
 import cors from '@infrastructure/settings/cors'
 import helmet from '@infrastructure/settings/helmet'
-import fastify, {
-  FastifyInstance,
-  RawReplyDefaultExpression,
-  RawRequestDefaultExpression,
-  RawServerDefault,
-} from 'fastify'
-import { Logger } from 'pino'
-
-type server = FastifyInstance<
-  RawServerDefault,
-  RawRequestDefaultExpression<RawServerDefault>,
-  RawReplyDefaultExpression<RawServerDefault>,
-  Logger<never>,
-  TypeBoxTypeProvider
->
+import fastify from 'fastify'
+import { server } from './interface'
 
 async function webserver(): Promise<server> {
   const instance = fastify({
@@ -39,10 +26,14 @@ async function webserver(): Promise<server> {
 }
 
 function start(instance: server): void {
+  instance.ready((err) => {
+    if (!err) return
+    Logs.console.error(err.message, err, true)
+  })
   instance.listen({ port: Number(process.env.APP_PORT), host: '0.0.0.0' }, (err, address) => {
     if (err) Logs.file.error(err.message, err, true)
     Logs.console.info(`Server listening on ${address}`)
-    Logs.console.info(`${instance.printRoutes()}`)
+    Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`)
   })
 }
 
