@@ -17,11 +17,12 @@ const cache: actions = {
 
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
   const actions = {
-    text: () => client.set(hash, vals),
-    json: () => client.json.set(hash, key ?? '$', vals),
+    text: async () => await client.set(hash, vals),
+    json: async () => await client.json.set(hash, key ?? '$', vals),
   }
-  if (ttl) client.expire(hash, ttl)
-  return actions[type]()
+  const action = actions[type]()
+  if (ttl) await client.expire(hash, ttl)
+  return action
 }
 
 export default cache
