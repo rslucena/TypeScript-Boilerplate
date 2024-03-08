@@ -1,4 +1,5 @@
 import { Type } from '@sinclair/typebox'
+import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { boolean, int, mysqlSchema, timestamp } from 'drizzle-orm/mysql-core'
 
@@ -25,29 +26,14 @@ const withPagination = Type.Object({
   pageSize: Type.Integer({ default: 10, minimum: 1, maximum: 15 }),
 })
 
-function hash(data: string | object) {
-  if (typeof data === 'string') {
-    const crypt = crypto.createHash('sha1')
-    crypt.update(data)
-    return crypt.digest('hex').slice(0, 32)
-  }
-  const crypt = crypto.createHash('sha1')
-  crypt.update(JSON.stringify(data))
-  return crypt.digest('hex').slice(0, 32)
+function hash(data: string | object, compare?: string) {
+  if (typeof data !== 'string') data = JSON.stringify(data)
+  if (compare) return bcrypt.compareSync(data, compare) ? 'OK' : ''
+  return bcrypt.hashSync(data, 10)
 }
 
 function uuid(): string {
-  const bytes = crypto.randomBytes(16)
-  bytes[6] = (bytes[6] & 0x0f) | 0x40
-  bytes[8] = (bytes[8] & 0x3f) | 0x80
-  const parts = [
-    bytes.readUInt32BE(0).toString(16).padStart(8, '0'),
-    bytes.readUInt16BE(4).toString(16).padStart(4, '0'),
-    bytes.readUInt16BE(6).toString(16).padStart(4, '0'),
-    bytes.readUInt16BE(8).toString(16).padStart(4, '0'),
-    bytes.readUInt32BE(10).toString(16).padStart(8, '0'),
-  ]
-  return parts.join('-')
+  return crypto.randomUUID()
 }
 
 export { hash, identifier, typeBoxIdentifier, uuid, withPagination }
