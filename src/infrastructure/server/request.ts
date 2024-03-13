@@ -77,28 +77,30 @@ export class container {
 
 function execute(
   callback: CallableFunction,
-  restricted = false
+  isRestricted = false
 ): (request: FastifyRequest, reply: FastifyReply) => Promise<void> {
-  return async (rq: FastifyRequest, rp: FastifyReply): Promise<void> => {
+  return async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const form = new container({
-      raw: rq.raw,
-      headers: rq.headers,
-      query: rq.query,
-      body: rq.body,
-      params: rq.params,
-      status: rp.statusCode,
+      raw: req.raw,
+      headers: req.headers,
+      query: req.query,
+      body: req.body,
+      params: req.params,
+      status: reply.statusCode,
     })
-    let resp = form.badRequest()
-    if (restricted) form.session({})
+    let resp: any = form.badRequest()
+    if (isRestricted) form.session({})
     try {
+      console.log(form.status())
       resp = await callback(form)
-    } catch (err: unknown | any) {
-      console.log(err)
-      if (typeof err === 'object') resp = err
-      else resp.message = err
+      console.log(form.status())
+      console.log(resp)
+    } catch (error) {
+      if (typeof error === 'object') resp = error
+      else resp.message = error
     }
-    return rp
-      .headers(form.headers() || rp.headers)
+    return reply
+      .headers(form.headers() || reply.headers)
       .code(form.status())
       .send(resp)
   }
