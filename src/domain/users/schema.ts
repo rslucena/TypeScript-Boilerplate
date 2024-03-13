@@ -1,4 +1,5 @@
-import { Array, Capitalize, Omit, Partial, Pick, String } from '@sinclair/typebox'
+import { withPagination } from '@infrastructure/repositories/references'
+import { Array, Capitalize, Intersect, Omit, Partial, Pick, String } from '@sinclair/typebox'
 import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
 import users from './entity'
 
@@ -15,7 +16,7 @@ const entity = {
   id: Pick(select, ['id']),
   create: Omit(create, ['id']),
   update: Partial(Omit(create, ['id'])),
-  find: Partial(Omit(select, ['id', 'password'])),
+  find: Omit(Intersect([Partial(select), withPagination]), ['id', 'password']),
   response: Array(Omit(select, ['password'])),
 }
 

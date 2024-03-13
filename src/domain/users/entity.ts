@@ -1,5 +1,5 @@
-import { dbschema, identifier } from '@infrastructure/repositories/references'
-import { varchar } from 'drizzle-orm/mysql-core'
+import { identifier } from '@infrastructure/repositories/references'
+import { pgTable, varchar } from 'drizzle-orm/pg-core'
 
 const columns = {
   name: varchar('name', { length: 50 }).notNull(),
@@ -8,6 +8,6 @@ const columns = {
   password: varchar('password', { length: 100 }).notNull(),
 }
 
-const user = dbschema.table('user', { ...columns, ...identifier })
+const user = pgTable('user', { ...columns, ...identifier })
 
 export default user

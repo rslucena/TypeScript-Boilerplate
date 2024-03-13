@@ -19,7 +19,7 @@ export default async function findById(
     .where(eq(user.id, sql.placeholder('id')))
     .limit(1)
     .orderBy(desc(user.id))
-    .prepare()
+    .prepare('findById')
   const content = await prepare.execute({ id })
   if (!content.length) throw request.notFound('User:Id')
   await cache.json.set(hash(`user:findById:${id}`), content, 60 * 60 * 24)

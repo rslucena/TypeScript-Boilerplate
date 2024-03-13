@@ -14,7 +14,7 @@ export default async function createAuth(request: container) {
     .where(eq(user.email, sql.placeholder('email')))
     .limit(1)
     .orderBy(desc(user.id))
-    .prepare()
+    .prepare('createAuth')
   const content = await prepare.execute({ email })
   if (!content.length) throw request.notFound('User:Auth')
   if (!hash(password, content[0].password)) throw request.notFound('User:Auth')

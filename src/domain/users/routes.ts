@@ -2,6 +2,7 @@ import request from '@infrastructure/server/request'
 import { FastifyInstance } from 'fastify'
 import createAuth from './actions/createAuth'
 import createUser from './actions/createUser'
+import find from './actions/find'
 import findById from './actions/findById'
 import schema from './schema'
 
@@ -16,6 +17,16 @@ export default async function users(api: FastifyInstance) {
       },
     },
     request.restricted(findById)
+  )
+  api.get(
+    '/users',
+    {
+      schema: {
+        params: schema.entity.find,
+        response: { 200: schema.entity.response },
+      },
+    },
+    request.restricted(find)
   )
   api.post(
     '/users/auth',
