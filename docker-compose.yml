@@ -3,33 +3,29 @@ services:
   redis:
     image: redis/redis-stack-server:latest
     container_name: ${REDIS_NAME}
-    ports:
-      - '6379:6379'
+    restart: always
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - '6379:6379'
     volumes:
       - ./.docker/redis/storage:/data
       - ./.docker/redis/modules:/usr/lib/redis/modules
+  postgres:
+    image: postgres:latest
+    container_name: ${POSTGRES_NAME}
     restart: always
-
-  mysql:
-    image: mysql:latest
-    container_name: ${MYSQL_NAME}
-    restart: always
-    command: '--character-set-server=utf8mb4'
-    ports:
-      - '3306:3306'
+    command: postgres -c listen_addresses='*'
     environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ALLOW_EMPTY_PASSWORD: false
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
     volumes:
-      - ./.docker/mysql/scripts:/docker-entrypoint-initdb.d:rw
-      - ./.docker/mysql/storage:/var/lib/mysql:rw
-      - ./.docker/mysql/logs:/var/lib/mysql-logs:rw
-
+      - ./.docker/postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./.docker/postgres/storage:/var/lib/postgresql/data
 networks:
   default:
     driver: bridge

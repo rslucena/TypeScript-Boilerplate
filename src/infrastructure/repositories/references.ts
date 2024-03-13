@@ -1,15 +1,13 @@
 import { Type } from '@sinclair/typebox'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
-import { boolean, int, mysqlSchema, timestamp } from 'drizzle-orm/mysql-core'
-
-export const dbschema = mysqlSchema(process.env.NODE_ENV === 'production' ? 'main' : 'shadow')
+import { boolean, serial, timestamp } from 'drizzle-orm/pg-core'
 
 const identifier = {
-  id: int('id').autoincrement().primaryKey(),
+  id: serial('id').primaryKey().unique().notNull(),
   activated: boolean('activated').default(true).notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' }).onUpdateNow(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }),
   deleteAt: timestamp('delete_at', { mode: 'string' }),
 }
 
@@ -22,8 +20,8 @@ const typeBoxIdentifier = Type.Object({
 })
 
 const withPagination = Type.Object({
-  page: Type.Integer({ default: 0, minimum: 0 }),
-  pageSize: Type.Integer({ default: 10, minimum: 1, maximum: 15 }),
+  page: Type.Number({ default: 1, minimum: 1 }),
+  pageSize: Type.Number({ default: 1, minimum: 1, maximum: 15 }),
 })
 
 function hash(data: string | object, compare?: string) {
@@ -36,4 +34,12 @@ function uuid(): string {
   return crypto.randomUUID()
 }
 
-export { hash, identifier, typeBoxIdentifier, uuid, withPagination }
+function collection(action: string, props: { [Key: string]: any }): string {
+  const colletion = []
+  for (const [Key, Value] of Object.entries(props)) {
+    if (Value) colletion.push(`${Key}:${Value}`)
+  }
+  return action + '/' + colletion.join('/')
+}
+
+export { collection, hash, identifier, typeBoxIdentifier, uuid, withPagination }

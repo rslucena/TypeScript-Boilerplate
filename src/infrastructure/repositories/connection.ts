@@ -1,13 +1,9 @@
-import isProd from '@infrastructure/settings/env'
-
 const connection = {
-  port: 3306,
-  host: String(process.env.MYSQL_SERVER),
-  password: String(process.env.MYSQL_PASSWORD),
-  user: isProd() ? String(process.env.MYSQL_MAIN_USER) : String(process.env.MYSQL_SHADOW_USER),
-  database: isProd()
-    ? String(process.env.MYSQL_MAIN_DATABASE)
-    : String(process.env.MYSQL_SHADOW_DATABASE),
+  port: 5432,
+  host: String(process.env.POSTGRES_SERVER),
+  password: String(process.env.POSTGRES_PASSWORD),
+  username: String(process.env.POSTGRES_USER),
+  database: String(process.env.POSTGRES_DATABASE),
 }
 
 export default connection
