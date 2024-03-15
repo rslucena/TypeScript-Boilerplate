@@ -90,19 +90,23 @@ function execute(
       params: req.params,
       status: reply.statusCode,
     })
+
     let resp: any = form.badRequest()
     if (isRestricted) form.session({})
+
     try {
       resp = await callback(form)
     } catch (error) {
       if (typeof error === 'object') resp = error
       else resp.message = error
     }
-    if (resp.statusCode) form.status(resp.statusCode)
+
+    if (resp && resp.statusCode) form.status(resp.statusCode)
+
     return reply
-      .headers(form.headers() || reply.headers)
+      .headers(form.headers())
       .code(form.status())
-      .send(resp)
+      .send(resp ?? '')
   }
 }
 
