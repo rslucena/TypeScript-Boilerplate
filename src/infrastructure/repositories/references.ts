@@ -2,6 +2,7 @@ import { Type } from '@sinclair/typebox'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { boolean, serial, timestamp } from 'drizzle-orm/pg-core'
+import typeEvents from './interface'
 
 const identifier = {
   id: serial('id').primaryKey().unique().notNull(),
@@ -34,12 +35,14 @@ function uuid(): string {
   return crypto.randomUUID()
 }
 
-function collection(action: string, props: { [Key: string]: any }): string {
-  const colletion = []
-  for (const [Key, Value] of Object.entries(props)) {
-    if (Value) colletion.push(`${Key}:${Value}`)
-  }
-  return action + '/' + colletion.join('/')
+function collection(
+  domain: string,
+  conditions: { [key: string]: any } = {},
+  action: typeEvents = 'value'
+): string {
+  let collection = `${action}/${domain}/`
+  for (const [key, value] of Object.entries(conditions)) collection += `${key}:${value}/`
+  return collection.toLowerCase().trim()
 }
 
 export { collection, hash, identifier, typeBoxIdentifier, uuid, withPagination }
