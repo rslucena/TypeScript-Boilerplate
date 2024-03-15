@@ -1,0 +1,32 @@
+name: Report bug
+description: Report a problem or behavior that is different from what was expected.
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a new issue, do some [search](https://github.com/rslucena/TypeScript-Boilerplate/issues) to ensure you are not reporting a duplicate issue. If you find an equivalent issue, contribute additional information if necessary.
+  - type: textarea
+    attributes:
+      label: Description
+      description: What type of problem did you encounter? Please describe it clearly and add images if applicable.
+      placeholder: I found a problem... when I was trying...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce the issue
+      description: What steps are necessary for someone else to encounter the same problem?
+      placeholder: |
+        1. The route...
+        2. in method...
+        3. Façawith parameters...
+        4. with debugging paused on...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Possible solution
+      description: Have you thought of anything that can solve this problem? If so, share below.
+      placeholder: |
+        Instead of... we can change... to...

@@ -1,0 +1,29 @@
+name: Ask a question
+description: Have any questions about the repository, code or implementation? Ask a question.
+labels: ['question']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a new issue, do some [search](https://github.com/rslucena/TypeScript-Boilerplate/issues) to ensure you are not reporting a duplicate issue. If you find an equivalent issue, contribute additional information if necessary.
+  - type: dropdown
+    attributes:
+      label: Subject
+      description: What is the subject of your question?
+      multiple: true
+      options:
+        - API
+        - Code
+        - Repository
+        - Contribution
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Question
+      description: What's your question? Be clear and provide relevant information so that other people can help you.
+      placeholder: |
+        I'm having trouble understanding...
+    validations:
+      required: true
