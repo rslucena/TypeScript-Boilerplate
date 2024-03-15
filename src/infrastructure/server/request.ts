@@ -1,7 +1,35 @@
+import { Type } from '@sinclair/typebox'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { guise } from './interface'
 
-export class container {
+export class error {
+  notFound(resource?: string) {
+    return {
+      statusCode: 404,
+      code: 'ERR_VALIDATION',
+      error: `Not Found ${resource || ''}`,
+      message: 'The requested resource was not found.',
+    }
+  }
+  badRequest(resource?: string) {
+    return {
+      statusCode: 400,
+      code: 'ERR_REQUEST',
+      error: `Bad Request ${resource ?? ''}`,
+      message: 'Do not repeat this request without modification.',
+    }
+  }
+  unprocessableEntity(resource?: string) {
+    return {
+      statusCode: 422,
+      code: 'UNPROCESSABLE_ENTITY',
+      error: `Unprocessable Entity ${resource ?? ''}`,
+      message: 'The request was well-formed but unable to be followed due to semantic errors.',
+    }
+  }
+}
+
+export class container extends error {
   protected _status: guise['status']
   protected _raw: guise['raw']
   protected _session: guise['session']
@@ -10,6 +38,7 @@ export class container {
   protected _body: guise['body']
   protected _params: guise['params']
   constructor({ status, raw, session, headers, query, body, params }: guise = {}) {
+    super()
     this._status = status || 200
     this._raw = raw
     this._session = session
@@ -46,33 +75,6 @@ export class container {
     this._status = context || this._status
     return this._status ?? 200
   }
-  notFound(resource?: string) {
-    this._status = 404
-    return {
-      statusCode: 404,
-      code: 'ERR_VALIDATION',
-      error: `Not Found ${resource ?? ''}`,
-      message: 'The requested resource was not found.',
-    }
-  }
-  badRequest(resource?: string) {
-    this._status = 400
-    return {
-      statusCode: 400,
-      code: 'ERR_REQUEST',
-      error: `Bad Request ${resource ?? ''}`,
-      message: 'Do not repeat this request without modification.',
-    }
-  }
-  unprocessableEntity(resource?: string) {
-    this._status = 422
-    return {
-      statusCode: 422,
-      code: 'UNPROCESSABLE_ENTITY',
-      error: `Unprocessable Entity ${resource ?? ''}`,
-      message: 'The request was well-formed but unable to be followed due to semantic errors.',
-    }
-  }
 }
 
 function execute(
@@ -91,14 +93,12 @@ function execute(
     let resp: any = form.badRequest()
     if (isRestricted) form.session({})
     try {
-      console.log(form.status())
       resp = await callback(form)
-      console.log(form.status())
-      console.log(resp)
     } catch (error) {
       if (typeof error === 'object') resp = error
       else resp.message = error
     }
+    if (resp.statusCode) form.status(resp.statusCode)
     return reply
       .headers(form.headers() || reply.headers)
       .code(form.status())
@@ -106,7 +106,24 @@ function execute(
   }
 }
 
+const errorSchema = (code: number) =>
+  Type.Object({
+    statusCoded: Type.Number({ default: code }),
+    code: Type.String(),
+    error: Type.String(),
+    message: Type.String(),
+  })
+
 export default {
+  reply: {
+    schemas: {
+      400: errorSchema(400),
+      401: errorSchema(401),
+      404: errorSchema(404),
+      500: errorSchema(500),
+      503: errorSchema(503),
+    },
+  },
   restricted: (fn: CallableFunction) => execute(fn, true),
   noRestricted: (fn: CallableFunction) => execute(fn),
 }
