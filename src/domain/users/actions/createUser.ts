@@ -16,7 +16,7 @@ export default async function createUser(request: container) {
     })
     .onConflictDoNothing()
     .returning()
-  if (!content.length) throw request.unprocessableEntity('User:Id')
+  if (!content.length) throw request.unprocessableEntity(`/user/${params.email}`)
   request.status(201)
   return findById(new container({ params: { id: content[0].id } }))
 }
