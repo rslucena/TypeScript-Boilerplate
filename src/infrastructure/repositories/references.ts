@@ -1,11 +1,11 @@
 import { Type } from '@sinclair/typebox'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
-import { boolean, serial, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, uuid as puuid, timestamp } from 'drizzle-orm/pg-core'
 import typeEvents from './interface'
 
 const identifier = {
-  id: serial('id').primaryKey().unique().notNull(),
+  id: puuid('id').primaryKey().defaultRandom().unique().notNull(),
   activated: boolean('activated').default(true).notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string' }),
