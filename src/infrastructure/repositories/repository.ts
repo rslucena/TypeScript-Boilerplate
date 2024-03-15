@@ -9,26 +9,15 @@ export function withPagination<T extends PgSelect>(qb: T, page: number, pageSize
   return qb.limit(1 * pageSize).offset(page * pageSize)
 }
 
-const Pool = postgres({
+const primaryDb = postgres({
   ...connection,
   idle_timeout: 5,
   max_lifetime: 60,
   max: Number(process.env.POSTGRES_POOL),
 })
 
-const manager = drizzle(Pool, {
+const manager = drizzle(primaryDb, {
   logger: new DefaultLogger({ writer: { write: (message) => Logs.file.info(message) } }),
 })
-
-// const repository = {
-//   get: (table: PgTable) => manager.select().from(table),
-//   update: () => manager.update,
-//   insert: () => manager.insert,
-//   delete: () => manager.delete,
-//   page: withPagination,
-//   manager,
-// }
-
-// manager
 
 export default manager
