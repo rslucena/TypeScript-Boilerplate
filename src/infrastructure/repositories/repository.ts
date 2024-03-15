@@ -11,8 +11,8 @@ export function withPagination<T extends PgSelect>(qb: T, page: number, pageSize
 
 const Pool = postgres({
   ...connection,
-  idle_timeout: 10,
-  max_lifetime: 60 * 30,
+  idle_timeout: 5,
+  max_lifetime: 60,
   max: Number(process.env.POSTGRES_POOL),
 })
 

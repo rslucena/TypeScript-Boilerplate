@@ -1,20 +1,20 @@
 version: '3.8'
 services:
   redis:
-    image: redis/redis-stack-server:latest
+    restart: unless-stopped
     container_name: ${REDIS_NAME}
-    restart: always
+    image: redis/redis-stack-server:latest
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:6379'
     volumes:
       - ./.docker/redis/storage:/data
       - ./.docker/redis/modules:/usr/lib/redis/modules
   postgres:
-    image: postgres:latest
+    image: postgres:alpine
+    restart: unless-stopped
     container_name: ${POSTGRES_NAME}
-    restart: always
     command: postgres -c listen_addresses='*'
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -22,7 +22,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - '5432:5432'
+      - '${POSTGRES_PORT}:5432'
     volumes:
       - ./.docker/postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./.docker/postgres/storage:/var/lib/postgresql/data

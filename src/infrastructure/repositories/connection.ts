@@ -1,5 +1,5 @@
 const connection = {
-  port: 5432,
+  port: Number(process.env.POSTGRES_PORT),
   host: String(process.env.POSTGRES_SERVER),
   password: String(process.env.POSTGRES_PASSWORD),
   username: String(process.env.POSTGRES_USER),
