@@ -17,7 +17,7 @@ async function webserver(): Promise<server> {
   }).withTypeProvider<TypeBoxTypeProvider>()
   instance.register(fastifyCors, cors)
   instance.register(fastifyHelmet, helmet)
-  instance.setNotFoundHandler((_request, reply) => reply.code(503).send())
+  instance.setNotFoundHandler((_request, reply) => reply.code(418).send())
   process.on('SIGTERM', () => instance.close())
   process.on('SIGINT', () => instance.close())
   process.on('uncaughtException', (err) => Logs.file.error('Uncaught Exception thrown', err))
