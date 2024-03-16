@@ -1,8 +1,7 @@
 import { withPagination } from '@infrastructure/repositories/references'
-import { Array, Intersect, Omit, Partial, Pick, String } from '@sinclair/typebox'
+import { Array, Intersect, Object, Omit, Partial, Pick, String } from '@sinclair/typebox'
 import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
-import users from './entity'
-import user from './entity'
+import { default as user, default as users } from './entity'
 
 const create = createInsertSchema(users, {
   name: () => String({ minLength: 1, maxLength: 50 }),
@@ -35,6 +34,10 @@ const entity = {
 }
 
 const auths = {
+  response: Object({
+    token: String(),
+    refresh: String(),
+  }),
   create: Pick(create, ['email', 'password']),
 }
 

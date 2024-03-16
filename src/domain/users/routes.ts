@@ -40,7 +40,7 @@ export default async function users(api: FastifyInstance) {
       schema: {
         body: schema.auths.create,
         response: {
-          201: schema.entity.response,
+          201: schema.auths.response,
           ...request.reply.schemas,
         },
       },
