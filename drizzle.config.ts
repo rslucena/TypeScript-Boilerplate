@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit'
 import connection from './src/infrastructure/repositories/connection'
 
 export default {
-  schema: './src/domain/**/*[entity].ts',
+  schema: './src/domain/**/entity.ts',
   out: './src/infrastructure/migrations',
   driver: 'pg',
   dbCredentials: {
