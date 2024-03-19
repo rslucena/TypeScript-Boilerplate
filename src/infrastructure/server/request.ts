@@ -1,6 +1,6 @@
-import { Type } from '@sinclair/typebox'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { guise } from './interface'
+import { z } from 'zod'
 
 export class error {
   notFound(resource?: string) {
@@ -111,11 +111,11 @@ function execute(
 }
 
 const errorSchema = (code: number) =>
-  Type.Object({
-    statusCoded: Type.Number({ default: code }),
-    code: Type.String(),
-    error: Type.String(),
-    message: Type.String(),
+  z.object({
+    statusCoded: z.number().default(code),
+    code: z.string(),
+    error: z.string(),
+    message: z.string(),
   })
 
 export default {

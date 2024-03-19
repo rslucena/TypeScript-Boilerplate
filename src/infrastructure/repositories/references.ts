@@ -1,28 +1,30 @@
-import { Type } from '@sinclair/typebox'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
-import { boolean, uuid as puuid, timestamp } from 'drizzle-orm/pg-core'
+import { PgTimestampConfig, boolean, uuid as puuid, timestamp } from 'drizzle-orm/pg-core'
+import { z } from 'zod'
 import typeEvents from './interface'
+
+const dateSettings: PgTimestampConfig = { mode: 'date', precision: 6 }
 
 const identifier = {
   id: puuid('id').primaryKey().defaultRandom().unique().notNull(),
   activated: boolean('activated').default(true).notNull(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' }),
-  deleteAt: timestamp('delete_at', { mode: 'string' }),
+  createdAt: timestamp('created_at', dateSettings).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', dateSettings),
+  deletedAt: timestamp('deleted_at', dateSettings),
 }
 
-const typeBoxIdentifier = Type.Object({
-  id: Type.Integer(),
-  activated: Type.Boolean(),
-  createdAt: Type.Optional(Type.Number()),
-  updatedAt: Type.Optional(Type.Number()),
-  deleteAt: Type.Optional(Type.Number()),
-})
+const zodIdentifier = {
+  id: z.string(),
+  activated: z.boolean(),
+  createdAt: z.date().or(z.string()),
+  updatedAt: z.date().or(z.string()).nullable(),
+  deletedAt: z.date().or(z.string()).nullable(),
+}
 
-const withPagination = Type.Object({
-  page: Type.Number({ default: 1, minimum: 1 }),
-  pageSize: Type.Number({ default: 1, minimum: 1, maximum: 15 }),
+const withPagination = z.object({
+  _page: z.number().min(1).default(1),
+  _size: z.number().min(1).max(15).default(15),
 })
 
 function hash(data: string | object, compare?: string) {
@@ -45,4 +47,4 @@ function collection(
   return collection.toLowerCase().trim()
 }
 
-export { collection, hash, identifier, typeBoxIdentifier, uuid, withPagination }
+export { collection, hash, identifier, uuid, withPagination, zodIdentifier }

@@ -1,10 +1,10 @@
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import {
   FastifyInstance,
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
   RawServerDefault,
 } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { Logger } from 'pino'
 
 interface guise {
@@ -22,7 +22,7 @@ type server = FastifyInstance<
   RawRequestDefaultExpression<RawServerDefault>,
   RawReplyDefaultExpression<RawServerDefault>,
   Logger<never>,
-  TypeBoxTypeProvider
+  ZodTypeProvider
 >
 
 export { guise, server }
