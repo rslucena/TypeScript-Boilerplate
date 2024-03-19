@@ -21,5 +21,6 @@ export default defineConfig({
   loader: {
     '.sql': 'file',
     '.log': 'file',
+    '.rest': 'file',
   },
 })
