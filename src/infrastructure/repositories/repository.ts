@@ -5,8 +5,8 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import connection from './connection'
 
-export function withPagination<T extends PgSelect>(qb: T, page: number, pageSize: number = 10) {
-  return qb.limit(1 * pageSize).offset(page * pageSize)
+export function withPagination<T extends PgSelect>(qb: T, page: number, size: number = 10) {
+  return qb.limit(size).offset((page - 1) * size)
 }
 
 const primaryDb = postgres({
