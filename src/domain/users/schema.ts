@@ -1,44 +1,37 @@
-import { withPagination } from '@infrastructure/repositories/references'
-import { Array, Intersect, Object, Omit, Partial, Pick, String } from '@sinclair/typebox'
-import { createInsertSchema, createSelectSchema } from 'drizzle-typebox'
-import { default as user, default as users } from './entity'
+import { withPagination, zodIdentifier } from '@infrastructure/repositories/references'
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { array, boolean, object, string } from 'zod'
+import { default as users } from './entity'
 
 const create = createInsertSchema(users, {
-  name: () => String({ minLength: 1, maxLength: 50 }),
-  lastName: () => String({ minLength: 1, maxLength: 100 }),
-  email: () => String({ format: 'email', maxLength: 256 }),
-  password: () => String({ minLength: 8, maxLength: 50 }),
+  name: () => string().min(1).max(50),
+  email: () => string().email().min(1).max(400),
+  lastName: () => string().min(1).max(100),
+  password: () => string().min(8).max(50),
+  activated: () => boolean().default(true),
 })
 
 const select = createSelectSchema(users, {
-  email: () => String({ format: 'email' }),
+  email: () => string().email(),
+  ...zodIdentifier,
 })
 
-const entity = {
-  id: Pick(select, ['id']),
-  create: Omit(create, ['id']),
-  update: Partial(Omit(create, ['id'])),
-  find: Omit(Intersect([Partial(select), withPagination]), ['id', 'password']),
-  response: Array(Omit(select, ['password'])),
-  columns: {
-    id: user.id,
-    email: user.email,
-    password: user.password,
-    name: user.name,
-    activated: user.activated,
-    lastName: user.lastName,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    deleteAt: user.deleteAt,
+const actions = {
+  id: select.pick({ id: true }),
+  read: select.omit({ id: true, password: true }).partial().merge(withPagination),
+  create: {
+    entity: create.omit({ id: true }),
+    auth: create.pick({ email: true, password: true }),
   },
+  update: create.omit({ id: true }).partial(),
+  delete: create.pick({ id: true }),
 }
 
-const auths = {
-  response: Object({
-    token: String(),
-    refresh: String(),
-  }),
-  create: Pick(create, ['email', 'password']),
-}
+const entity = array(select.omit({ password: true }))
 
-export default { entity, auths }
+const auth = object({
+  token: string(),
+  refresh: string(),
+})
+
+export default { actions, entity, auth }

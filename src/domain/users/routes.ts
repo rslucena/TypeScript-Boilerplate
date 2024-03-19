@@ -1,63 +1,55 @@
 import request from '@infrastructure/server/request'
 import { FastifyInstance } from 'fastify'
-import createAuth from './actions/createAuth'
-import createUser from './actions/createUser'
-import find from './actions/find'
-import findById from './actions/findById'
+import GetById from './actions/GetById'
+import GetFindByParams from './actions/GetFindByParams'
+import PostNewAuth from './actions/PostNewAuth'
+import PostNewEntity from './actions/PostNewEntity'
 import schema from './schema'
 
-export default async function users(api: FastifyInstance) {
-  api.get('/user/ping', (_, reply) => reply.code(200).send())
+export default async function userRoutes(api: FastifyInstance) {
+  api.get('/ping', { schema: { tags: ['user'] } }, (_, reply) => reply.code(200).send())
   api.get(
-    '/user/find/:id',
+    '/:id',
     {
       schema: {
-        params: schema.entity.id,
-        response: {
-          200: schema.entity.response,
-          ...request.reply.schemas,
-        },
+        tags: ['user'],
+        params: schema.actions.id,
+        response: { 200: schema.entity, ...request.reply.schemas },
       },
     },
-    request.restricted(findById)
+    request.restricted(GetById)
   )
   api.get(
-    '/user/find',
+    '/',
     {
       schema: {
-        params: schema.entity.find,
-        response: {
-          200: schema.entity.response,
-          ...request.reply.schemas,
-        },
+        tags: ['user'],
+        params: schema.actions.read,
+        response: { 200: schema.entity, ...request.reply.schemas },
       },
     },
-    request.restricted(find)
+    request.restricted(GetFindByParams)
   )
   api.post(
-    '/user/auth',
+    '/',
     {
       schema: {
-        body: schema.auths.create,
-        response: {
-          201: schema.auths.response,
-          ...request.reply.schemas,
-        },
+        tags: ['user'],
+        body: schema.actions.create.entity,
+        response: { 201: schema.entity, ...request.reply.schemas },
       },
     },
-    request.noRestricted(createAuth)
+    request.noRestricted(PostNewEntity)
   )
   api.post(
-    '/user',
+    '/auth',
     {
       schema: {
-        body: schema.entity.create,
-        response: {
-          201: schema.entity.response,
-          ...request.reply.schemas,
-        },
+        tags: ['user'],
+        body: schema.actions.create.auth,
+        response: { 201: schema.auth, ...request.reply.schemas },
       },
     },
-    request.noRestricted(createUser)
+    request.noRestricted(PostNewAuth)
   )
 }

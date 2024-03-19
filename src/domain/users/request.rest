@@ -1,0 +1,33 @@
+GET http://localhost:3000/user/ping
+Content-Type: application/json
+
+###
+
+POST http://localhost:3000/user/auth HTTP/1.1
+content-type: application/json
+
+{
+    "email":"rodrigo@rslucena.com.br",
+    "password":"12345678"
+}
+
+###
+
+POST http://localhost:3000/user HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Rodrigo",
+    "email": "rodrigo@rslucena.com.br",
+    "password": "12345678"
+}
+
+###
+
+GET http://localhost:3000/user/486658b9-626d-4da8-a769-0217dc1916f9 HTTP/1.1
+content-type: application/json
+
+###
+
+GET http://localhost:3000/user HTTP/1.1
+content-type: application/json
