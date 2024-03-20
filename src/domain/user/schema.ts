@@ -14,11 +14,11 @@ const create = createInsertSchema(users, {
 const select = createSelectSchema(users, {
   email: () => string().email(),
   ...zodIdentifier,
-})
+}).partial()
 
 const actions = {
   id: select.pick({ id: true }),
-  read: select.omit({ id: true, password: true }).partial().merge(withPagination),
+  read: select.omit({ id: true, password: true }).merge(withPagination),
   create: {
     entity: create.omit({ id: true }),
     auth: create.pick({ email: true, password: true }),

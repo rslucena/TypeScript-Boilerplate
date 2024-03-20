@@ -7,12 +7,12 @@ import PostNewEntity from './actions/PostNewEntity'
 import schema from './schema'
 
 export default async function userRoutes(api: FastifyInstance) {
-  api.get('/ping', { schema: { tags: ['user'] } }, (_, reply) => reply.code(200).send())
+  api.get('/ping', { schema: { tags: ['User'] } }, (_, reply) => reply.code(200).send())
   api.get(
     '/:id',
     {
       schema: {
-        tags: ['user'],
+        tags: ['User'],
         params: schema.actions.id,
         response: { 200: schema.entity, ...request.reply.schemas },
       },
@@ -23,7 +23,7 @@ export default async function userRoutes(api: FastifyInstance) {
     '/',
     {
       schema: {
-        tags: ['user'],
+        tags: ['User'],
         params: schema.actions.read,
         response: { 200: schema.entity, ...request.reply.schemas },
       },
@@ -34,7 +34,7 @@ export default async function userRoutes(api: FastifyInstance) {
     '/',
     {
       schema: {
-        tags: ['user'],
+        tags: ['User'],
         body: schema.actions.create.entity,
         response: { 201: schema.entity, ...request.reply.schemas },
       },
@@ -45,7 +45,7 @@ export default async function userRoutes(api: FastifyInstance) {
     '/auth',
     {
       schema: {
-        tags: ['user'],
+        tags: ['User'],
         body: schema.actions.create.auth,
         response: { 201: schema.auth, ...request.reply.schemas },
       },
