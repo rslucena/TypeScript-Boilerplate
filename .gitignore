@@ -21,7 +21,6 @@ lib-cov
 *.db
 *.pem
 .turbo
-package-lock.json
 
 # IDE settings
 .idea/
