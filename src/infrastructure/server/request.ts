@@ -47,10 +47,12 @@ export class authentication {
     try {
       Header = JSON.parse(Buffer.from(encodedHeader, 'base64').toString())
       body = JSON.parse(Buffer.from(encodedPayload, 'base64').toString())
-    } catch (err) { return false}
+    } catch (err) {
+      return false
+    }
 
     if (Header.typ !== 'JWT' || Header.alg !== 'HS256') return false
-    
+
     if (!body) return false
 
     const expectedSignature = crypto
@@ -171,14 +173,18 @@ function execute(
       receiver.session(auth)
     }
 
+    let context
+
     try {
-      receiver.body(await callback(receiver))
+      context = await callback(receiver)
+      receiver.body(context)
     } catch (err: any) {
-      const mask = receiver.badRequest()
-      typeof err === 'string' ? { ...mask, message: err } : err
-      if (err && !err.statusCode) receiver.status(400)
-      receiver.body(mask)
+      context = receiver.badRequest()
+      context = typeof err === 'string' ? { ...context, message: err } : err
+      receiver.body(context)
     }
+
+    if (context && context.statusCode) receiver.status(context.statusCode)
 
     return reply
       .headers(receiver.headers())
