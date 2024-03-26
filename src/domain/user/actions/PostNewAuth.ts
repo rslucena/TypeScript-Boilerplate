@@ -1,6 +1,6 @@
 import { hash } from '@infrastructure/repositories/references'
 import repository from '@infrastructure/repositories/repository'
-import { container } from '@infrastructure/server/request'
+import { authentication, container } from '@infrastructure/server/request'
 import { desc, eq, sql } from 'drizzle-orm'
 import user from '../entity'
 import { default as schema } from '../schema'
@@ -34,7 +34,10 @@ export default async function PostNewAuth(request: container) {
   request.headers({ authorization: `Bearer ${hash(content[0].email)}` })
 
   return {
-    token: hash(content[0].email),
+    token: new authentication().create({
+      id: content[0].id,
+      email: content[0].email,
+    }),
     refresh: hash(content[0].password),
   }
 }

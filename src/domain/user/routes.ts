@@ -24,7 +24,7 @@ export default async function userRoutes(api: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
-        params: schema.actions.read,
+        querystring: schema.actions.read,
         response: { 200: schema.entity, ...request.reply.schemas },
       },
     },

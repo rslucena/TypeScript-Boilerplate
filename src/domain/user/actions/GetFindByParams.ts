@@ -50,7 +50,7 @@ export default async function GetFindByParams(request: container) {
 
   if (!content.length) throw request.notFound('get/user/{params}')
 
-  cache.json.set(collection('get/user/{params}', validRequest.data), content)
+  cache.json.set(collection('get/user/{params}', validRequest.data), content, 60 * 1)
 
   return content
 }
