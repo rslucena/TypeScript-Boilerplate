@@ -43,7 +43,10 @@ function collection(
   action: typeEvents = 'value'
 ): string {
   let collection = `${action}/${domain}/`
-  for (const [key, value] of Object.entries(conditions)) collection += `${key}:${value}/`
+  for (const [key, value] of Object.entries(conditions)) {
+    if (key === '_page' || key === '_size') key.replace(/_/, '')
+    collection += `${key}:${value}`
+  }
   return collection.toLowerCase().trim()
 }
 
