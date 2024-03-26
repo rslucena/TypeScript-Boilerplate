@@ -6,6 +6,7 @@ import {
 } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { Logger } from 'pino'
+import { z } from 'zod'
 
 interface guise {
   status?: number
@@ -25,4 +26,22 @@ type server = FastifyInstance<
   ZodTypeProvider
 >
 
-export { guise, server }
+const errorSchema = (code: number) =>
+  z.object({
+    statusCode: z.number().default(code),
+    code: z.string(),
+    error: z.string(),
+    message: z.string(),
+  })
+
+const replyErrorSchema = {
+  schemas: {
+    400: errorSchema(400),
+    401: errorSchema(401),
+    404: errorSchema(404),
+    500: errorSchema(500),
+    503: errorSchema(503),
+  },
+}
+
+export { errorSchema, guise, replyErrorSchema, server }

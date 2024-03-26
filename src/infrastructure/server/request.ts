@@ -1,8 +1,82 @@
+import * as crypto from 'crypto'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { guise } from './interface'
-import { z } from 'zod'
+import { guise, replyErrorSchema } from './interface'
+
+export class authentication {
+  create(content: guise['session'], exp?: number) {
+    const header = {
+      alg: 'HS256',
+      typ: 'JWT',
+      exp: Math.floor(Date.now() / 1000) + (exp ?? 60 * 60),
+    }
+    const encodedHeader = Buffer.from(JSON.stringify(header))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '')
+    const encodedPayload = Buffer.from(JSON.stringify(content))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '')
+    const signature = crypto
+      .createHmac('sha256', String(process.env.AUTH_SALT))
+      .update(`${encodedHeader}.${encodedPayload}`)
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '')
+    return `${encodedHeader}.${encodedPayload}.${signature}`
+  }
+  session(request: FastifyRequest) {
+    const { authorization } = request.headers
+    if (!authorization) return false
+
+    const jwt = authorization.replace('Bearer', '').replace(' ', '')
+
+    const Parts = jwt.split('.')
+    if (Parts.length !== 3 || !Parts[0] || !Parts[1] || !Parts[2]) return false
+
+    const encodedHeader = Parts[0]
+    const encodedPayload = Parts[1]
+    const signature = Parts[2]
+
+    let Header
+    let body
+
+    try {
+      Header = JSON.parse(Buffer.from(encodedHeader, 'base64').toString())
+      body = JSON.parse(Buffer.from(encodedPayload, 'base64').toString())
+    } catch (err) { return false}
+
+    if (Header.typ !== 'JWT' || Header.alg !== 'HS256') return false
+    
+    if (!body) return false
+
+    const expectedSignature = crypto
+      .createHmac('sha256', String(process.env.AUTH_SALT))
+      .update(`${encodedHeader}.${encodedPayload}`)
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '')
+
+    if (signature !== expectedSignature) return false
+    const Now = Math.floor(Date.now() / 1000)
+    if (Now > Header.exp) return false
+    return body
+  }
+}
 
 export class error {
+  unauthorized() {
+    return {
+      statusCode: 401,
+      code: 'ERR_UNAUTHORIZED',
+      error: 'Unauthorized',
+      message: 'You are not authorized to access this resource.',
+    }
+  }
   notFound(resource?: string) {
     return {
       statusCode: 404,
@@ -82,7 +156,7 @@ function execute(
   isRestricted = false
 ): (request: FastifyRequest, reply: FastifyReply) => Promise<void> {
   return async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
-    const form = new container({
+    const receiver = new container({
       raw: req.raw,
       headers: req.headers,
       query: req.query,
@@ -91,43 +165,30 @@ function execute(
       status: reply.statusCode,
     })
 
-    let resp: any = form.badRequest()
-    if (isRestricted) form.session({})
-
-    try {
-      resp = await callback(form)
-    } catch (error) {
-      if (typeof error === 'object') resp = error
-      else resp.message = error
+    if (isRestricted) {
+      const auth = new authentication().session(req)
+      if (!auth) return reply.code(401).send(receiver.unauthorized())
+      receiver.session(auth)
     }
 
-    if (resp && resp.statusCode) form.status(resp.statusCode)
+    try {
+      receiver.body(await callback(receiver))
+    } catch (err: any) {
+      const mask = receiver.badRequest()
+      typeof err === 'string' ? { ...mask, message: err } : err
+      if (err && !err.statusCode) receiver.status(400)
+      receiver.body(mask)
+    }
 
     return reply
-      .headers(form.headers())
-      .code(form.status())
-      .send(resp ?? '')
+      .headers(receiver.headers())
+      .code(receiver.status())
+      .send(receiver.body() ?? '')
   }
 }
 
-const errorSchema = (code: number) =>
-  z.object({
-    statusCoded: z.number().default(code),
-    code: z.string(),
-    error: z.string(),
-    message: z.string(),
-  })
-
 export default {
-  reply: {
-    schemas: {
-      400: errorSchema(400),
-      401: errorSchema(401),
-      404: errorSchema(404),
-      500: errorSchema(500),
-      503: errorSchema(503),
-    },
-  },
+  reply: replyErrorSchema,
   restricted: (fn: CallableFunction) => execute(fn, true),
   noRestricted: (fn: CallableFunction) => execute(fn),
 }
