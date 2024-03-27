@@ -24,7 +24,7 @@ const zodIdentifier = {
 
 const withPagination = z.object({
   _page: z.number().min(1).default(1),
-  _size: z.number().min(1).max(15).default(15),
+  _pageSize: z.number().min(1).max(15).default(15),
 })
 
 function hash(data: string | object, compare?: string) {
@@ -44,7 +44,7 @@ function collection(
 ): string {
   let collection = `${action}/${domain}/`
   for (const [key, value] of Object.entries(conditions)) {
-    if (key === '_page' || key === '_size') key.replace(/_/, '')
+    if (key === '_page' || key === '_pageSize') key.replace(/_/, '')
     collection += `${key}:${value}`
   }
   return collection.toLowerCase().trim()
