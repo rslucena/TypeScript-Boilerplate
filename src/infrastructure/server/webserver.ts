@@ -9,6 +9,7 @@ import { SettingOptions, SettingOptionsUI } from '@infrastructure/settings/swagg
 import fastify from 'fastify'
 import { ZodTypeProvider, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import { server } from './interface'
+import { convertRequestTypes } from './request'
 
 async function webserver(): Promise<server> {
   const instance = fastify({
@@ -18,6 +19,7 @@ async function webserver(): Promise<server> {
     requestTimeout: 20000,
     disableRequestLogging: true,
   }).withTypeProvider<ZodTypeProvider>()
+  instance.addHook('onRequest', convertRequestTypes)
   instance.setValidatorCompiler(validatorCompiler)
   instance.setSerializerCompiler(serializerCompiler)
   instance.register(fastifyCors, cors)

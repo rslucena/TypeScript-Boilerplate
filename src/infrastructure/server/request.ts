@@ -1,5 +1,5 @@
 import * as crypto from 'crypto'
-import { FastifyReply, FastifyRequest } from 'fastify'
+import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { guise, replyErrorSchema } from './interface'
 
 export class authentication {
@@ -151,6 +151,28 @@ export class container extends error {
     this._status = context || this._status
     return this._status ?? 200
   }
+}
+
+export function convertRequestTypes(
+  req: FastifyRequest,
+  _reply: FastifyReply,
+  done: HookHandlerDoneFunction
+) {
+  const convert = (params: { [key: string]: any }) => {
+    for (const key in params) {
+      const vl = params[key]
+      if (vl === undefined || vl === '') continue
+      if (!isNaN(vl)) params[key] = Number(vl)
+      if (vl === 'true') params[key] = true
+      if (vl === 'false') params[key] = false
+      if (vl === 'null') params[key] = null
+    }
+    return params
+  }
+  req.body = convert(req.body ?? {})
+  req.params = convert(req.params ?? {})
+  req.query = convert(req.query ?? {})
+  done()
 }
 
 function execute(
