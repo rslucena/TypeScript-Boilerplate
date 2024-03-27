@@ -1,5 +1,4 @@
 import cache from '@infrastructure/cache/actions'
-import Logs from '@infrastructure/logs/handler'
 import { collection } from '@infrastructure/repositories/references'
 import repository, { withPagination } from '@infrastructure/repositories/repository'
 import { container } from '@infrastructure/server/request'
@@ -26,7 +25,7 @@ export default async function GetFindByParams(request: container) {
   if (data.updatedAt) data.updatedAt = `${data.updatedAt}%`
 
   const { password, ...outhers } = getTableColumns(user)
-  
+
   const prepare = repository
     .select({ ...outhers })
     .from(user)
