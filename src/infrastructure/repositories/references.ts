@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { PgTimestampConfig, boolean, uuid as puuid, timestamp } from 'drizzle-orm/pg-core'
 import { z } from 'zod'
-import typeEvents from './interface'
+import { refer } from './interface'
 
 const dateSettings: PgTimestampConfig = { mode: 'date', precision: 6 }
 
@@ -37,17 +37,17 @@ function uuid(): string {
   return crypto.randomUUID()
 }
 
-function collection(
-  domain: string,
-  conditions: { [key: string]: any } = {},
-  action: typeEvents = 'value'
+function tag(
+  domain: refer['domain'],
+  method: refer['method'],
+  conditions?: refer['conditions']
 ): string {
-  let collection = `${action}/${domain}/`
-  for (const [key, value] of Object.entries(conditions)) {
-    if (key === '_page' || key === '_pageSize') key.replace(/_/, '')
-    collection += `${key}:${value}`
-  }
+  let collection = `${domain}/${method}`
+  if (!conditions) return collection.toLowerCase().trim()
+  collection += '/'
+  for (const [key, value] of Object.entries(conditions))
+    collection += `[${key.replace('_', '')}:${value}]`
   return collection.toLowerCase().trim()
 }
 
-export { collection, hash, identifier, uuid, withPagination, zodIdentifier }
+export { hash, identifier, tag, uuid, withPagination, zodIdentifier }
