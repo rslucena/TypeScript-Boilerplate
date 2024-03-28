@@ -13,6 +13,7 @@ export default async function userRoutes(api: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
+        summary: 'Find user by id',
         params: schema.actions.id,
         response: { 200: schema.entity, ...request.reply.schemas },
       },
@@ -24,6 +25,7 @@ export default async function userRoutes(api: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
+        summary: 'Find users',
         querystring: schema.actions.read,
         response: { 200: schema.entity, ...request.reply.schemas },
       },
@@ -35,6 +37,7 @@ export default async function userRoutes(api: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
+        summary: 'Create new user',
         body: schema.actions.create.entity,
         response: { 201: schema.entity, ...request.reply.schemas },
       },
@@ -46,6 +49,7 @@ export default async function userRoutes(api: FastifyInstance) {
     {
       schema: {
         tags: ['User'],
+        summary: 'Create new authorization',
         body: schema.actions.create.auth,
         response: { 201: schema.auth, ...request.reply.schemas },
       },
