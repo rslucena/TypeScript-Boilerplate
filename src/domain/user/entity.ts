@@ -10,4 +10,6 @@ const columns = {
 
 const user = pgTable('user', { ...columns, ...identifier })
 
+type user = typeof user.$inferSelect
+
 export default user
