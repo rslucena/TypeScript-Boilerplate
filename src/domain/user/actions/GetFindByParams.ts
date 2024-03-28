@@ -1,5 +1,5 @@
 import cache from '@infrastructure/cache/actions'
-import { collection } from '@infrastructure/repositories/references'
+import { tag } from '@infrastructure/repositories/references'
 import repository, { withPagination } from '@infrastructure/repositories/repository'
 import { container } from '@infrastructure/server/request'
 import { and, desc, eq, getTableColumns, ilike, sql } from 'drizzle-orm'
@@ -10,11 +10,12 @@ export default async function GetFindByParams(request: container) {
   request.status(200)
 
   const validRequest = await schema.actions.read.safeParseAsync(request.query())
-  if (!validRequest.success) throw request.badRequest('get/user/{params}')
+  if (!validRequest.success) throw request.badRequest(tag('user', 'find{params}'))
 
   const { data } = validRequest
+  const reference = tag('user', 'find{params}', data)
 
-  const cached = await cache.json.get(collection('get/user/{params}', validRequest))
+  const cached = await cache.json.get<user[]>(reference)
   if (cached) return cached
 
   if (data.name) data.name = `%${data.name}%`
@@ -47,9 +48,9 @@ export default async function GetFindByParams(request: container) {
 
   const content = await prepare.execute(validRequest.data)
 
-  if (!content.length) throw request.notFound('get/user/{params}')
+  if (!content.length) throw request.notFound(tag('user', 'find{params}'))
 
-  cache.json.set(collection('get/user/{params}', validRequest.data), content, 60 * 1)
+  cache.json.set(reference, content, 60 * 1)
 
   return content
 }

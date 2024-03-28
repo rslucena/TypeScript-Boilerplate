@@ -1,5 +1,5 @@
 import cache from '@infrastructure/cache/actions'
-import { collection } from '@infrastructure/repositories/references'
+import { tag } from '@infrastructure/repositories/references'
 import repository from '@infrastructure/repositories/repository'
 import { container } from '@infrastructure/server/request'
 import { desc, eq, sql } from 'drizzle-orm'
@@ -10,11 +10,12 @@ export default async function GetById(request: container) {
   request.status(200)
 
   const validRequest = await schema.actions.id.safeParseAsync(request.params())
-  if (!validRequest.success) throw request.badRequest(`get/user/{id}`)
+  if (!validRequest.success) throw request.badRequest(tag('user', 'find{id}'))
 
   const { id } = validRequest.data
+  const reference = tag('user', 'find{id}', { id })
 
-  const cached = await cache.json.get(collection('get/user/{id}', { id }))
+  const cached = await cache.json.get<user[]>(reference)
   if (cached) return cached
 
   const prepare = repository
@@ -36,9 +37,9 @@ export default async function GetById(request: container) {
 
   const content = await prepare.execute({ id })
 
-  if (!content.length) throw request.notFound(`get/user/${id}`)
+  if (!content.length) throw request.notFound(tag('user', 'find{id}'))
 
-  await cache.json.set(collection('get/user/{id}', { id }), content, 60 * 10)
+  await cache.json.set(reference, content, 60 * 10)
 
   return content
 }

@@ -1,4 +1,5 @@
-import { hash } from '@infrastructure/repositories/references'
+import cache from '@infrastructure/cache/actions'
+import { hash, tag } from '@infrastructure/repositories/references'
 import repository from '@infrastructure/repositories/repository'
 import { container } from '@infrastructure/server/request'
 import user from '../entity'
@@ -21,6 +22,8 @@ export default async function PostNewEntity(request: container) {
     .returning()
 
   if (!content.length) throw request.unprocessableEntity(`post/user/${validRequest.data.email}`)
+
+  await cache.json.del(tag('user', 'find*'))
 
   return GetById(new container({ params: { id: content[0].id } }))
 }
