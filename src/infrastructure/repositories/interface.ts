@@ -1,3 +1,5 @@
-type typeEvents = 'value' | 'child_added' | 'child_changed' | 'child_moved' | 'child_removed'
-
-export default typeEvents
+export type refer = {
+  domain: string
+  method: string
+  conditions: { [key: string]: any }
+}
