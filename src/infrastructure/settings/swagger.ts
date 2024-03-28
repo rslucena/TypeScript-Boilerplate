@@ -32,7 +32,8 @@ export const SettingOptionsUI: FastifySwaggerUiOptions = {
         filename: 'swaggertheme.js',
         content:
           '( new MutationObserver( () => document.querySelectorAll(".try-out__btn" ).forEach( ( el ) => el.remove() ) ).observe( document.body, { childList: true, subtree: true } ) );' +
-          '( new MutationObserver( () => document.querySelector( "#swagger-ui > section > div.topbar" ).remove()).observe( document.body, { childList: true, subtree: true } ) );',
+          '( new MutationObserver( () => document.querySelector( "#swagger-ui > section > div.topbar" ).remove()).observe( document.body, { childList: true, subtree: true } ) );' +
+          '( new MutationObserver( () => document.querySelector( "div.scheme-container" ).remove()).observe( document.body, { childList: true, subtree: true } ) );',
       },
     ],
   },
