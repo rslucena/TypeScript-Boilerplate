@@ -1,9 +1,9 @@
 import request from '@infrastructure/server/request'
 import { FastifyInstance } from 'fastify'
-import GetById from './actions/GetById'
-import GetFindByParams from './actions/GetFindByParams'
-import PostNewAuth from './actions/PostNewAuth'
-import PostNewEntity from './actions/PostNewEntity'
+import getById from './actions/get-by-id'
+import getFindByParams from './actions/get-find-by-params'
+import postNewAuth from './actions/post-new-auth'
+import postNewEntity from './actions/post-new-entity'
 import schema from './schema'
 
 export default async function userRoutes(api: FastifyInstance) {
@@ -18,7 +18,7 @@ export default async function userRoutes(api: FastifyInstance) {
         response: { 200: schema.entity, ...request.reply.schemas },
       },
     },
-    request.restricted(GetById)
+    request.restricted(getById)
   )
   api.get(
     '/',
@@ -30,7 +30,7 @@ export default async function userRoutes(api: FastifyInstance) {
         response: { 200: schema.entity, ...request.reply.schemas },
       },
     },
-    request.restricted(GetFindByParams)
+    request.restricted(getFindByParams)
   )
   api.post(
     '/',
@@ -42,7 +42,7 @@ export default async function userRoutes(api: FastifyInstance) {
         response: { 201: schema.entity, ...request.reply.schemas },
       },
     },
-    request.noRestricted(PostNewEntity)
+    request.noRestricted(postNewEntity)
   )
   api.post(
     '/auth',
@@ -54,6 +54,6 @@ export default async function userRoutes(api: FastifyInstance) {
         response: { 201: schema.auth, ...request.reply.schemas },
       },
     },
-    request.noRestricted(PostNewAuth)
+    request.noRestricted(postNewAuth)
   )
 }

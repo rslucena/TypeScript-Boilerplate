@@ -4,9 +4,9 @@ import repository from '@infrastructure/repositories/repository'
 import { container } from '@infrastructure/server/request'
 import user from '../entity'
 import { default as schema } from '../schema'
-import GetById from './GetById'
+import getById from './get-by-id'
 
-export default async function PostNewEntity(request: container) {
+export default async function postNewEntity(request: container) {
   request.status(201)
 
   const validRequest = await schema.actions.create.entity.safeParseAsync(request.body())
@@ -25,5 +25,5 @@ export default async function PostNewEntity(request: container) {
 
   await cache.json.del(tag('user', 'find*'))
 
-  return GetById(new container({ params: { id: content[0].id } }))
+  return getById(new container({ params: { id: content[0].id } }))
 }

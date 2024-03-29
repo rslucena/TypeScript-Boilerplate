@@ -6,7 +6,7 @@ import { and, desc, eq, getTableColumns, ilike, sql } from 'drizzle-orm'
 import user from '../entity'
 import { default as schema } from '../schema'
 
-export default async function GetFindByParams(request: container) {
+export default async function getFindByParams(request: container) {
   request.status(200)
 
   const validRequest = await schema.actions.read.safeParseAsync(request.query())

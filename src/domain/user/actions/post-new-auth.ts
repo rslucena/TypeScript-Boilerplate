@@ -6,7 +6,7 @@ import { desc, eq, sql } from 'drizzle-orm'
 import user from '../entity'
 import { default as schema } from '../schema'
 
-export default async function PostNewAuth(request: container) {
+export default async function postNewAuth(request: container) {
   request.status(201)
 
   const validRequest = await schema.actions.create.auth.safeParseAsync(request.body())

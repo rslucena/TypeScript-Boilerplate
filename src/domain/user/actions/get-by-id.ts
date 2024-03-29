@@ -6,7 +6,7 @@ import { desc, eq, sql } from 'drizzle-orm'
 import user from '../entity'
 import { default as schema } from '../schema'
 
-export default async function GetById(request: container) {
+export default async function getById(request: container) {
   request.status(200)
 
   const validRequest = await schema.actions.id.safeParseAsync(request.params())
