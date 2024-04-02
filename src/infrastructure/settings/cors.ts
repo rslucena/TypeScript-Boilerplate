@@ -8,5 +8,5 @@ export default <FastifyCorsOptions>{
   origin: process.env.PROCESS_CORS_ORIGIN,
   exposedHeaders: ['set-cookie', 'authorization'],
   allowedHeaders: ['content-type', 'authorization'],
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
 }
