@@ -16,6 +16,11 @@ const select = createSelectSchema(users, {
   ...zodIdentifier,
 }).partial()
 
+const auth = object({
+  token: string(),
+  refresh: string(),
+})
+
 const actions = {
   id: select.pick({ id: true }),
   read: select.omit({ id: true, password: true }).merge(withPagination),
@@ -28,10 +33,5 @@ const actions = {
 }
 
 const entity = array(select.omit({ password: true }))
-
-const auth = object({
-  token: string(),
-  refresh: string(),
-})
 
 export default { actions, entity, auth }
