@@ -10,8 +10,8 @@ interface eventemitter {
 }
 
 interface triggers {
-  events: eventemitter
-  messages: actions
+  event: eventemitter
+  message: actions
 }
 
 export default triggers
