@@ -27,10 +27,22 @@ async function webserver(): Promise<server> {
   instance.setNotFoundHandler((_request, reply) => reply.code(418).send())
   instance.register(fastifySwagger, SettingOptions)
   instance.register(fastifySwaggerUi, SettingOptionsUI)
-  process.on('SIGTERM', () => instance.close())
-  process.on('SIGINT', () => instance.close())
-  process.on('uncaughtException', (err) => Logs.file.error('Uncaught Exception thrown', err))
-  process.on('unhandledRejection', (reasons) => Logs.file.error('Unhandled Rejection', reasons))
+  process.on('SIGTERM', () => {
+    instance.close()
+    process.exit(1)
+  })
+  process.on('SIGINT', () => {
+    instance.close()
+    process.exit(1)
+  })
+  process.on('uncaughtException', (err) => {
+    Logs.file.error('Uncaught Exception thrown', err)
+    process.exit(1)
+  })
+  process.on('unhandledRejection', (reasons) => {
+    Logs.file.error('Unhandled Rejection', reasons)
+    process.exit(1)
+  })
   return instance
 }
 
@@ -39,7 +51,6 @@ async function start(instance: server): Promise<void> {
     if (err) return Logs.console.error(err.message, err, true)
     instance.swagger()
   })
-
   instance.listen({ port: Number(process.env.PROCESS_PORT), host: '0.0.0.0' }, (err, address) => {
     if (err) Logs.file.error(err.message, err, true)
     Logs.console.info(`Server listening on ${address}`)
