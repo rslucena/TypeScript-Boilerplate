@@ -9,7 +9,7 @@ import { SettingOptions, SettingOptionsUI } from '@infrastructure/settings/swagg
 import fastify from 'fastify'
 import { ZodTypeProvider, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import { server } from './interface'
-import { convertRequestTypes } from './request'
+import { convertRequestTypes, err } from './request'
 
 async function webserver(): Promise<server> {
   const instance = fastify({
@@ -27,6 +27,11 @@ async function webserver(): Promise<server> {
   instance.setNotFoundHandler((_request, reply) => reply.code(418).send())
   instance.register(fastifySwagger, SettingOptions)
   instance.register(fastifySwaggerUi, SettingOptionsUI)
+  instance.setErrorHandler(function (error, request, reply) {
+    let er = new err().badRequest()
+    er.message = error.message
+    return reply.headers(request.headers).code(er.statusCode).send(er)
+  })
   process.on('SIGTERM', () => {
     instance.close()
     process.exit(1)

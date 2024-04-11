@@ -70,7 +70,7 @@ export class authentication {
   }
 }
 
-export class error {
+export class err {
   unauthorized() {
     return {
       statusCode: 401,
@@ -105,7 +105,7 @@ export class error {
   }
 }
 
-export class container extends error {
+export class container extends err {
   protected _status: guise['status']
   protected _raw: guise['raw']
   protected _session: guise['session']
