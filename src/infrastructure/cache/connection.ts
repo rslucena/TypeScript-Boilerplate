@@ -8,6 +8,7 @@ const connection: RedisClientOptions = {
     servername: process.env.REDIS_SSL != 'false' ? 'rediss' : 'redis',
     host: process.env.REDIS_SERVER,
     port: Number(process.env.REDIS_PORT),
+    reconnectStrategy: 10000,
   },
 }
 
