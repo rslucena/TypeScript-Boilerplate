@@ -1,6 +1,14 @@
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
-import { PgTimestampConfig, boolean, uuid as puuid, timestamp } from 'drizzle-orm/pg-core'
+import {
+  IndexBuilder,
+  PgColumn,
+  PgTimestampConfig,
+  boolean,
+  index,
+  uuid as puuid,
+  timestamp,
+} from 'drizzle-orm/pg-core'
 import { z } from 'zod'
 import { refer } from './interface'
 
@@ -27,6 +35,14 @@ const withPagination = z.object({
   _pageSize: z.number().min(1).max(15).default(15),
 })
 
+function pgIndex(table: { [key: string]: PgColumn }, columns: string[]) {
+  const configs: { [key: string]: IndexBuilder } = {}
+  for (const column of columns) configs[column] = index(`${column}_idx`).on(table[column])
+  for (const column of Object.keys(identifier))
+    if (table[column]) configs[column] = index(`${column}_idx`).on(table[column])
+  return configs
+}
+
 function hash(data: string | object, compare?: string) {
   if (typeof data !== 'string') data = JSON.stringify(data)
   if (compare) return bcrypt.compareSync(data, compare) ? 'OK' : ''
@@ -50,4 +66,4 @@ function tag(
   return collection.toLowerCase().trim()
 }
 
-export { hash, identifier, tag, uuid, withPagination, zodIdentifier }
+export { hash, identifier, pgIndex, tag, uuid, withPagination, zodIdentifier }

@@ -1,4 +1,4 @@
-import { identifier } from '@infrastructure/repositories/references'
+import { identifier, pgIndex } from '@infrastructure/repositories/references'
 import { pgTable, varchar } from 'drizzle-orm/pg-core'
 
 const columns = {
@@ -8,7 +8,9 @@ const columns = {
   password: varchar('password', { length: 100 }).notNull(),
 }
 
-const user = pgTable('user', { ...columns, ...identifier })
+const user = pgTable('user', { ...columns, ...identifier }, (table) =>
+  pgIndex(table, ['name', 'lastName'])
+)
 
 type user = typeof user.$inferSelect
 
