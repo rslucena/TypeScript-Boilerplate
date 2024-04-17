@@ -9,7 +9,7 @@ import {
   uuid as puuid,
   timestamp,
 } from 'drizzle-orm/pg-core'
-import { z } from 'zod'
+import { array, number, z } from 'zod'
 import { refer } from './interface'
 
 const dateSettings: PgTimestampConfig = { mode: 'date', precision: 6 }
@@ -31,8 +31,7 @@ const zodIdentifier = {
 }
 
 const withPagination = z.object({
-  _page: z.number().min(1).default(1),
-  _pageSize: z.number().min(1).max(15).default(15),
+  'req.page': array(number().min(1)).length(2).default([1, 10]),
 })
 
 function pgIndex(table: { [key: string]: PgColumn }, columns: string[]) {

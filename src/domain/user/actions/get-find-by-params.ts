@@ -44,7 +44,7 @@ export default async function getFindByParams(request: container) {
     .orderBy(desc(user.id))
     .$dynamic()
 
-  withPagination(prepare, data._page, data._pageSize)
+  withPagination(prepare, data['req.page'][0], data['req.page'][1])
 
   const content = await prepare.execute(validRequest.data)
 
