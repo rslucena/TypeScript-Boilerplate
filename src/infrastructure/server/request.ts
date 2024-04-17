@@ -166,6 +166,7 @@ export function convertRequestTypes(
       if (vl === 'true') params[key] = true
       if (vl === 'false') params[key] = false
       if (vl === 'null') params[key] = null
+      if (vl.startsWith('[') && vl.endsWith(']')) params[key] = JSON.parse(vl)
     }
     return params
   }
