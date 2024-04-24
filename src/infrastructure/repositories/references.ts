@@ -61,7 +61,7 @@ function tag(
   if (!conditions) return collection.toLowerCase().trim()
   collection += '/'
   for (const [key, value] of Object.entries(conditions))
-    collection += `[${key.replace('_', '')}:${value}]`
+    collection += `\{${key.replace('_', '')}:${value}\}`
   return collection.toLowerCase().trim()
 }
 
