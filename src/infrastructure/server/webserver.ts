@@ -19,6 +19,7 @@ async function webserver(): Promise<server> {
     requestTimeout: 20000,
     disableRequestLogging: true,
   }).withTypeProvider<ZodTypeProvider>()
+  instance.removeContentTypeParser('text/plain')
   instance.addHook('onRequest', convertRequestTypes)
   instance.setValidatorCompiler(validatorCompiler)
   instance.setSerializerCompiler(serializerCompiler)
@@ -29,6 +30,10 @@ async function webserver(): Promise<server> {
   instance.register(fastifySwaggerUi, SettingOptionsUI)
   instance.setErrorHandler(function (error, request, reply) {
     let er = new err().badRequest()
+    if (error.message.startsWith('Unsupported Media Type')) {
+      request.headers['content-type'] = 'application/json'
+      error.message = error.message.split(';')[0]
+    }
     er.message = error.message
     return reply.headers(request.headers).code(er.statusCode).send(er)
   })
