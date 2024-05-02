@@ -14,18 +14,17 @@ import { convertRequestTypes, err } from './request'
 async function webserver(): Promise<server> {
   const instance = fastify({
     logger: Logs.provider,
-    caseSensitive: true,
+    caseSensitive: false,
     pluginTimeout: 20000,
     requestTimeout: 20000,
     disableRequestLogging: true,
   }).withTypeProvider<ZodTypeProvider>()
-  instance.removeContentTypeParser('text/plain')
   instance.addHook('onRequest', convertRequestTypes)
   instance.setValidatorCompiler(validatorCompiler)
   instance.setSerializerCompiler(serializerCompiler)
   instance.register(fastifyCors, cors)
   instance.register(fastifyHelmet, helmet)
-  instance.setNotFoundHandler((_request, reply) => reply.code(418).send())
+  instance.setNotFoundHandler((_request, reply) => reply.code(510).send())
   instance.register(fastifySwagger, SettingOptions)
   instance.register(fastifySwaggerUi, SettingOptionsUI)
   instance.setErrorHandler(function (error, request, reply) {
@@ -56,12 +55,12 @@ async function webserver(): Promise<server> {
   return instance
 }
 
-async function start(instance: server): Promise<void> {
+async function start(instance: server, port: number): Promise<void> {
   instance.ready((err) => {
     if (err) return Logs.console.error(err.message, err, true)
     instance.swagger()
   })
-  instance.listen({ port: Number(process.env.PROCESS_PORT), host: '0.0.0.0' }, (err, address) => {
+  instance.listen({ port, host: '0.0.0.0' }, (err, address) => {
     if (err) Logs.file.error(err.message, err, true)
     Logs.console.info(`Server listening on ${address}`)
     Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`)
@@ -70,5 +69,5 @@ async function start(instance: server): Promise<void> {
 
 export default {
   create: () => webserver(),
-  start: (instance: server) => start(instance),
+  start: (instance: server, port: number) => start(instance, port),
 }

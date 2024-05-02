@@ -3,5 +3,5 @@ import webserver from '@infrastructure/server/webserver'
 ;(async () => {
   const server = await webserver.create()
   server.register(userRoutes, { prefix: '/api/v1/users' })
-  webserver.start(server)
+  webserver.start(server, Number(process.env.PROCESS_PORT))
 })()
