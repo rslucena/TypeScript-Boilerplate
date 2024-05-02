@@ -11,8 +11,10 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "paths": {
+      "@commands/*": ["./src/commands/*"],
       "@domain/*": ["./src/domain/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
+      "@providers/*": ["./src/providers/*"],
       "@tests/*": ["./src/tests/*"]
     }
   },
