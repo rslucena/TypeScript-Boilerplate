@@ -14,18 +14,18 @@ import { refer } from './interface'
 
 const dateSettings: PgTimestampConfig = { mode: 'date', precision: 6 }
 
-const identifier = {
-  id: puuid('id').primaryKey().defaultRandom().unique().notNull(),
+const identifier = (table: string) => ({
+  id: puuid('id').primaryKey().defaultRandom().notNull(),
   activated: boolean('activated').default(true).notNull(),
   createdAt: timestamp('created_at', dateSettings).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', dateSettings),
   deletedAt: timestamp('deleted_at', dateSettings),
-}
+})
 
 const zodIdentifier = {
-  id: z.string(),
-  activated: z.boolean(),
-  createdAt: z.date().or(z.string()),
+  id: z.string().uuid(),
+  activated: z.boolean().default(true),
+  createdAt: z.date().or(z.string()).nullable(),
   updatedAt: z.date().or(z.string()).nullable(),
   deletedAt: z.date().or(z.string()).nullable(),
 }
@@ -34,11 +34,10 @@ const withPagination = z.object({
   'req.page': array(number().min(1)).length(2).default([1, 10]),
 })
 
-function pgIndex(table: { [key: string]: PgColumn }, columns: string[]) {
+function pgIndex(table: string, columns: { [key: string]: PgColumn }, keys: string[]) {
   const configs: { [key: string]: IndexBuilder } = {}
-  for (const column of columns) configs[column] = index(`${column}_idx`).on(table[column])
-  for (const column of Object.keys(identifier))
-    if (table[column]) configs[column] = index(`${column}_idx`).on(table[column])
+  for (const column of keys) configs[column] = index(`${table}_${column}_idx`).on(columns[column])
+  configs.activated = index(`${table}_activated_idx`).on(columns['activated'])
   return configs
 }
 

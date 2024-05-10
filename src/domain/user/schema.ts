@@ -2,6 +2,7 @@ import { withPagination, zodIdentifier } from '@infrastructure/repositories/refe
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { array, boolean, object, string } from 'zod'
 import { default as users } from './entity'
+import { headers } from '@infrastructure/server/interface'
 
 const create = createInsertSchema(users, {
   name: () => string().min(1).max(50),
@@ -22,6 +23,7 @@ const auth = object({
 })
 
 const actions = {
+  headers,
   id: select.pick({ id: true }),
   read: select.omit({ id: true, password: true }).merge(withPagination),
   create: {
