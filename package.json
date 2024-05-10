@@ -10,8 +10,8 @@
   },
   "scripts": {
     "pb:health": "npm outdated",
-    "pb:eslint": "eslint --no-warn-ignored --fix ./src/**/*.ts",
-    "pb:prettier": "prettier ./src/**/*.ts --write --check",
+    "pb:eslint": "eslint --quiet --no-warn-ignored --fix ./src/**/*.ts",
+    "pb:prettier": "prettier ./src/**/*.ts --write",
     "db:push": "drizzle-kit push:pg",
     "db:migrate:up": "drizzle-kit up:pg",
     "db:migrate": "drizzle-kit generate:pg",
