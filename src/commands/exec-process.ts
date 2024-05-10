@@ -1,14 +1,21 @@
 import { spawn } from 'child_process'
+import pm2Workspace from './pm2-workspace'
 
 const worker = process.env.npm_config_worker
+const err = new Error('Unable to locate the script, provider, or container for execution.')
 
 if (!worker || worker.split('/').length <= 1) {
-  const err = new Error('Unable to locate the script, provider, or container for execution.')
   console.log(err)
   process.exit()
 }
 
-const command = `tsx watch --env-file=.env -- ./src/${worker}.ts`
+const jobs = pm2Workspace.find((configs) => configs.name === worker)
+if (!jobs) {
+  console.log(err)
+  process.exit()
+}
+
+const command = `tsx watch --env-file=.env -- ${jobs.tsx}`
 
 const child = spawn(command, { stdio: 'inherit', shell: true })
 

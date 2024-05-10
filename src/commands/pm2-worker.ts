@@ -40,7 +40,7 @@ const info = (name: string | undefined, engine: string) =>
     console.table(format(worker, engine))
   })
 
-const restart = (name: string | undefined, engine: string) =>
+const restart = (name: string | undefined) =>
   pm2.list((err, list) => {
     if (err) return console.log(err)
     const worker = list.find((worker) => worker.name === name)

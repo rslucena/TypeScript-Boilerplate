@@ -20,7 +20,7 @@ export default <worker[]>[
   {
     name: 'http:primary:webserver',
     tsx: './src/providers/http-webserver.ts',
-    node: './dist/http-webserver.js',
+    node: './dist/providers/http-webserver.js',
     options: { ...defaultConfigs },
-  }
+  },
 ]
