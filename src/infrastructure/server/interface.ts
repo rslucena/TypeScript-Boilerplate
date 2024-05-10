@@ -18,6 +18,14 @@ interface guise {
   params?: { [key: string]: any } | unknown
 }
 
+const headers = z.object({
+  authorization: z
+    .string()
+    .startsWith('Bearer')
+    .trim()
+    .regex(/^Bearer [a-zA-Z0-9-._~+/]+=*$/),
+})
+
 type server = FastifyInstance<
   RawServerDefault,
   RawRequestDefaultExpression<RawServerDefault>,
@@ -44,4 +52,4 @@ const replyErrorSchema = {
   },
 }
 
-export { errorSchema, guise, replyErrorSchema, server }
+export { errorSchema, guise, headers, replyErrorSchema, server }
