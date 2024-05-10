@@ -4,7 +4,7 @@ import pm2Workspace from './pm2-workspace'
 const worker = process.env.npm_config_worker
 const err = new Error('Unable to locate the script, provider, or container for execution.')
 
-if (!worker || worker.split('/').length <= 1) {
+if (!worker) {
   console.log(err)
   process.exit()
 }
