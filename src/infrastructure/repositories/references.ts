@@ -14,13 +14,13 @@ import { refer } from './interface'
 
 const dateSettings: PgTimestampConfig = { mode: 'date', precision: 6 }
 
-const identifier = (table: string) => ({
+const identifier = {
   id: puuid('id').primaryKey().defaultRandom().notNull(),
   activated: boolean('activated').default(true).notNull(),
   createdAt: timestamp('created_at', dateSettings).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', dateSettings),
   deletedAt: timestamp('deleted_at', dateSettings),
-})
+}
 
 const zodIdentifier = {
   id: z.string().uuid(),

@@ -8,9 +8,8 @@ const columns = {
   password: varchar('password', { length: 100 }).notNull(),
 }
 
-const user = pgTable('user',
-  { ...columns, ...identifier('user') },
-  (table) => pgIndex('user', table, ['name', 'email'])
+const user = pgTable('user', { ...columns, ...identifier }, (table) =>
+  pgIndex('user', table, ['name', 'email'])
 )
 
 type user = typeof user.$inferSelect
