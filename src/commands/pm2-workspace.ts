@@ -12,7 +12,7 @@ const defaultConfigs: pm2.StartOptions = {
   max_restarts: 5,
   exec_mode: 'fork',
   autorestart: true,
-  max_memory_restart: '300M',
+  max_memory_restart: '100M',
   ignore_watch: ['node_modules'],
 }
 

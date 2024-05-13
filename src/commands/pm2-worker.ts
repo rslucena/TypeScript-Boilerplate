@@ -14,7 +14,7 @@ function format(args: any, eng: string) {
 
 const list = (engine: 'tsx' | 'node') =>
   pm2.list((err, list) => {
-    if (err) return console.log(err)
+    if (err) return console.error(err)
     console.table(list.map((worker: any) => format(worker, engine)))
   })
 
@@ -34,17 +34,17 @@ const start = (engine: 'tsx' | 'node', worker: worker) =>
 
 const info = (name: string | undefined, engine: string) =>
   pm2.list((err, list) => {
-    if (err) return console.log(err)
+    if (err) return console.error(err)
     const worker = list.find((worker) => worker.name === name)
-    if (!worker) return console.log('Unable to locate the worker.')
+    if (!worker) return console.error('Unable to locate the worker.')
     console.table(format(worker, engine))
   })
 
 const restart = (name: string | undefined) =>
   pm2.list((err, list) => {
-    if (err) return console.log(err)
+    if (err) return console.error(err)
     const worker = list.find((worker) => worker.name === name)
-    if (!worker) return console.log('Unable to locate the worker.')
+    if (!worker) return console.error('Unable to locate the worker.')
     pm2.restart(worker.name as string, (err, app) => (err ? console.log(err) : console.table(app)))
   })
 
