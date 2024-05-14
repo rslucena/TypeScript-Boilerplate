@@ -36,8 +36,8 @@ async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | nu
   return action
 }
 
-async function del({ type, hash }: setmode): Promise<number> {
-  const keys = await client.keys(hash)
+async function del({ hash }: setmode): Promise<number> {
+  const keys = await client.keys(`${hash}*`)
   if (!keys.length) return 0
   for (const key of keys) await client.del(key)
   return keys.length
