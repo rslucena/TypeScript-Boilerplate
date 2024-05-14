@@ -20,7 +20,7 @@
     "build": "npm run pb:eslint && npm run pb:prettier && tsup src",
     "workers": "tsx watch --env-file=.env -- src/workers.ts",
     "dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
-    "start": "node --env-file=.env -r tsconfig-paths/register dist/workers.js"
+    "start": "node --env-file=.env dist/workers.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
