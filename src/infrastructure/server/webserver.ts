@@ -28,7 +28,7 @@ async function webserver(): Promise<server> {
   instance.register(fastifySwagger, SettingOptions)
   instance.register(fastifySwaggerUi, SettingOptionsUI)
   instance.setErrorHandler(function (error, request, reply) {
-    let er = new err().badRequest()
+    let er = new err().badRequest(request.headers['accept-language'])
     if (error.message.startsWith('Unsupported Media Type')) {
       request.headers['content-type'] = 'application/json'
       error.message = error.message.split(';')[0]

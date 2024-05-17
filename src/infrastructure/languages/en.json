@@ -1,0 +1,7 @@
+{
+  "ERR_UNAUTHORIZED" : "You are not authorized to access this resource.",
+  "ERR_NOT_FOUND" : "The requested resource was not found.",
+  "ERR_REQUEST" : "Do not repeat this request without modification.",
+  "UNPROCESSABLE_ENTITY" : "The request was well-formed but unable to be followed due to semantic errors.",
+  "CONFLICT" : "The request could not be completed due to a conflict with the current state of the target resource."
+}

@@ -10,20 +10,23 @@ import { z } from 'zod'
 
 interface guise {
   status?: number
+  url?: string
+  language?: string
   raw?: { [key: string]: any } | unknown
   session?: { [key: string]: any }
   headers?: { [key: string]: any }
   query?: { [key: string]: any } | unknown
   body?: { [key: string]: any } | unknown
   params?: { [key: string]: any } | unknown
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
 }
 
 const headers = z.object({
-  authorization: z
+  'authorization': z
     .string()
     .startsWith('Bearer')
-    .trim()
     .regex(/^Bearer [a-zA-Z0-9-._~+/]+=*$/),
+  'accept-language': z.string().default('en'),
 })
 
 type server = FastifyInstance<

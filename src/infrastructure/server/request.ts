@@ -1,3 +1,4 @@
+import translate from '@infrastructure/languages/translate'
 import * as crypto from 'crypto'
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { guise, replyErrorSchema } from './interface'
@@ -71,69 +72,91 @@ export class authentication {
 }
 
 export class err {
-  unauthorized() {
+  unauthorized(language?: string) {
     return {
       statusCode: 401,
       code: 'ERR_UNAUTHORIZED',
       error: 'Unauthorized',
-      message: 'You are not authorized to access this resource.',
+      message: translate('ERR_UNAUTHORIZED', language),
     }
   }
-  notFound(resource?: string) {
+  notFound(language?: string, resource?: string) {
     return {
       statusCode: 404,
-      code: 'ERR_VALIDATION',
+      code: 'ERR_NOT_FOUND',
       error: `Not Found ${resource || ''}`,
-      message: 'The requested resource was not found.',
+      message: translate('ERR_NOT_FOUND', language),
     }
   }
-  badRequest(resource?: string) {
+  badRequest(language?: string, resource?: string) {
     return {
       statusCode: 400,
       code: 'ERR_REQUEST',
       error: `Bad Request ${resource ?? ''}`,
-      message: 'Do not repeat this request without modification.',
+      message: translate('ERR_REQUEST', language),
     }
   }
-  unprocessableEntity(resource?: string) {
+  unprocessableEntity(language?: string, resource?: string) {
     return {
       statusCode: 422,
       code: 'UNPROCESSABLE_ENTITY',
       error: `Unprocessable Entity ${resource ?? ''}`,
-      message: 'The request was well-formed but unable to be followed due to semantic errors.',
+      message: translate('UNPROCESSABLE_ENTITY', language),
+    }
+  }
+  conflict(language?: string, resource?: string) {
+    return {
+      statusCode: 409,
+      code: 'CONFLICT',
+      error: `Conflict ${resource ?? ''}`,
+      message: translate('CONFLICT', language),
     }
   }
 }
 
-export class container extends err {
+export class container<t = any> extends err {
+  protected _url: guise['url']
   protected _status: guise['status']
+  protected _language: guise['language']
   protected _raw: guise['raw']
   protected _session: guise['session']
   protected _headers: guise['headers']
   protected _query: guise['query']
   protected _body: guise['body']
   protected _params: guise['params']
-  constructor({ status, raw, session, headers, query, body, params }: guise = {}) {
+  protected _method: guise['method']
+  constructor(args: guise) {
     super()
-    this._status = status || 200
-    this._raw = raw
-    this._session = session
-    this._headers = headers
-    this._query = query
-    this._body = body
-    this._params = params
+    this._url = args.url
+    this._status = args.status || 200
+    this._language = args.language || 'en'
+    this._session = args.session
+    this._headers = args.headers
+    this._query = args.query
+    this._body = args.body
+    this._params = args.params
+    this._method = args.method
+    this._raw = args.raw
   }
   debug<T>(context?: guise['raw']) {
     this._raw = context || this._raw
     return this._raw as T
   }
-  session<T>(context?: guise['session']) {
+  url(context?: guise['url']) {
+    this._url = context || this._url
+    return this._url
+  }
+  session<T extends t>(context?: guise['session']) {
     this._session = context || this._session
     return this._session as T
   }
-  headers<T>(context?: guise['headers']) {
+  language(context?: string) {
+    this._language = context || this._language
+    return this._language
+  }
+  headers(context?: guise['headers']) {
     this._headers = { ...this._headers, ...context }
-    return this._headers as T
+    return this._headers
   }
   query<T>(context?: guise['query']) {
     this._query = context || this._query
@@ -150,6 +173,10 @@ export class container extends err {
   status(context?: guise['status']) {
     this._status = context || this._status
     return this._status ?? 200
+  }
+  method(context?: guise['method']) {
+    this._method = context || this._method
+    return this._method ?? 'GET'
   }
 }
 
@@ -182,17 +209,20 @@ function execute(
 ): (request: FastifyRequest, reply: FastifyReply) => Promise<void> {
   return async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const receiver = new container({
-      raw: req.raw,
+      url: req.routeOptions.config.url,
+      status: reply.statusCode,
+      language: req.headers['accept-language'],
       headers: req.headers,
       query: req.query,
       body: req.body,
       params: req.params,
-      status: reply.statusCode,
+      method: req.routeOptions.config.method as guise['method'],
+      raw: req.raw,
     })
 
     if (isRestricted) {
       const auth = new authentication().session(req)
-      if (!auth) return reply.code(401).send(receiver.unauthorized())
+      if (!auth) return reply.code(401).send(receiver.unauthorized(receiver.language()))
       receiver.session(auth)
     }
 
@@ -202,7 +232,7 @@ function execute(
       context = await callback(receiver)
       receiver.body(context)
     } catch (err: any) {
-      context = receiver.badRequest()
+      context = receiver.badRequest(receiver.language())
       context = typeof err === 'string' ? { ...context, message: err } : err
       receiver.body(context)
     }
