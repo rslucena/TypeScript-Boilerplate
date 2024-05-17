@@ -4,6 +4,7 @@ export interface worker {
   tsx: string
   node: string
   name: string
+  activated: boolean
   options: Omit<pm2.StartOptions, 'name' | 'script'>
 }
 
@@ -18,6 +19,7 @@ const defaultConfigs: pm2.StartOptions = {
 
 export default <worker[]>[
   {
+    activated: true,
     name: 'http:primary:webserver',
     tsx: './src/providers/http-webserver.ts',
     node: './dist/providers/http-webserver.js',

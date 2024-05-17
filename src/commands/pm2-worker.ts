@@ -20,6 +20,7 @@ const list = (engine: 'tsx' | 'node') =>
 
 const start = (engine: 'tsx' | 'node', worker: worker) =>
   new Promise((resolve, reject) => {
+    if (worker.activated) return resolve(null)
     pm2.start(
       {
         name: worker.name,
