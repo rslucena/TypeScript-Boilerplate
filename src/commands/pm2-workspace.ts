@@ -20,9 +20,9 @@ const defaultConfigs: pm2.StartOptions = {
 export default <worker[]>[
   {
     activated: true,
-    name: 'http:primary:webserver',
-    tsx: './src/providers/http-webserver.ts',
-    node: './dist/providers/http-webserver.js',
+    name: 'http:web:server',
+    tsx: './src/functions/http-web-server.ts',
+    node: './dist/functions/http-web-server.js',
     options: { ...defaultConfigs },
   },
 ]

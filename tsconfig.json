@@ -14,7 +14,7 @@
       "@commands/*": ["./src/commands/*"],
       "@domain/*": ["./src/domain/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
-      "@providers/*": ["./src/providers/*"],
+      "@providers/*": ["./src/functions/*"],
       "@tests/*": ["./src/tests/*"]
     }
   },
