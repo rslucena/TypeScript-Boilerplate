@@ -20,13 +20,11 @@ const list = (engine: 'tsx' | 'node') =>
 
 const start = (engine: 'tsx' | 'node', worker: worker) =>
   new Promise((resolve, reject) => {
-    if (worker.activated) return resolve(null)
+    if (!worker.activated) return resolve(null)
     pm2.start(
       {
         name: worker.name,
         script: worker[engine],
-        args: '--update-env',
-        interpreter_args: '--watch',
         ...worker.options,
       },
       (err, app) => (err ? reject(err) : resolve(app))
