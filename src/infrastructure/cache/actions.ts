@@ -1,6 +1,8 @@
 import client from './connection'
 import { actions, setmode } from './interfaces'
 
+const stack = String(process.env.REDIS_STACK) === 'true'
+
 const cache: actions = {
   text: {
     del: (hash) => del({ type: 'text', hash } as setmode),
@@ -21,17 +23,19 @@ async function get<t>({ type, hash }: setmode, force: boolean = false): Promise<
     text: async () => await client.get(hash),
     json: async () => await client.json.get(hash),
   }
-  const action = actions[type]()
+  const action = await actions[stack ? type : 'text']()
   if (!action) return null
+  if (!stack) return JSON.parse(action as string)
   return action as t
 }
 
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
+  if (!stack) vals = JSON.stringify(vals)
   const actions = {
     text: async () => await client.set(hash, vals),
     json: async () => await client.json.set(hash, key ?? '$', vals),
   }
-  const action = actions[type]()
+  const action = actions[stack ? type : 'text']()
   if (ttl) await client.expire(hash, ttl)
   return action
 }
