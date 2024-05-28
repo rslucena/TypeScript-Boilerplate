@@ -2,6 +2,7 @@ import translate from '@infrastructure/languages/translate'
 import * as crypto from 'crypto'
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { guise, replyErrorSchema } from './interface'
+import { safeParse } from './transforms'
 
 export class authentication {
   create(content: guise['session'], exp?: number) {
@@ -29,31 +30,24 @@ export class authentication {
       .replace(/=/g, '')
     return `${encodedHeader}.${encodedPayload}.${signature}`
   }
-  session(request: FastifyRequest) {
-    const { authorization } = request.headers
+  session(request: container) {
+    const { authorization } = request.headers()
     if (!authorization) return false
 
     const jwt = authorization.replace('Bearer', '').replace(' ', '')
 
-    const Parts = jwt.split('.')
-    if (Parts.length !== 3 || !Parts[0] || !Parts[1] || !Parts[2]) return false
+    const parts = jwt.split('.')
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false
 
-    const encodedHeader = Parts[0]
-    const encodedPayload = Parts[1]
-    const signature = Parts[2]
+    const encodedHeader = parts[0]
+    const encodedPayload = parts[1]
+    const signature = parts[2]
 
-    let Header
-    let body
+    const header = safeParse(Buffer.from(encodedHeader, 'base64').toString())
+    if (!header) return false
+    if (header.typ !== 'JWT' || header.alg !== 'HS256') return false
 
-    try {
-      Header = JSON.parse(Buffer.from(encodedHeader, 'base64').toString())
-      body = JSON.parse(Buffer.from(encodedPayload, 'base64').toString())
-    } catch (err) {
-      return false
-    }
-
-    if (Header.typ !== 'JWT' || Header.alg !== 'HS256') return false
-
+    const body = safeParse(Buffer.from(encodedPayload, 'base64').toString())
     if (!body) return false
 
     const expectedSignature = crypto
@@ -65,8 +59,10 @@ export class authentication {
       .replace(/=/g, '')
 
     if (signature !== expectedSignature) return false
+
     const Now = Math.floor(Date.now() / 1000)
-    if (Now > Header.exp) return false
+    if (Now > header.exp) return false
+
     return body
   }
 }
@@ -193,7 +189,7 @@ export function convertRequestTypes(
       if (vl === 'true') params[key] = true
       if (vl === 'false') params[key] = false
       if (vl === 'null') params[key] = null
-      if (vl.startsWith('[') && vl.endsWith(']')) params[key] = JSON.parse(vl)
+      if (vl.startsWith('[') && vl.endsWith(']')) params[key] = safeParse(vl)
     }
     return params
   }
@@ -221,7 +217,7 @@ function execute(
     })
 
     if (isRestricted) {
-      const auth = new authentication().session(req)
+      const auth = new authentication().session(receiver)
       if (!auth) return reply.code(401).send(receiver.unauthorized(receiver.language()))
       receiver.session(auth)
     }

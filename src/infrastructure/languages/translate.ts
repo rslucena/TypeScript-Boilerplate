@@ -1,12 +1,13 @@
+import { safeParse } from '@infrastructure/server/transforms'
 import * as fs from 'fs'
 import path from 'path'
 
 const paths = path.resolve('./src/infrastructure/languages')
 
 export const Languages: { [key: string]: { [key: string]: string } } = {
-  en: JSON.parse(fs.readFileSync(`${paths}/en.json`, 'utf8').toString()),
-  es: JSON.parse(fs.readFileSync(`${paths}/es.json`, 'utf8').toString()),
-  "pt-br": JSON.parse(fs.readFileSync(`${paths}/pt.json`, 'utf8').toString()),
+  'en': safeParse(fs.readFileSync(`${paths}/en.json`, 'utf8').toString()) ?? {},
+  'es': safeParse(fs.readFileSync(`${paths}/es.json`, 'utf8').toString()) ?? {},
+  'pt-br': safeParse(fs.readFileSync(`${paths}/pt.json`, 'utf8').toString()) ?? {},
 }
 
 export default function translate(text: string, language?: string): string {

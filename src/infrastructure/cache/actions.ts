@@ -1,3 +1,4 @@
+import { safeParse } from '@infrastructure/server/transforms'
 import client from './connection'
 import { actions, setmode } from './interfaces'
 
@@ -25,7 +26,7 @@ async function get<t>({ type, hash }: setmode, force: boolean = false): Promise<
   }
   const action = await actions[stack ? type : 'text']()
   if (!action) return null
-  if (!stack) return JSON.parse(action as string)
+  if (!stack) return safeParse<t>(action as string) ?? null
   return action as t
 }
 
