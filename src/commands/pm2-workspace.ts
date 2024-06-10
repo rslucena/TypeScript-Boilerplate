@@ -5,6 +5,7 @@ export interface worker {
   node: string
   name: string
   activated: boolean
+  uptime: string
   options: Omit<pm2.StartOptions, 'name' | 'script'>
 }
 
@@ -25,5 +26,6 @@ export default <worker[]>[
     tsx: './src/functions/http-web-server.ts',
     node: './dist/functions/http-web-server.js',
     options: { ...defaultConfigs },
+    uptime: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
   },
 ]

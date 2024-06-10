@@ -25,7 +25,17 @@ pm2.connect(async function (err) {
 
   workers.catch((err) => console.error(err))
 
-  workers.then(() => pm2Worker.list(enginer))
+  workers.then(async (workers: Array<any>) => {
+    for (let i = 0; i < workers.length; i++) {
+      const worker: pm2.Proc & { uptime: string } = workers[i]
+      if (!worker.uptime) continue
+      const updown = worker.status === 'online' ? 'up' : 'down'
+      await fetch(`${worker.uptime}?status=${updown}`, {
+        signal: AbortSignal.timeout(1000),
+      }).catch(() => null)
+    }
+    pm2Worker.list(enginer)
+  })
 
   messages.sub('workers:server:info', async (message: string) =>
     message.length ? pm2Worker.info(message, enginer) : undefined

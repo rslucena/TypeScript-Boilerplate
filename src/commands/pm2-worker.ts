@@ -21,14 +21,12 @@ const list = (engine: 'tsx' | 'node') =>
 const start = (engine: 'tsx' | 'node', worker: worker) =>
   new Promise((resolve, reject) => {
     if (!worker.activated) return resolve(null)
-    pm2.start(
-      {
-        name: worker.name,
-        script: worker[engine],
-        ...worker.options,
-      },
-      (err, app) => (err ? reject(err) : resolve(app))
-    )
+    const job = {
+      name: worker.name,
+      script: worker[engine],
+      ...worker.options,
+    }
+    pm2.start(job, (err, app: any) => (err ? reject(err) : resolve({ ...app[0], ...worker })))
   })
 
 const info = (name: string | undefined, engine: string) =>
