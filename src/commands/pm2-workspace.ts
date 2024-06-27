@@ -5,7 +5,7 @@ export interface worker {
   node: string
   name: string
   activated: boolean
-  uptime: string
+  heartbeat: string
   options: Omit<pm2.StartOptions, 'name' | 'script'>
 }
 
@@ -22,10 +22,10 @@ const defaultConfigs: pm2.StartOptions = {
 export default <worker[]>[
   {
     activated: true,
-    name: 'http:web:server',
-    tsx: './src/functions/http-web-server.ts',
-    node: './dist/functions/http-web-server.js',
+    name: 'primary/webserver',
+    tsx: './src/functions/http-primary-webserver.ts',
+    node: './dist/functions/http-primary-webserver.js',
     options: { ...defaultConfigs },
-    uptime: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
+    heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
   },
 ]

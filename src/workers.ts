@@ -27,10 +27,10 @@ pm2.connect(async function (err) {
 
   workers.then(async (workers: Array<any>) => {
     for (let i = 0; i < workers.length; i++) {
-      const worker: pm2.Proc & { uptime: string } = workers[i]
-      if (!worker.uptime) continue
+      const worker: pm2.Proc & { heartbeat: string } = workers[i]
+      if (!worker.heartbeat) continue
       const updown = worker.status === 'online' ? 'up' : 'down'
-      await fetch(`${worker.uptime}?status=${updown}`, {
+      await fetch(`${worker.heartbeat}?status=${updown}`, {
         signal: AbortSignal.timeout(1000),
       }).catch(() => null)
     }
