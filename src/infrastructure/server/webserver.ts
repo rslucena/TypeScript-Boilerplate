@@ -11,9 +11,11 @@ import { ZodTypeProvider, serializerCompiler, validatorCompiler } from 'fastify-
 import { server } from './interface'
 import { convertRequestTypes, err } from './request'
 
+const logger = Logs.handler('webserver')
+
 async function webserver(): Promise<server> {
   const instance = fastify({
-    logger: Logs.provider,
+    logger: logger,
     caseSensitive: false,
     pluginTimeout: 20000,
     requestTimeout: 20000,
@@ -36,32 +38,29 @@ async function webserver(): Promise<server> {
     er.message = error.message
     return reply.headers(request.headers).code(er.statusCode).send(er)
   })
-  process.on('SIGTERM', () => {
-    instance.close()
-    process.exit(1)
-  })
-  process.on('SIGINT', () => {
-    instance.close()
-    process.exit(1)
-  })
-  process.on('uncaughtException', (err) => {
-    Logs.file.error('Uncaught Exception thrown', err)
-    process.exit(1)
-  })
-  process.on('unhandledRejection', (reasons) => {
-    Logs.file.error('Unhandled Rejection', reasons)
-    process.exit(1)
-  })
+
+  const safeExit = (message: string, err?: any) => {
+    logger.error(message, err ?? '')
+    process.emit('SIGTERM')
+    process.emit('SIGINT')
+  }
+
+  process.on('SIGTERM', () => process.exit(1))
+  process.on('SIGINT', () => process.exit(1))
+  process.on('SIGILL', (err) => safeExit('Illegal Instruction', err))
+  process.on('SIGFPE', (err) => safeExit('Divided by 0', err))
+  process.on('uncaughtException', (err) => safeExit('Uncaught Exception', err))
+  process.on('unhandledRejection', (err) => safeExit('Unhandled Rejection', err))
   return instance
 }
 
 async function start(instance: server, port: number): Promise<void> {
   instance.ready((err) => {
-    if (err) return Logs.console.error(err.message, err, true)
+    if (err) return logger.error(err.message, err)
     instance.swagger()
   })
   instance.listen({ port, host: '0.0.0.0' }, (err, address) => {
-    if (err) Logs.file.error(err.message, err, true)
+    if (err) return logger.error(err.message, err)
     Logs.console.info(`Server listening on ${address}`)
     Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`)
   })

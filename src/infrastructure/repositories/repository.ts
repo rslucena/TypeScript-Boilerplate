@@ -5,6 +5,9 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import connection from './connection'
 
+const handler = Logs.handler('database')
+const logger = new DefaultLogger({ writer: { write: (message) => handler.info(message) } })
+
 export function withPagination<T extends PgSelect>(qb: T, page: number, size: number = 10) {
   return qb.limit(size).offset((page - 1) * size)
 }
@@ -17,8 +20,6 @@ const primaryDb = postgres({
   max: Number(process.env.POSTGRES_POOL),
 })
 
-const manager = drizzle(primaryDb, {
-  logger: new DefaultLogger({ writer: { write: (message) => Logs.file.info(message) } }),
-})
+const manager = drizzle(primaryDb, { logger: logger })
 
 export default manager
