@@ -28,4 +28,12 @@ export default <worker[]>[
     options: { ...defaultConfigs },
     heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
   },
+  {
+    activated: true,
+    name: 'primary/websocket',
+    tsx: './src/functions/udp-primary-websocket.ts',
+    node: './dist/functions/udp-primary-websocket.js',
+    options: { ...defaultConfigs },
+    heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/asdasd`,
+  },
 ]
