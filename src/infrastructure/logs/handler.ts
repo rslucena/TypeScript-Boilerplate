@@ -3,54 +3,43 @@ import * as path from 'path'
 import pino from 'pino'
 import actions from './interfaces'
 
-const folder = `${path.resolve('./src')}/temp/logs/`
-existsSync(folder) ? undefined : mkdirSync(folder)
-existsSync(folder) ? undefined : writeFileSync(`${folder}/webserver.log`, '')
+const bindings = (bindings: any) => ({ ...bindings, node_version: process.versions.node })
 
-export const handler = pino({
-  level: process.env.LOG_LEVEL,
+const configs = {
+  level: process.env.LOG_LEVEL ?? 'info',
   redact: ['headers.authorization'],
   enabled: process.env.SHOW_LOG === 'true',
   timestamp: () => `,"time":"${new Date().toISOString()}"`,
-  formatters: {
-    bindings: (bindings) => ({ ...bindings, node_version: process.versions.node }),
-  },
-  transport: {
-    target: 'pino/file',
-    options: { destination: `${folder}/webserver.log` },
-  },
-})
+  formatters: { bindings },
+}
 
-const files: actions['file'] = {
-  error: (message, props, exit) => {
-    handler.error(props, message)
-    if (exit) process.emit('SIGTERM')
-  },
-  warn: (props, message?) => handler.warn(props, message),
-  info: (props) => handler.info(props),
-  debug: (props, exit?) => {
-    handler.debug(props)
-    if (exit) process.emit('SIGTERM')
-  },
+const folder = `${path.resolve('.')}/temp/`
+existsSync(folder) ? undefined : mkdirSync(folder)
+
+const handler = (filename: string) => {
+  const file = existsSync(`${folder}/${filename}.log`)
+  if (!file) writeFileSync(`${folder}/${filename}.log`, '')
+  return pino({
+    ...configs,
+    ...{
+      transport: {
+        target: 'pino/file',
+        options: { destination: `${folder}/${filename}.log` },
+      },
+    },
+  })
 }
 
 const terminal: actions['console'] = {
-  error: (message, props, exit) => {
-    console.debug({ message, props })
-    if (exit) process.emit('SIGTERM')
-  },
-  warn: (props, message?) => console.debug({ ...props, message }),
+  error: (message, props) => console.debug(message, props),
+  warn: (message, props) => console.debug(message, props),
   info: (props) => console.debug(props),
-  debug: (props, exit?) => {
-    console.debug(props)
-    if (exit) process.emit('SIGTERM')
-  },
+  debug: (props) => console.debug(props),
 }
 
 export const Logs: actions = {
-  file: files,
   console: terminal,
-  provider: handler,
+  handler,
 }
 
 export default Logs
