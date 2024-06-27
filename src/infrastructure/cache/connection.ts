@@ -13,7 +13,8 @@ const connection: RedisClientOptions = {
 }
 
 const client = createClient(connection)
-client.on('error', (err) => Logs.console.error('Redis Client Error', err, true))
+
+client.on('error', (err) => Logs.console.error('redis error', err))
 
 await client.connect()
 
