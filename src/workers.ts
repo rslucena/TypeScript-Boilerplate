@@ -5,6 +5,7 @@ import pm2Workspace from './commands/pm2-workspace'
 
 const enginer = process.env.npm_lifecycle_event === 'workers' ? 'tsx' : 'node'
 const worker = process.env.npm_config_worker === 'all' ? undefined : process.env.npm_config_worker
+const activated = !worker ? false : true
 
 pm2.connect(async function (err) {
   if (err) {
@@ -21,7 +22,9 @@ pm2.connect(async function (err) {
 
   const workspace = Array.isArray(jobs) ? jobs : [jobs]
 
-  const workers = Promise.all(workspace.map((worker) => pm2Worker.start(enginer, worker)))
+  const workers = Promise.all(
+    workspace.map((worker) => pm2Worker.start(enginer, worker, activated))
+  )
 
   workers.catch((err) => console.error(err))
 

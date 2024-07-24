@@ -19,9 +19,9 @@ const list = (engine: 'tsx' | 'node') =>
     console.table(list.map((worker: any) => format(worker, engine)))
   })
 
-const start = (engine: 'tsx' | 'node', worker: worker) =>
+const start = (engine: 'tsx' | 'node', worker: worker, force?:boolean) =>
   new Promise((resolve, reject) => {
-    if (!worker.activated) return resolve(null)
+    if (!force && !worker.activated) return resolve(null)
     const job = {
       name: worker.name,
       script: worker[engine],
