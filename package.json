@@ -17,7 +17,8 @@
     "db:migrate": "drizzle-kit generate:pg",
     "db:studio": "drizzle-kit studio --host localhost",
     "tests": "vitest --mode development",
-    "build": "npm run pb:eslint && npm run pb:prettier && tsup src",
+    "prebuild": "npm run pb:eslint && npm run pb:prettier",
+    "build": "tsx --env-file=.env -- src/commands/exec-builder.ts",
     "workers": "tsx watch --env-file=.env -- src/workers.ts",
     "dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
     "start": "node --env-file=.env dist/workers.js"
