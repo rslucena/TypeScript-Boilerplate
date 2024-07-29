@@ -18,7 +18,7 @@
     "db:studio": "drizzle-kit studio --host localhost",
     "tests": "vitest --mode development",
     "prebuild": "npm run pb:eslint && npm run pb:prettier",
-    "build": "tsx --env-file=.env -- src/commands/exec-builder.ts",
+    "build": "tsx -- src/commands/exec-builder.ts",
     "workers": "tsx watch --env-file=.env -- src/workers.ts",
     "dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
     "start": "node --env-file=.env dist/workers.js"
