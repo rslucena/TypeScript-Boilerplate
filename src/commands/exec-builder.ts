@@ -4,7 +4,7 @@ import { build, Options } from 'tsup'
 import ts from 'typescript'
 import pm2Workspace from './pm2-workspace'
 
-const worker = process.env.npm_config_worker === 'all' ? undefined : process.env.npm_config_worker
+const worker = process.env.npm_config_worker ?? undefined
 
 const jobs = worker ? pm2Workspace.find((configs) => configs.name === worker) : pm2Workspace
 if (!jobs) {
@@ -27,43 +27,40 @@ const commandline = ts.parseJsonConfigFileContent(
   path.dirname(tsPath)
 )
 
-const programTS = ts.createProgram(commandline.fileNames, commandline.options)
-const crossdependency = new Set<string>()
-const processedFiles = new Set<string>()
-const excludes: string[] = config.exclude.map((v: string) => v.replace('/**', ''))
 const outers = new Set<string>()
+const crossdependency = new Set<string>()
+const processed = new Set<string>()
+const excludes: string[] = config.exclude.map((v: string) => v.replace('/**', ''))
+const programTS = ts.createProgram(commandline.fileNames, commandline.options)
 
-const execution = path.resolve(rootdir, './src/workers.ts')
-dependencies(execution)
-crossdependency.add(execution)
+const workers = path.resolve(rootdir, './src/workers.ts')
+dependencies(workers)
+crossdependency.add(workers)
 
 const workspace = Array.isArray(jobs) ? jobs : [jobs]
-
 for (let i = 0; i < workspace.length; i++) {
   const job = path.resolve(rootdir, workspace[i].tsx)
   dependencies(job)
   crossdependency.add(job)
 }
 
-if (!crossdependency.size) {
-  console.error(new Error('Unable to locate the script, provider, or container for execution.'))
-  process.exit()
-}
-
 function dependencies(entry: string) {
-  const directory = path.dirname(entry)
-  const files = fs.readdirSync(directory)
-  for (const file of files) {
-    const fullPath = path.join(directory, file)
-    const stat = fs.statSync(fullPath)
-    if (stat.isFile() && path.extname(file) !== '.ts') outers.add(fullPath)
-  }
+  if (processed.has(entry)) return
+
   const exclude = excludes.some((term) => entry.includes(term.toString()))
   if (exclude) return
-  if (processedFiles.has(entry)) return
-  processedFiles.add(entry)
+
+  const directory = path.dirname(entry)
+  for (const file of fs.readdirSync(directory)) {
+    const fullPath = path.join(directory, file)
+    const status = fs.statSync(fullPath)
+    if (status.isFile() && path.extname(file) !== '.ts') outers.add(fullPath)
+  }
+
+  processed.add(entry)
   const source = programTS.getSourceFile(entry)
   if (!source) throw new Error('File not found')
+
   source.forEachChild((node) => nodes(node, source))
 }
 

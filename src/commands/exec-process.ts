@@ -2,7 +2,8 @@ import Logs from '@infrastructure/logs/handler'
 import { spawn } from 'child_process'
 import pm2Workspace from './pm2-workspace'
 
-const worker = process.env.npm_config_worker === 'all' ? undefined : process.env.npm_config_worker
+const worker = process.env.npm_config_worker ?? undefined
+
 const err = 'Unable to locate the script, provider, or container for execution.'
 
 if (!worker) {

@@ -3,8 +3,8 @@ import pm2 from 'pm2'
 import pm2Worker from './commands/pm2-worker'
 import pm2Workspace from './commands/pm2-workspace'
 
-const enginer = process.env.npm_lifecycle_event === 'workers' ? 'tsx' : 'node'
-const worker = process.env.npm_config_worker === 'all' ? undefined : process.env.npm_config_worker
+const enginer = process.env.npm_lifecycle_event === 'dev' ? 'tsx' : 'node'
+const worker = process.env.npm_config_worker ?? undefined
 const activated = !worker ? false : true
 
 pm2.connect(async function (err) {
