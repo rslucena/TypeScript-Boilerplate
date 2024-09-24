@@ -20,7 +20,7 @@
     "prebuild": "npm run pb:eslint && npm run pb:prettier",
     "build": "tsx -- src/commands/exec-builder.ts",
     "dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
-    "start": "node --env-file=.env dist/workers.js"
+    "start": "node --env-file=.env dist/commands/exec-process.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",

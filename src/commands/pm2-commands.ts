@@ -25,6 +25,7 @@ const start = (engine: 'tsx' | 'node', worker: worker, force?: boolean) =>
     const job = {
       name: worker.name,
       script: worker[engine],
+      watch: engine === 'tsx' ? true : false,
       ...worker.options,
     }
     pm2.start(job, (err, app: any) => (err ? reject(err) : resolve({ ...app[0], ...worker })))

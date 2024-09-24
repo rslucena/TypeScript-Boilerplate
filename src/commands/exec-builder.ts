@@ -33,9 +33,9 @@ const processed = new Set<string>()
 const excludes: string[] = config.exclude.map((v: string) => v.replace('/**', ''))
 const programTS = ts.createProgram(commandline.fileNames, commandline.options)
 
-const workers = path.resolve(rootdir, './src/workers.ts')
-dependencies(workers)
-crossdependency.add(workers)
+const execution = path.resolve(rootdir, './src/commands/exec-process.ts')
+dependencies(execution)
+crossdependency.add(execution)
 
 const workspace = Array.isArray(jobs) ? jobs : [jobs]
 for (let i = 0; i < workspace.length; i++) {

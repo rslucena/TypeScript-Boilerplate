@@ -4,6 +4,7 @@ export interface worker {
   tsx: string
   node: string
   name: string
+  group: string
   activated: boolean
   heartbeat: string
   options: Omit<pm2.StartOptions, 'name' | 'script'>
@@ -22,7 +23,8 @@ const defaultConfigs: pm2.StartOptions = {
 export default <worker[]>[
   {
     activated: true,
-    name: 'primary/webserver',
+    group: 'primary',
+    name: 'primarywebserver',
     tsx: './src/functions/http-primary-webserver.ts',
     node: './dist/functions/http-primary-webserver.js',
     options: { ...defaultConfigs },
@@ -30,6 +32,7 @@ export default <worker[]>[
   },
   {
     activated: true,
+    group: 'primary',
     name: 'primary/websocket',
     tsx: './src/functions/udp-primary-websocket.ts',
     node: './dist/functions/udp-primary-websocket.js',
