@@ -24,7 +24,7 @@ export default <worker[]>[
   {
     activated: true,
     group: 'primary',
-    name: 'primarywebserver',
+    name: 'primary-webserver',
     tsx: './src/functions/http-primary-webserver.ts',
     node: './dist/functions/http-primary-webserver.js',
     options: { ...defaultConfigs },
@@ -33,7 +33,7 @@ export default <worker[]>[
   {
     activated: true,
     group: 'primary',
-    name: 'primary/websocket',
+    name: 'primary-websocket',
     tsx: './src/functions/udp-primary-websocket.ts',
     node: './dist/functions/udp-primary-websocket.js',
     options: { ...defaultConfigs },

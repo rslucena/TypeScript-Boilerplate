@@ -21,6 +21,11 @@ const list = (engine: 'tsx' | 'node') =>
 
 const start = (engine: 'tsx' | 'node', worker: worker, force?: boolean) =>
   new Promise((resolve, reject) => {
+    if (engine === 'tsx')
+      Object.assign(worker.options, {
+        autorestart: false,
+        interpreter_args: '--import tsx',
+      })
     if (!force && !worker.activated) return resolve(null)
     const job = {
       name: worker.name,
