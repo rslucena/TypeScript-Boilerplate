@@ -1,4 +1,5 @@
 import { messages } from '@infrastructure/messages/actions'
+import { spawn } from 'child_process'
 import pm2 from 'pm2'
 import pm2Commands from './pm2-commands'
 import { worker } from './pm2-workspace'
@@ -6,6 +7,19 @@ import { worker } from './pm2-workspace'
 const enginer = process.env.npm_lifecycle_event === 'dev' ? 'tsx' : 'node'
 const worker = process.env.npm_config_worker ?? undefined
 const abort = { signal: AbortSignal.timeout(1000) }
+
+async function debug(jobs: worker[]) {
+  for (let i = 0; i < jobs.length; i++) {
+    const command = `tsx watch --env-file=.env -- ${jobs[i].tsx}`
+    const child = spawn(command, { stdio: 'inherit', shell: true })
+    const { stdout, stderr } = child
+    child.on('message', (message) => console.debug(message))
+    child.on('error', (error) => console.error('command error:', error))
+    child.on('close', (code) => console.error(`command exited with code ${code}`))
+    stdout?.on('data', (data) => console.debug(data))
+    stderr?.on('data', (data) => console.debug(data))
+  }
+}
 
 async function execute(jobs: worker[], force?: boolean) {
   pm2.connect(async function (err) {
@@ -40,4 +54,4 @@ async function execute(jobs: worker[], force?: boolean) {
   })
 }
 
-export default { execute }
+export default { execute, debug }
