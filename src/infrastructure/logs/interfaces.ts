@@ -2,7 +2,7 @@ import { Logger } from 'pino'
 
 export default interface actions {
   console: methods
-  handler: (filename: string) => Logger<never>
+  handler: (filename: string) => Logger<never, boolean>
 }
 
 interface methods {

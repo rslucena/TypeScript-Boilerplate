@@ -1,11 +1,6 @@
-import {
-  FastifyInstance,
-  RawReplyDefaultExpression,
-  RawRequestDefaultExpression,
-  RawServerDefault,
-} from 'fastify'
+import { FastifyBaseLogger, FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { Logger } from 'pino'
+import { IncomingMessage, Server, ServerResponse } from 'http'
 import { z } from 'zod'
 
 interface guise {
@@ -30,10 +25,10 @@ const headers = z.object({
 })
 
 type server = FastifyInstance<
-  RawServerDefault,
-  RawRequestDefaultExpression<RawServerDefault>,
-  RawReplyDefaultExpression<RawServerDefault>,
-  Logger<never>,
+  Server<typeof IncomingMessage, typeof ServerResponse>,
+  IncomingMessage,
+  ServerResponse<IncomingMessage>,
+  FastifyBaseLogger,
   ZodTypeProvider
 >
 
