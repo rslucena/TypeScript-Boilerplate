@@ -10,17 +10,15 @@
   },
   "scripts": {
     "pb:health": "npm outdated",
-    "pb:eslint": "eslint --quiet --no-warn-ignored --fix ./src/**/*.ts",
-    "pb:prettier": "prettier ./src/**/*.ts --write",
     "db:push": "drizzle-kit push:pg",
     "db:migrate:up": "drizzle-kit up:pg",
     "db:migrate": "drizzle-kit generate:pg",
     "db:studio": "drizzle-kit studio --host localhost",
     "tests": "vitest --mode development",
-    "prebuild": "npm run pb:eslint && npm run pb:prettier",
     "build": "tsx -- src/commands/exec-builder.ts",
+    "start": "node --env-file=.env dist/commands/exec-process.js",
     "dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
-    "start": "node --env-file=.env dist/commands/exec-process.js"
+    "prebuild": "npx prettier ./src/**/*.ts --write && npx eslint --quiet --no-warn-ignored --fix ./src/**/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
@@ -48,7 +46,7 @@
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "fastify": "^5.0.0",
-    "fastify-type-provider-zod": "^3.0.0",
+    "fastify-type-provider-zod": "^4.0.1",
     "pino": "^9.4.0",
     "pm2": "^5.4.2",
     "postgres": "^3.4.4",
