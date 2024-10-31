@@ -1,10 +1,10 @@
-import type { Config } from 'drizzle-kit'
+import { defineConfig } from "drizzle-kit";
 import connection from './src/infrastructure/repositories/connection'
 
-export default {
+export default defineConfig({
+  dialect: 'postgresql',
   schema: './src/domain/**/entity.ts',
   out: './src/infrastructure/migrations',
-  driver: 'pg',
   dbCredentials: {
     database: connection.database,
     host: connection.host,
@@ -12,6 +12,5 @@ export default {
     password: connection.password,
     user: connection.username,
   },
-  strict: true,
-  verbose: true,
-} satisfies Config
+  strict: true
+})
