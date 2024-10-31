@@ -27,7 +27,7 @@ const headers = z.object({
 type server = FastifyInstance<
   Server<typeof IncomingMessage, typeof ServerResponse>,
   IncomingMessage,
-  ServerResponse<IncomingMessage>,
+  ServerResponse,
   FastifyBaseLogger,
   ZodTypeProvider
 >

@@ -13,7 +13,6 @@ describe('Test cache functions', () => {
   })
 
   it('Must be possible to insert json content', async () => {
-    const ref = hash({ table: 1, id: 2 })
     const action = await cache.json.set('test-json-key', { test: 'test' })
     expect(action).toBe('OK')
   })

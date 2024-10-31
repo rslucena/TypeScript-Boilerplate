@@ -8,7 +8,7 @@ describe('Messaging system testing', () => {
   })
   it('It must be possible to send', async () => {
     const Topic = hash({ table: 1, id: 1 })
-    messages.sub(Topic, async () => {})
+    await messages.sub(Topic, async () => {})
     expect(await messages.pub(Topic, [1])).toBeDefined()
   })
 })

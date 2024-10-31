@@ -21,4 +21,4 @@ if (!jobs.length) {
 }
 enginer === 'dev'
   ? await pm2Workers.debug(jobs)
-  : await pm2Workers.execute(jobs, worker ? true : false)
+  : await pm2Workers.execute(jobs, !!worker)

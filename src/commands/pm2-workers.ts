@@ -4,8 +4,7 @@ import pm2 from 'pm2'
 import pm2Commands from './pm2-commands'
 import { worker } from './pm2-workspace'
 
-const enginer = process.env.npm_lifecycle_event === 'dev' ? 'tsx' : 'node'
-const worker = process.env.npm_config_worker ?? undefined
+const engineer = process.env.npm_lifecycle_event === 'dev' ? 'tsx' : 'node'
 const abort = { signal: AbortSignal.timeout(1000) }
 
 async function debug(jobs: worker[]) {
@@ -32,7 +31,7 @@ async function execute(jobs: worker[], force?: boolean) {
       process.exit()
     }
 
-    const workers = Promise.all(jobs.map((job) => pm2Commands.start(enginer, job, force)))
+    const workers = Promise.all(jobs.map((job) => pm2Commands.start(engineer, job, force)))
 
     workers.catch((err) => console.error(err))
 
@@ -43,14 +42,14 @@ async function execute(jobs: worker[], force?: boolean) {
         const updown = worker.status === 'online' ? 'up' : 'down'
         await fetch(`${worker.heartbeat}?status=${updown}`, abort).catch(() => null)
       }
-      pm2Commands.list(enginer)
+      pm2Commands.list(engineer)
     })
 
-    messages.sub('workers:server:info', async (message: string) =>
-      pm2Commands.info(message, enginer)
+    await messages.sub('workers:server:info', async (message: string) =>
+      pm2Commands.info(message, engineer)
     )
 
-    messages.sub('workers:server:restart', async (message: string) => pm2Commands.restart(message))
+    await messages.sub('workers:server:restart', async (message: string) => pm2Commands.restart(message))
   })
 }
 
