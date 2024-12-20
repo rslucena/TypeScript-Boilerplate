@@ -49,7 +49,9 @@ async function execute(jobs: worker[], force?: boolean) {
       pm2Commands.info(message, engineer)
     )
 
-    await messages.sub('workers:server:restart', async (message: string) => pm2Commands.restart(message))
+    await messages.sub('workers:server:restart', async (message: string) =>
+      pm2Commands.restart(message)
+    )
   })
 }
 

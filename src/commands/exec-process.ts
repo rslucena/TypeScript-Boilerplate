@@ -19,6 +19,4 @@ if (!jobs.length) {
   console.error(err)
   process.exit()
 }
-enginer === 'dev'
-  ? await pm2Workers.debug(jobs)
-  : await pm2Workers.execute(jobs, !!worker)
+enginer === 'dev' ? await pm2Workers.debug(jobs) : await pm2Workers.execute(jobs, !!worker)
