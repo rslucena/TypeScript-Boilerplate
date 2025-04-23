@@ -43,7 +43,7 @@
     "@fastify/swagger": "^9.4.2",
     "@fastify/swagger-ui": "^5.2.1",
     "bcrypt": "^5.1.1",
-    "drizzle-orm": "^0.40.0",
+    "drizzle-orm": "^0.41.0",
     "drizzle-zod": "^0.7.0",
     "fastify": "^5.2.1",
     "fastify-type-provider-zod": "^4.0.2",
