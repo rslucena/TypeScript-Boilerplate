@@ -1,13 +1,13 @@
-import { Logger } from 'pino'
+import type { Logger } from "pino";
 
 export default interface actions {
-  console: methods
-  handler: (filename: string) => Logger
+	console: methods;
+	handler: (filename: string) => Logger;
 }
 
 interface methods {
-  error: (message: string, props?: any) => void
-  warn: (message: string, props?: any) => void
-  info: (props: any) => void
-  debug: (props: any) => void
+	error: (message: string, props?: object | string) => void;
+	warn: (message: string, props?: object | string) => void;
+	info: (props: object | string) => void;
+	debug: (props: object | string) => void;
 }
