@@ -1,6 +1,6 @@
+import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import type { FastifyBaseLogger, FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import { z } from "zod/v4";
 
 interface guise {
@@ -8,8 +8,8 @@ interface guise {
 	url?: string;
 	language?: string;
 	raw?: { [key: string]: object } | unknown;
-	session?: { [key: string]: object };
-	headers?: { [key: string]: string | string[] | undefined };
+	session?: { [key: string]: unknown };
+	headers?: { [key: string]: string | undefined };
 	query?: { [key: string]: object } | unknown;
 	body?: { [key: string]: object } | unknown;
 	params?: { [key: string]: object } | unknown;
@@ -50,6 +50,8 @@ const replyErrorSchema = {
 	},
 };
 
+type JWT = { typ: string; alg: string; exp: number };
+
 type AnyType = string | object | boolean | number | null | undefined;
 
-export { errorSchema, type guise, headers, replyErrorSchema, type server, type AnyType };
+export { type JWT, errorSchema, type guise, headers, replyErrorSchema, type server, type AnyType };

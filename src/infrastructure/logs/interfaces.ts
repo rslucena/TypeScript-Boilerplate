@@ -1,8 +1,9 @@
-import type { Logger } from "pino";
+import type { Logger, LoggerOptions } from "pino";
 
 export default interface actions {
 	console: methods;
 	handler: (filename: string) => Logger;
+	settings: (filename: string) => LoggerOptions;
 }
 
 interface methods {

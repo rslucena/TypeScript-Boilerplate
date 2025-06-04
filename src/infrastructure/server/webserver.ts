@@ -15,7 +15,7 @@ const logger = Logs.handler("webserver");
 
 async function webserver(): Promise<server> {
 	const instance = fastify({
-		logger: logger,
+		logger: Logs.settings("webserver"),
 		caseSensitive: false,
 		pluginTimeout: 20000,
 		requestTimeout: 20000,

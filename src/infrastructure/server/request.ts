@@ -1,7 +1,7 @@
-import translate from "@infrastructure/languages/translate";
 import * as crypto from "node:crypto";
+import translate from "@infrastructure/languages/translate";
 import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
-import { type AnyType, type guise, replyErrorSchema } from "./interface";
+import { type AnyType, type JWT, type guise, replyErrorSchema } from "./interface";
 import { safeParse } from "./transforms";
 
 export class authentication {
@@ -43,11 +43,11 @@ export class authentication {
 		const encodedPayload = parts[1];
 		const signature = parts[2];
 
-		const header = safeParse(Buffer.from(encodedHeader, "base64").toString());
+		const header = safeParse<JWT>(Buffer.from(encodedHeader, "base64").toString());
 		if (!header) return false;
 		if (header.typ !== "JWT" || header.alg !== "HS256") return false;
 
-		const body = safeParse(Buffer.from(encodedPayload, "base64").toString());
+		const body = safeParse<{ [key: string]: unknown }>(Buffer.from(encodedPayload, "base64").toString());
 		if (!body) return false;
 
 		const expectedSignature = crypto
@@ -61,9 +61,7 @@ export class authentication {
 		if (signature !== expectedSignature) return false;
 
 		const Now = Math.floor(Date.now() / 1000);
-		if (Now > header.exp) return false;
-
-		return body;
+		return Now > header.exp ? false : body;
 	}
 }
 
@@ -134,15 +132,7 @@ export class container<t = unknown> extends err {
 		this._method = args.method;
 		this._raw = args.raw;
 	}
-	debug<T>(context?: guise["raw"]) {
-		this._raw = context || this._raw;
-		return this._raw as T;
-	}
-	url(context?: guise["url"]) {
-		this._url = context || this._url;
-		return this._url;
-	}
-	session<T extends t>(context?: unknown) {
+	session<T extends t>(context?: { [key: string]: unknown } | undefined) {
 		this._session = context || this._session;
 		return this._session as T;
 	}
@@ -169,10 +159,6 @@ export class container<t = unknown> extends err {
 	status(context?: guise["status"]) {
 		this._status = context || this._status;
 		return this._status ?? 200;
-	}
-	method(context?: guise["method"]) {
-		this._method = context || this._method;
-		return this._method ?? "GET";
 	}
 }
 
@@ -206,7 +192,7 @@ function execute(
 			url: req.routeOptions.config.url,
 			status: reply.statusCode,
 			language: req.headers["accept-language"],
-			headers: req.headers,
+			headers: req.headers as guise["headers"],
 			query: req.query,
 			body: req.body,
 			params: req.params,
@@ -220,18 +206,18 @@ function execute(
 			receiver.session(auth);
 		}
 
-		let context;
+		let context: AnyType | unknown;
 
 		try {
 			context = await callback(receiver);
 			receiver.body(context);
 		} catch (err: unknown) {
 			context = receiver.badRequest(receiver.language());
-			context = typeof err === "string" ? { ...context, message: err } : err;
+			context = typeof err === "string" ? { ...(context as Record<string, unknown>), message: err } : err;
 			receiver.body(context);
 		}
 
-		if (context?.statusCode) receiver.status(context.statusCode);
+		if (context && typeof context === "object" && "statusCode" in context) receiver.status(Number(context.statusCode));
 
 		return reply
 			.headers(receiver.headers())
