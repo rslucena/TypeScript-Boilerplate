@@ -10,6 +10,7 @@ import {
 	uuid as puuid,
 	timestamp,
 } from "drizzle-orm/pg-core";
+import type { IndexBuilderOn } from "drizzle-orm/pg-core/indexes";
 import { array, number, z } from "zod/v4";
 
 const dateSettings: PgTimestampConfig = { mode: "date", precision: 6 };
@@ -35,9 +36,9 @@ const withPagination = z.object({
 });
 
 function pgIndex(table: string, columns: { [key: string]: PgColumn }, keys: string[]) {
-	const configs: { [key: string]: IndexBuilder } = {};
-	for (const column of keys) configs[column] = index(`${table}_${column}_idx`).on(columns[column]);
-	configs.activated = index(`${table}_activated_idx`).on(columns.activated);
+	const configs: IndexBuilder[] = [];
+	for (const column of keys) configs.push(index(`${table}_${column}_idx`).on(columns[column]));
+	configs.push(index(`${table}_activated_idx`).on(columns.activated));
 	return configs;
 }
 
