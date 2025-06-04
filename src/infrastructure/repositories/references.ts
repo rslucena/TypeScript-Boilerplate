@@ -1,4 +1,3 @@
-import * as crypto from "node:crypto";
 import type { refer } from "@infrastructure/repositories/interface";
 import * as bcrypt from "bcrypt";
 import {
@@ -10,7 +9,6 @@ import {
 	uuid as puuid,
 	timestamp,
 } from "drizzle-orm/pg-core";
-import type { IndexBuilderOn } from "drizzle-orm/pg-core/indexes";
 import { array, number, z } from "zod/v4";
 
 const dateSettings: PgTimestampConfig = { mode: "date", precision: 6 };
@@ -48,10 +46,6 @@ function hash(data: object | string, compare?: string) {
 	return bcrypt.hashSync(dump, 10);
 }
 
-function uuid(): string {
-	return crypto.randomUUID();
-}
-
 function tag(domain: refer["domain"], method: refer["method"], conditions?: refer["conditions"]): string {
 	let collection = `${domain}/${method}`;
 	if (!conditions) return collection.toLowerCase().trim();
@@ -60,4 +54,4 @@ function tag(domain: refer["domain"], method: refer["method"], conditions?: refe
 	return collection.toLowerCase().trim();
 }
 
-export { hash, identifier, pgIndex, tag, uuid, withPagination, zodIdentifier };
+export { hash, identifier, pgIndex, tag, withPagination, zodIdentifier };

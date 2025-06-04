@@ -39,7 +39,7 @@ async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | nu
 	if (!stack) vals = JSON.stringify(vals);
 	const actions = {
 		text: async () => await client.set(hash, vals as string),
-		json: async () => await client.json.set(hash, key ?? "$", vals),
+		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))),
 	};
 	const action = actions[stack ? type : "text"]();
 	if (ttl) await client.expire(hash, ttl);
