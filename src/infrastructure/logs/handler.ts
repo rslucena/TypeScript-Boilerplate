@@ -16,17 +16,18 @@ const folder = `${path.resolve(".")}/temp/`;
 !existsSync(folder) ? mkdirSync(folder) : undefined;
 
 const handler = (filename: string) => {
+	const shape = settings(filename);
+	return pino(shape);
+};
+
+const settings = (filename: string) => {
 	const file = existsSync(`${folder}/${filename}.log`);
 	if (!file) writeFileSync(`${folder}/${filename}.log`, "");
-	return pino({
-		...configs,
-		...{
-			transport: {
-				target: "pino/file",
-				options: { destination: `${folder}/${filename}.log` },
-			},
-		},
-	});
+	const transport = {
+		target: "pino/file",
+		options: { destination: `${folder}/${filename}.log` },
+	};
+	return { ...configs, transport };
 };
 
 const terminal: actions["console"] = {
@@ -39,6 +40,7 @@ const terminal: actions["console"] = {
 export const Logs: actions = {
 	console: terminal,
 	handler,
+	settings,
 };
 
 export default Logs;

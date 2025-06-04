@@ -1,12 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
-import { build, type Options } from "tsup";
+import { type Options, build } from "tsup";
 import ts from "typescript";
 import pm2Workspace from "./pm2-workspace";
 
-const worker = process.env.npm_config_worker ?? undefined;
+const [command] = process.argv.slice(2) as [string | undefined];
 
-const jobs = worker ? pm2Workspace.find((configs) => configs.name === worker) : pm2Workspace;
+const worker = !command ? undefined : command.replace("--", "").split("=");
+const jobs = worker ? pm2Workspace.find((configs) => configs.name === worker[1]) : pm2Workspace;
 
 if (!jobs) {
 	console.error(new Error("Unable to locate the script, provider, or container for execution."));

@@ -1,5 +1,5 @@
-import { messages } from "@infrastructure/messages/actions";
 import { spawn } from "node:child_process";
+import { messages } from "@infrastructure/messages/actions";
 import pm2 from "pm2";
 import pm2Commands from "./pm2-commands";
 import type { ProcHeart, worker } from "./pm2-workspace";
@@ -45,9 +45,11 @@ async function execute(jobs: worker[], force?: boolean) {
 			pm2Commands.list(engineer);
 		});
 
-		await messages.sub("workers:server:info", async (message: string) => pm2Commands.info(message, engineer));
+		await messages.sub("workers:server:info", async (message: unknown) =>
+			pm2Commands.info(message as string, engineer),
+		);
 
-		await messages.sub("workers:server:restart", async (message: string) => pm2Commands.restart(message));
+		await messages.sub("workers:server:restart", async (message: unknown) => pm2Commands.restart(message as string));
 	});
 }
 

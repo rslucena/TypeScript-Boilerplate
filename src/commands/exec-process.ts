@@ -1,22 +1,21 @@
-import pm2Workers from "./pm2-workers";
-import pm2Workspace from "./pm2-workspace";
+import pm2Workers from "@commands/pm2-workers";
+import pm2Workspace, { type worker } from "@commands/pm2-workspace";
 
-const enginer = process.env.npm_lifecycle_event;
-const worker = process.env.npm_config_worker ?? undefined;
-const group = process.env.npm_config_group ?? undefined;
-const err = new Error("Unable to locate the script, provider, or container for execution.");
+const [command] = process.argv.slice(2) as [string | undefined];
+if (!command) throw new Error("Command not found.");
 
-if (!worker && !group) {
-	console.error(err);
-	process.exit();
-}
+const scripts = command.replace("--", "").split("=");
+if (!["workers", "group"].includes(scripts[0])) throw new Error("Worker not found.");
 
-const jobs = group
-	? pm2Workspace.filter((configs) => configs.group.includes(group))
-	: pm2Workspace.filter((configs) => configs.name === worker);
+let jobs: worker[] = [];
+const mode = scripts[0] === "workers" ? "workers" : "group";
+
+if (mode === "workers") jobs = pm2Workspace.filter((configs) => configs.name === scripts[1]);
+if (mode === "group") jobs = pm2Workspace.filter((configs) => configs.group === scripts[1]);
 
 if (!jobs.length) {
-	console.error(err);
+	console.error("Group or Worker not found.");
 	process.exit();
 }
-enginer === "dev" ? await pm2Workers.debug(jobs) : await pm2Workers.execute(jobs, !!worker);
+
+process.argv[1].endsWith(".ts") ? await pm2Workers.debug(jobs) : await pm2Workers.execute(jobs, true);
