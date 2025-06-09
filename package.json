@@ -43,7 +43,7 @@
 		"drizzle-orm": "^0.43.1",
 		"drizzle-zod": "^0.8.2",
 		"fastify": "^5.3.3",
-		"fastify-type-provider-zod": "^4.0.2",
+		"fastify-type-provider-zod": "^5.0.0",
 		"pino": "^9.7.0",
 		"pm2": "^6.0.6",
 		"postgres": "^3.4.7",
