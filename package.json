@@ -24,7 +24,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@eslint/js": "^9.28.0",
 		"@types/bcrypt": "^5.0.2",
-		"@types/node": "^22.15.29",
+		"@types/node": "^24.0.3",
 		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.1",
 		"eslint": "^9.28.0",
