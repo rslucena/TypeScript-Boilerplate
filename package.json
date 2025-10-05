@@ -14,7 +14,7 @@
 		"db:migrate:up": "drizzle-kit up",
 		"db:migrate": "drizzle-kit generate",
 		"db:studio": "drizzle-kit studio --host localhost",
-		"tests": "vitest --mode development",
+		"tests": "vitest --coverage --mode development",
 		"build": "tsx -- src/commands/exec-builder.ts",
 		"start": "node --env-file=.env dist/commands/exec-process.js",
 		"dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
@@ -22,12 +22,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@eslint/js": "^9.37.0",
 		"@types/bcrypt": "^5.0.2",
 		"@types/node": "^24.6.2",
 		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.5",
-		"eslint": "^9.37.0",
 		"tsconfig-paths": "^4.2.0",
 		"tsup": "^8.5.0",
 		"tsx": "^4.20.6",
@@ -39,6 +37,7 @@
 		"@fastify/helmet": "^13.0.2",
 		"@fastify/swagger": "^9.5.2",
 		"@fastify/swagger-ui": "^5.2.3",
+		"@vitest/coverage-v8": "^3.2.4",
 		"bcrypt": "^6.0.0",
 		"drizzle-orm": "^0.44.6",
 		"drizzle-zod": "^0.8.3",
@@ -48,7 +47,6 @@
 		"pm2": "^6.0.13",
 		"postgres": "^3.4.7",
 		"redis": "^5.8.3",
-		"simple-git": "^3.28.0",
 		"ws": "^8.18.3",
 		"zod": "^3.25.76"
 	}
