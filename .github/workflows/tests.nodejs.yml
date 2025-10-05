@@ -1,4 +1,4 @@
-name: Build and Test
+name: Tests
 
 on:
   push:
@@ -26,4 +26,7 @@ jobs:
         run: bun install
 
       - name: Run tests
-        run: bun test
+        env:
+          NODE_ENV: test
+          REDIS_STACK: false
+        run: bun tests
