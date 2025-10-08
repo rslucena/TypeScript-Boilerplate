@@ -23,7 +23,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bcrypt": "^5.0.2",
-		"@types/node": "^24.6.2",
+		"@types/node": "^24.7.0",
 		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.5",
 		"tsconfig-paths": "^4.2.0",
@@ -48,6 +48,6 @@
 		"postgres": "^3.4.7",
 		"redis": "^5.8.3",
 		"ws": "^8.18.3",
-		"zod": "^4.1.11"
+		"zod": "^4.1.12"
 	}
 }
