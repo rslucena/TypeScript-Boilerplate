@@ -21,8 +21,8 @@
 		"prebuild": "bunx biome format --write ./src/**/*.ts"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@types/bcrypt": "^5.0.2",
+		"@biomejs/biome": "2.2.6",
+		"@types/bcrypt": "^6.0.0",
 		"@types/node": "^24.7.0",
 		"@types/ws": "^8.18.1",
 		"drizzle-kit": "^0.31.5",
