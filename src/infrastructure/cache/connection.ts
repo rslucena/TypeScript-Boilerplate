@@ -1,5 +1,5 @@
 import Logs from "@infrastructure/logs/handler";
-import { type RedisClientOptions, createClient } from "redis";
+import { createClient, type RedisClientOptions } from "redis";
 
 const connection: RedisClientOptions = {
 	username: process.env.REDIS_USERNAME,
