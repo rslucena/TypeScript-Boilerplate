@@ -10,7 +10,7 @@ export default async function postNewAuth(request: container) {
 	request.status(201);
 
 	const validRequest = await schema.actions.create.auth.safeParseAsync(request.body());
-	if (!validRequest.success) throw request.badRequest(tag("user", "auth{params}"));
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "auth{params}"));
 
 	const { data } = validRequest;
 	const reference = tag("user", "auth{params}", { email: data.email });
@@ -36,8 +36,8 @@ export default async function postNewAuth(request: container) {
 	const content = await prepare.execute(validRequest.data);
 
 	const errMessage = tag("user", "auth{params}", { email: validRequest.data.email });
-	if (!content.length) throw request.unprocessableEntity(errMessage);
-	if (!hash(validRequest.data.password, content[0].password)) throw request.notFound(errMessage);
+	if (!content.length) throw request.unprocessableEntity(request.language(), errMessage);
+	if (!hash(validRequest.data.password, content[0].password)) throw request.notFound(request.language(), errMessage);
 
 	const secrets = {
 		token: new authentication().create({
