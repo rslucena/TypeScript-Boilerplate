@@ -7,7 +7,7 @@ import cors from "@infrastructure/settings/cors";
 import helmet from "@infrastructure/settings/helmet";
 import { SettingOptions, SettingOptionsUI } from "@infrastructure/settings/swagger";
 import fastify from "fastify";
-import { type ZodTypeProvider, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 import type { server } from "./interface";
 import { convertRequestTypes, err } from "./request";
 
@@ -29,38 +29,41 @@ async function webserver(): Promise<server> {
 	instance.setNotFoundHandler((_request, reply) => reply.code(510).send());
 	instance.register(fastifySwagger, SettingOptions);
 	instance.register(fastifySwaggerUi, SettingOptionsUI);
-	instance.setErrorHandler((error, request, reply) => {
-		const er = new err().badRequest(request.headers["accept-language"]);
-		if (error.message.startsWith("Unsupported Media Type")) {
-			request.headers["content-type"] = "application/json";
-			error.message = error.message.split(";")[0];
-		}
-		er.message = error.message;
-		return reply.headers(request.headers).code(er.statusCode).send(er);
-	});
+  instance.setErrorHandler((error: unknown, request, reply) => {
+    const er = new err().badRequest(request.headers["accept-language"]);
+    er.message = "An unknown error occurred";
+    if (error instanceof Error) {
+      if (error.message.startsWith("Unsupported Media Type")) {
+        request.headers["content-type"] = "application/json";
+        error.message = error.message.split(";")[0];
+      }
+      er.message = error.message;
+    }
+    return reply.headers(request.headers).code(er.statusCode).send(er);
+  });
 
-	const safeExit = (message: string, err?: unknown) => {
-		logger.error(message, err ?? "");
+	const safeExit = (message: string) => {
+		logger.error(message);
 		process.emit("SIGTERM");
 		process.emit("SIGINT");
 	};
 
 	process.on("SIGTERM", () => process.exit(1));
 	process.on("SIGINT", () => process.exit(1));
-	process.on("SIGILL", (err) => safeExit("Illegal Instruction", err));
-	process.on("SIGFPE", (err) => safeExit("Divided by 0", err));
-	process.on("uncaughtException", (err) => safeExit("Uncaught Exception", err));
-	process.on("unhandledRejection", (err) => safeExit("Unhandled Rejection", err));
+	process.on("SIGILL", () => safeExit("Illegal Instruction"));
+	process.on("SIGFPE", () => safeExit("Divided by 0"));
+	process.on("uncaughtException", () => safeExit("Uncaught Exception"));
+	process.on("unhandledRejection", () => safeExit("Unhandled Rejection"));
 	return instance;
 }
 
 async function start(instance: server, port: number): Promise<void> {
 	instance.ready((err) => {
-		if (err) return logger.error(err.message, err);
+		if (err) return logger.error(err.message);
 		instance.swagger();
 	});
 	instance.listen({ port, host: "0.0.0.0" }, (err, address) => {
-		if (err) return logger.error(err.message, err);
+		if (err) return logger.error(err.message);
 		Logs.console.info(`Server listening on ${address}`);
 		Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`);
 	});

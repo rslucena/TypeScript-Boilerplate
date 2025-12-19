@@ -1,7 +1,7 @@
 import * as crypto from "node:crypto";
 import translate from "@infrastructure/languages/translate";
 import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
-import { type AnyType, type JWT, type guise, replyErrorSchema } from "./interface";
+import { type AnyType, type guise, type JWT, replyErrorSchema } from "./interface";
 import { safeParse } from "./transforms";
 
 export class authentication {

@@ -10,7 +10,7 @@ export default async function getFindByParams(request: container) {
 	request.status(200);
 
 	const validRequest = await schema.actions.read.safeParseAsync(request.query());
-	if (!validRequest.success) throw request.badRequest(tag("user", "find{params}"));
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{params}"));
 
 	const { data } = validRequest;
 	const reference = tag("user", "find{params}", data);
@@ -48,7 +48,7 @@ export default async function getFindByParams(request: container) {
 
 	const content = await prepare.execute(validRequest.data);
 
-	if (!content.length) throw request.notFound(tag("user", "find{params}"));
+	if (!content.length) throw request.notFound(request.language(), tag("user", "find{params}"));
 
 	await cache.json.set(reference, content, 60 * 10);
 

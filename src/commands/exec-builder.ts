@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { type Options, build } from "tsup";
+import { build, type Options } from "tsup";
 import ts from "typescript";
 import pm2Workspace from "./pm2-workspace";
 

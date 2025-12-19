@@ -1,6 +1,6 @@
-import Logs from "@infrastructure/logs/handler";
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
+import Logs from "@infrastructure/logs/handler";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import { authentication, container } from "./request";
 import { safeParse } from "./transforms";
@@ -15,7 +15,7 @@ const logger = Logs.handler("websocket");
 export default function websocket(Params: WebSocketServer["options"]) {
 	const ws = new WebSocketServer({ ...Params, host: "0.0.0.0" });
 	ws.on("close", () => logger.error("websocket closed"));
-	ws.on("error", (err) => logger.error("websocket error", err));
+	ws.on("error", () => logger.error("websocket error"));
 	ws.on("listening", () => logger.info(`websocket listening ${JSON.stringify(ws.address())}`));
 	ws.on("connection", (link, request) => connection(link, request));
 	return ws;

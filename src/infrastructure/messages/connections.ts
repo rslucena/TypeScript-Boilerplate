@@ -1,5 +1,5 @@
-import client from "@infrastructure/cache/connection";
 import EventEmitter from "node:events";
+import client from "@infrastructure/cache/connection";
 
 const publisher = client;
 const subscriber = client.duplicate();

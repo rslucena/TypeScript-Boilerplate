@@ -1,11 +1,11 @@
 import type { refer } from "@infrastructure/repositories/interface";
 import * as bcrypt from "bcrypt";
 import {
+	boolean,
 	type IndexBuilder,
+	index,
 	type PgColumn,
 	type PgTimestampConfig,
-	boolean,
-	index,
 	uuid as puuid,
 	timestamp,
 } from "drizzle-orm/pg-core";
@@ -50,7 +50,7 @@ function tag(domain: refer["domain"], method: refer["method"], conditions?: refe
 	let collection = `${domain}/${method}`;
 	if (!conditions) return collection.toLowerCase().trim();
 	collection += "/";
-	for (const [key, value] of Object.entries(conditions)) collection += `\{${key.replace("_", "")}:${value}\}`;
+	for (const [key, value] of Object.entries(conditions)) collection += `{${key.replace("_", "")}:${value}}`;
 	return collection.toLowerCase().trim();
 }
 
