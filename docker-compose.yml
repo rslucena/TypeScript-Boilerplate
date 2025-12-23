@@ -4,7 +4,7 @@ services:
     container_name: ${REDIS_NAME}
     image: redis/redis-stack-server:latest
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
     ports:
       - '${REDIS_PORT}:6379'
     volumes:

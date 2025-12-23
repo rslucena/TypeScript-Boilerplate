@@ -1,6 +1,6 @@
-import * as crypto from "node:crypto";
 import translate from "@infrastructure/languages/translate";
 import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
+import * as crypto from "node:crypto";
 import { type AnyType, type guise, type JWT, replyErrorSchema } from "./interface";
 import { safeParse } from "./transforms";
 
@@ -163,6 +163,10 @@ export class container<t = unknown> extends err {
 }
 
 export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, done: HookHandlerDoneFunction) {
+	if (req.url.startsWith("/documentation")) {
+		done();
+		return;
+	}
 	const convert = (params: { [key: string]: AnyType } | undefined) => {
 		if (!params) return {};
 		for (const key in params) {

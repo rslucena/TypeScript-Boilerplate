@@ -3,20 +3,19 @@ import type { FastifySwaggerUiOptions } from "@fastify/swagger-ui";
 import { jsonSchemaTransform } from "fastify-type-provider-zod";
 
 export const SettingOptions: SwaggerOptions = {
-	swagger: {
+	openapi: {
 		info: {
 			title: String(process.env.APP_NAME),
 			description: String(process.env.APP_DESCRIPTION),
 			version: String(process.env.APP_VERSION),
 		},
-		schemes: ["http", "https"],
-		consumes: ["application/json"],
-		produces: ["application/json"],
-		securityDefinitions: {
-			jwt: {
-				type: "apiKey",
-				name: "Authorization",
-				in: "header",
+		components: {
+			securitySchemes: {
+				jwt: {
+					type: "http",
+					scheme: "bearer",
+					bearerFormat: "JWT",
+				},
 			},
 		},
 	},
@@ -27,23 +26,15 @@ export const SettingOptionsUI: FastifySwaggerUiOptions = {
 	routePrefix: "/documentation",
 	theme: {
 		title: String(process.env.APP_NAME),
-		js: [
-			{
-				filename: "swaggertheme.js",
-				content:
-					'( new MutationObserver( () => document.querySelectorAll(".try-out__btn" ).forEach( ( el ) => el.remove() ) ).observe( document.body, { childList: true, subtree: true } ) );' +
-					'( new MutationObserver( () => document.querySelector( "#swagger-ui > section > div.topbar" ).remove()).observe( document.body, { childList: true, subtree: true } ) );' +
-					'( new MutationObserver( () => document.querySelector( "div.scheme-container" ).remove()).observe( document.body, { childList: true, subtree: true } ) );',
-			},
-		],
 	},
 	uiConfig: {
 		docExpansion: "list",
+		deepLinking: false,
 		displayRequestDuration: true,
 		persistAuthorization: true,
-		deepLinking: false,
 		showExtensions: false,
 	},
 	staticCSP: false,
+	transformStaticCSP: undefined,
 	transformSpecificationClone: false,
 };

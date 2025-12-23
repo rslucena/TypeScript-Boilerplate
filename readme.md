@@ -58,7 +58,7 @@ bun run db:migrate
 With the database and schema ready, you can start the development server
 ```bash
 # 1. Start the application in development mode
-bun run dev
+bun run dev --workers=primary-webserver
 ```
 
 ---
