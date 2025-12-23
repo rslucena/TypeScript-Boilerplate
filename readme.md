@@ -21,7 +21,7 @@ Follow the steps below to clone the repository, set up the environment, and star
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/rslucena/TypeScript-Boilerplate.git](https://github.com/rslucena/TypeScript-Boilerplate.git) my-project
+git clone https://github.com/rslucena/TypeScript-Boilerplate.git my-project
 
 # 1.1. Move to the project directory
 cd my-project
@@ -31,9 +31,11 @@ bun install
 
 # 3. Create the environment variables file
 cp .env.exemple .env
+    # NODE_ENV=production
     # POSTGRES_PORT=5432
     # POSTGRES_POOL=200
     # POSTGRES_SERVER=localhost
+    #PROCESS_CORS_ORIGIN=https://prod.alias,https://prod.ip
     # Add other variables as needed...
 
 ```
@@ -52,6 +54,7 @@ Once the database is active, you must run the Drizzle ORM migrations to create t
 # 1. Execute the command to run pending migrations
 # Verify the exact script name in your package.json (e.g., 'drizzle:migrate')
 bun run db:migrate
+bun run db:migrate:push
 ```
 
 ### 4. Start the Application
@@ -152,28 +155,20 @@ import { default as schema } from '../schema'
 import getById from './get-by-id'
 
 export default async function postNewEntity(request: container) {
-  request.status(201)
-
-  // 1. Validation using Zod schema
-  const validRequest = await schema.actions.create.entity.safeParseAsync(request.body())
-  if (!validRequest.success) throw request.badRequest('post/user/{params}')
-
-  // 2. Business Rule & Persistence
+  request.status(201);
+  const validRequest = await schema.actions.create.entity.safeParseAsync(request.body());
+  if (!validRequest.success) throw request.badRequest(request.language(), "post/user/{params}");
   const content = await repository
-    .insert(user) // Persistence via abstracted repository module
+    .insert(user)
     .values({
       ...validRequest.data,
-      password: hash(validRequest.data.password), // Business Rule: Hash password
+      password: hash(validRequest.data.password),
     })
     .onConflictDoNothing()
-    .returning()
-
-  if (!content.length) throw request.unprocessableEntity(`post/user/${validRequest.data.email}`)
-
-  // 3. Side Effects (Cache invalidation)
-  await cache.json.del(tag('user', 'find*'))
-
-  return getById(new container({ params: { id: content[0].id } }))
+    .returning();
+  if (!content.length) throw request.unprocessableEntity(request.language(), `post/user/${validRequest.data.email}`);
+  await cache.json.del(tag("user", "find*"));
+  return getById(new container({ params: { id: content[0].id } }));
 }
 ```
 ### 3. Application Entry Point (src/commands/api/routes/user.ts)
