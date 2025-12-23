@@ -2,7 +2,6 @@ import Logs from "@infrastructure/logs/handler";
 import { createClient, type RedisClientOptions } from "redis";
 
 const connection: RedisClientOptions = {
-	username: process.env.REDIS_USERNAME,
 	password: process.env.REDIS_PASSWORD,
 	socket: {
 		servername: process.env.REDIS_SSL !== "false" ? "rediss" : "redis",
