@@ -15,6 +15,6 @@ const client = createClient(connection);
 
 client.on("error", (err) => Logs.console.error("redis error", err));
 
-await client.connect();
+if (process.env.NODE_ENV !== "test") await client.connect();
 
 export default client;
