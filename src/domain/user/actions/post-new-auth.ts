@@ -15,10 +15,10 @@ export default async function postNewAuth(request: container) {
 	const { data } = validRequest;
 	const reference = tag("user", "auth{params}", { email: data.email });
 
-	const cached = await cache.json.get<{ token: string; refresh: string }>(reference);
-	if (cached) {
-		request.headers({ authorization: `Bearer ${cached.token}` });
-		return cached;
+	const cached = await cache.json.get<{ [key: string]: { token: string; refresh: string } }>(reference);
+	if (cached?.[reference]) {
+		request.headers({ authorization: `Bearer ${cached[reference].token}` });
+		return cached[reference];
 	}
 
 	const prepare = repository

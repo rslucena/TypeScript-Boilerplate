@@ -15,8 +15,8 @@ export default async function getById(request: container) {
 	const { id } = validRequest.data;
 	const reference = tag("user", "find{id}", { id });
 
-	const cached = await cache.json.get<user[]>(reference);
-	if (cached) return cached;
+	const cached = await cache.json.get<{ [key: string]: user[] }>(reference);
+	if (cached?.[reference]) return cached[reference];
 
 	const { password, ...outhers } = getTableColumns(user);
 

@@ -30,7 +30,8 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 	for (let i = 0; i < keys.length; i++) {
 		const action = await actions[stack ? type : "text"]();
 		if (!action) contents[hash] = null;
-		if (!stack) contents[hash] = safeParse<t>(action as string) ?? (action as t);
+		else if (stack) contents[hash] = action as t;
+		else contents[hash] = safeParse<t>(action as string) ?? (action as t);
 	}
 	return contents as t;
 }
