@@ -1,12 +1,16 @@
-import { afterEach, describe, expect, it, mock } from "bun:test";
-import { mockClient } from "@tests/mocks/redis";
+import { afterEach, beforeAll, describe, expect, it, mock beforeAlbun:testt, it, mock mockCliento} from "@tests/mocks/redisocks/redis";
 
-process.env = { ...process.env, REDIS_STACK: "false" };
 mock.module("@infrastructure/cache/connection", () => ({ default: mockClient }));
 
-import cache from "@infrastructure/cache/actions";
-
 describe("Cache Infrastructure", () => {
+	let cache: typeof import("@infrastructure/cache/actions").default;
+
+	beforeAll(async () => {
+		const originalEnv = process.env;
+		process.env = { ...originalEnv, REDIS_STACK: "true" };
+		const module = await import("@infrastructure/cache/actions");
+		cache = module.default;
+	});
 	afterEach(() => {
 		mock.restore();
 		mockClient.get.mockClear();
