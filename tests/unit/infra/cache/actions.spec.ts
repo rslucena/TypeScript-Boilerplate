@@ -1,5 +1,5 @@
-import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
 import { mockClient } from "@tests/mocks/redis";
+import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
 
 mock.module("@infrastructure/cache/connection", () => ({ default: mockClient }));
 
@@ -25,15 +25,22 @@ describe("Cache Infrastructure", () => {
 
 	describe("Text Actions", () => {
 		it("should set value correctly", async () => {
-			mockClient.set.mockResolvedValue("OK");
+			// Removed explicit mockResolvedValue to test default mock in redis.ts
 			const result = await cache.text.set("key", "value");
 			expect(result).toBe("OK");
 			expect(mockClient.set).toHaveBeenCalledTimes(1);
 			expect(mockClient.set).toHaveBeenCalledWith("key", "value");
 		});
 
+		it("should handle set error correctly", async () => {
+			mockClient.set.mockRejectedValue(new Error("Redis error"));
+			const result = await cache.text.set("key", "value");
+			expect(result).toBe("");
+			expect(mockClient.set).toHaveBeenCalledTimes(1);
+		});
+
 		it("should set value with TTL", async () => {
-			mockClient.set.mockResolvedValue("OK");
+			// Removed explicit mockResolvedValue
 			await cache.text.set("key", "value", 60);
 			expect(mockClient.set).toHaveBeenCalledWith("key", "value");
 			expect(mockClient.expire).toHaveBeenCalledWith("key", 60);
@@ -49,7 +56,7 @@ describe("Cache Infrastructure", () => {
 
 		it("should delete value correctly", async () => {
 			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
-			mockClient.del.mockResolvedValue(1);
+			// Removed explicit mockResolvedValue to test default mock in redis.ts
 			const result = await cache.text.del("key");
 			expect(result).toBe(1);
 			expect(mockClient.del).toHaveBeenCalledWith("key");
@@ -58,11 +65,19 @@ describe("Cache Infrastructure", () => {
 
 	describe("JSON Actions", () => {
 		it("should set json value correctly", async () => {
-			mockClient.json.set.mockResolvedValue("OK");
+			// Removed explicit mockResolvedValue to test default mock in redis.ts
 			const data = { foo: "bar" };
 			const result = await cache.json.set("key", data);
 			expect(result).toBe("OK");
 			expect(mockClient.json.set).toHaveBeenCalledWith("key", "$", JSON.parse(JSON.stringify(data)));
+		});
+
+		it("should handle json set error correctly", async () => {
+			mockClient.json.set.mockRejectedValue(new Error("Redis error"));
+			const data = { foo: "bar" };
+			const result = await cache.json.set("key", data);
+			expect(result).toBe("");
+			expect(mockClient.json.set).toHaveBeenCalledTimes(1);
 		});
 
 		it("should get json value correctly", async () => {
@@ -73,5 +88,21 @@ describe("Cache Infrastructure", () => {
 			expect(result).toEqual({ key: data });
 			expect(mockClient.json.get).toHaveBeenCalledWith("key");
 		});
+
+		it("should delete json value correctly", async () => {
+			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
+			// Default mock for del returns 1
+			const result = await cache.json.del("key");
+			expect(result).toBe(1);
+			expect(mockClient.del).toHaveBeenCalledWith("key");
+		});
+	});
+
+
+
+	it("should ping correctly", async () => {
+		const result = await cache.ping();
+		expect(result).toBe("PONG");
+		expect(mockClient.ping).toHaveBeenCalledTimes(1);
 	});
 });
