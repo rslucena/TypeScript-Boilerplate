@@ -13,6 +13,8 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 [![CodeQL](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml)   [![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml)   [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/pulse)   [![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/rslucena/Template-Typescript?link=https%3A%2F%2Fgithub.com%2Frslucena%2FTemplate-Typescript%2Fcommits%2Fmain%2F)](https://github.com/rslucena/Template-Typescript/graphs/code-frequency)   [![GitHub contributors](https://img.shields.io/github/contributors/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/graphs/contributors)
 
+
+
 ## 🚀 Quick Start
 
 Follow the steps below to clone the repository, set up the environment, and start both the application and the database.
@@ -71,10 +73,10 @@ The project uses a structured, modular approach inspired by clean architecture p
 
 ```
 src/
-  commands/         # Commands or CLI entry points (System Core)
-  domain/           # Core Business Logic (The "What")
-  functions/        # Application entry points (APIs, Functions, CLI)
-  infrastructure/   # External Dependencies (The "How")
+├── commands/         # Commands or CLI entry points (System Core)
+├── domain/           # Core Business Logic (The "What")
+├── functions/        # Application entry points (APIs, Functions, CLI)
+├── infrastructure/   # External Dependencies (The "How")
 tests/              # Automated tests
 ```
 
@@ -87,6 +89,53 @@ tests/              # Automated tests
 | **`src/commands`** | **Acts as the **interface and control layer** | Where the application is configured. This directory hosts all the actual executables: <ul><li>**Runtime and Process Management:** Contains the crucial configuration logic related to the **Bun runtime**, **PM2 configuration** (if programmatic), and hooks for optimized build/initialization scripts.</li></ul>                                                                                                                                                                                                                      |
 | **`src/functions`** | **Execution Entry Points & Application Wiring** | Acts as the **initialization and bootstrapping layer** where the application is wired up. This directory hosts the actual executable entry points: <ul><li>**Entry Points:** API Routes, WebSocket Handlers, or CLI Commands.</li><li>**Wiring:** Connects the Use Cases (`domain`) with the Infrastructure (`infrastructure`).</li><li>**Runtime & Process Management:** Contains crucial setup logic related to the **Bun runtime**, **PM2 configuration** (if programmatic), and hooks for optimized build/startup scripts.</li></ul> |
 | **`tests`** | **Automated Tests** | Houses unit, integration, and end-to-end tests for the entire application.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+
+---
+
+## ⚓ Testing Guide
+
+This directory contains the automated tests for the application. The structure follows best practices for test organization to facilitate maintenance and scalability.
+
+```
+tests/
+├── unit/
+│   ├── domain/              # Pure logic tests (user/user-get-by-id.spec.ts)
+│   └── infra/               # Adapter/gateway testing
+├── integration/
+│   └── api/                 # Route/Endpoint Testing (users.test.ts)
+├── builders/                # Real objects or DTOs with valid data (users.builder.ts)
+└── mocks/                   # Global and reusable mockups
+```
+
+- Test file names: `[name].test.ts` or `[name].spec.ts`
+- Test descriptions: should be descriptive and use `should... when...`
+
+**Arrange-Act-Assert**:
+ ```typescript
+ it('should return user when valid ID is provided', async () => {
+   const userId = '1';
+   const expectedUser = createUserBuilder({ id: userId });
+   mockRepository.getById.mockResolvedValue(expectedUser);
+   const result = await userService.getUserById(userId);
+   expect(result).toEqual(expectedUser);
+ });
+ ```
+```typescript
+it('should throw error when user not found', async () => {
+  // Arrange
+  const userId = 'non-existent';
+  mockRepository.getById.mockResolvedValue(null);
+  await expect(userService.getUserById(userId)).rejects.toThrow()
+});
+```
+
+### Executando Testes
+
+```bash
+bun test  # Run all tests
+bun test --watch # Run tests in watch mode
+bun test --coverage # Run tests with coverage
+```
 ---
 
 ## 💡 Complete Use Case Example: Creating a User
