@@ -1,23 +1,24 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "sourceMap": true,
-    "target": "es2022",
-    "module": "es2022",
-    "declaration": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "paths": {
-      "@commands/*": ["./src/commands/*"],
-      "@domain/*": ["./src/domain/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"],
-      "@providers/*": ["./src/functions/*"],
-      "@tests/*": ["./src/tests/*"]
-    }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules/**", ".docker/**", ".git/**", ".github/**", ".vscode/**", "dist/**"]
+	"compilerOptions": {
+		"types": ["bun-types"],
+		"strict": true,
+		"baseUrl": ".",
+		"sourceMap": true,
+		"target": "es2022",
+		"module": "es2022",
+		"declaration": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@commands/*": ["./src/commands/*"],
+			"@domain/*": ["./src/domain/*"],
+			"@infrastructure/*": ["./src/infrastructure/*"],
+			"@providers/*": ["./src/functions/*"],
+			"@tests/*": ["./tests/*"]
+		}
+	},
+	"include": ["src"],
+	"exclude": ["node_modules/**", ".docker/**", ".git/**", ".github/**", ".vscode/**", "dist/**"]
 }
