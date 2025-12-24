@@ -1,4 +1,5 @@
-import { afterEach, beforeAll, describe, expect, it, mock beforeAlbun:testt, it, mock mockCliento} from "@tests/mocks/redisocks/redis";
+import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
+import { mockClient } from "@tests/mocks/redis";
 
 mock.module("@infrastructure/cache/connection", () => ({ default: mockClient }));
 
