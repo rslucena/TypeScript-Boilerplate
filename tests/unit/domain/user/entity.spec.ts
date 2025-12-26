@@ -1,5 +1,5 @@
-import { columnBuilder, pgIndexBuilder, pgTableBuilder, varcharBuilder } from "@tests/builders/coluumn.builders";
-import { describe, expect, it, mock } from "bun:test";
+import { columnBuilder, pgIndexBuilder, pgTableBuilder, varcharBuilder } from "@tests/builders/column.builders";
+import { mock } from "bun:test";
 
 mock.module("drizzle-orm/pg-core", () => {
 	return {
@@ -24,6 +24,7 @@ mock.module("@infrastructure/repositories/references", () => {
 });
 
 import user from "@domain/user/entity";
+import { describe, expect, it } from "bun:test";
 
 describe("User Entity", () => {
 	it("should be defined", () => {

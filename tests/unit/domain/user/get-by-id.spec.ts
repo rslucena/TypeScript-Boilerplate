@@ -1,9 +1,8 @@
-import "@domain/user/schema";
 import { redisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { containerMock } from "@tests/mocks/server.mock";
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { mock } from "bun:test";
 import { z } from "zod/v4";
 
 mock.module("@infrastructure/cache/connection", () => ({
@@ -28,11 +27,14 @@ mock.module("@infrastructure/repositories/references", () => ({
 	withPagination: referencesMock.withPagination,
 	identifier: { id: mock().mockReturnValue("some-string") },
 	pgIndex: mock(() => []),
-	zodIdentifier: z.object({ id: z.string() }),
+	zodIdentifier: { id: z.string().uuid() },
 }));
 
+import "@domain/user/schema";
+import { beforeEach, describe, expect, it } from "bun:test";
+
 describe("User Domain Actions : getById", () => {
-	let getById: CallableFunction
+	let getById: CallableFunction;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();

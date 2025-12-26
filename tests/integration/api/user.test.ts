@@ -1,12 +1,8 @@
-import userRoutes from "@domain/user/routes";
-import { createUserBuilder } from "@tests/builders/user.builder";
 import { redisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import fastify, { type FastifyInstance } from "fastify";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
 
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
@@ -18,9 +14,14 @@ mock.module("@infrastructure/repositories/references", () => ({
 	...referencesMock,
 	identifier: { id: mock(() => "test-id") },
 	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string() },
+	zodIdentifier: { id: z.string().uuid() },
 }));
 mock.module("@infrastructure/server/request", () => ({ default: serverRequestMock }));
+
+import userRoutes from "@domain/user/routes";
+import { createUserBuilder } from "@tests/builders/user.builder";
+import fastify, { type FastifyInstance } from "fastify";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 
 describe("User API Routes", () => {
 	let server: FastifyInstance;
