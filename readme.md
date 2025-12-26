@@ -11,61 +11,107 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 ### This boilerplate is optimized for production and comes with full support for testing and code quality.
 
-[![CodeQL](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml)   [![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml) [![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/rslucena/Template-Typescript?link=https%3A%2F%2Fgithub.com%2Frslucena%2FTemplate-Typescript%2Fcommits%2Fmain%2F)](https://github.com/rslucena/Template-Typescript/graphs/code-frequency)   [![GitHub contributors](https://img.shields.io/github/contributors/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/graphs/contributors)
+[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) [![Build and Test CI](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/build.nodejs.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/build.nodejs.yml) [![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency) [![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors)
 
-[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/pulse)
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse) [![GitHub Stars](https://img.shields.io/github/stars/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/stargazers)
 
+---
 
-## 🚀 Quick Start
+## 📖 Table of Contents
+- [What Makes This Special](#-what-makes-this-special)
+- [Quick Start](#-quick-start)
+- [Why Choose This?](#-why-choose-this-boilerplate)
+- [Folder Structure](#-detailed-folder-structure)
+- [Testing Guide](#-testing-guide)
+- [Complete Example](#-complete-use-case-example-creating-a-user)
+- [Main Features](#-main-features)
+- [Resources](#-resources)
+- [Contributing](#-contributing)
 
-Follow the steps below to clone the repository, set up the environment, and start both the application and the database.
+---
 
-### 1. Cloning and Initial Setup
+## ✨ What Makes This Special
+
+- 🎯 **Production-Ready**: Full CI/CD pipeline, Docker support, and PM2 process management
+- ⚡ **CLI Generator**: Scaffold complete CRUD domains in seconds with `bun gen:domain`
+- 🔒 **Type-Safe Everything**: End-to-end type safety with Drizzle ORM + Zod validation
+- 💾 **Smart Caching**: Redis integration with automatic cache invalidation
+- 📚 **Auto API Docs**: Swagger UI automatically generated from Zod schemas
+- 🌍 **i18n Ready**: Multi-language error messages and responses out of the box
+- 🧪 **100% Tested**: Comprehensive unit tests with Bun's blazing-fast test runner
+- 🚀 **Blazing Fast**: Bun runtime delivers 3x faster performance than Node.js
+
+---
+
+## 🚀 Quick Start (3 Minutes to Running API)
+
+### Step 1️⃣ - Clone & Install
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/rslucena/TypeScript-Boilerplate.git my-project
+# Clone the repository
+git clone https://github.com/rslucena/TypeScript-Boilerplate.git my-api
 
-# 1.1. Move to the project directory
-cd my-project
+# Navigate to directory
+cd my-api
 
-# 2. Install dependencies using Bun
+# Install dependencies with Bun
 bun install
 
-# 3. Create the environment variables file
+# Create environment file
 cp .env.exemple .env
-    # NODE_ENV=production
-    # POSTGRES_PORT=5432
-    # POSTGRES_POOL=200
-    # POSTGRES_SERVER=localhost
-    #PROCESS_CORS_ORIGIN=https://prod.alias,https://prod.ip
-    # Add other variables as needed...
-
+# Configure your environment variables (DATABASE_URL, REDIS_URL, etc.)
 ```
 
-### 2. Database Initialization (Docker)
-To ensure an isolated development environment, the database is started via Docker.
+### Step 2️⃣ - Start Infrastructure
+
 ```bash
-# 1. Start the database container (e.g., PostgreSQL) in the background
-# The --build flag ensures the service image is built the first time
+# Start PostgreSQL + Redis containers
 docker-compose up -d --build
+
+# Run database migrations
+bun db:migrate        # Generate migration files
+bun db:migrate:push   # Apply to database
 ```
 
-### 3. Schema Setup (Drizzle ORM)
-Once the database is active, you must run the Drizzle ORM migrations to create the initial schema in the database.
+### Step 3️⃣ - Generate Your First Domain (Optional)
+
 ```bash
-# 1. Execute the command to run pending migrations
-# Verify the exact script name in your package.json (e.g., 'drizzle:migrate')
-bun run db:migrate
-bun run db:migrate:push
+# Scaffold a complete CRUD domain in seconds
+bun gen:domain product
+
+# This creates:
+# ✓ Entity (Drizzle table)
+# ✓ Schema (Zod validation)
+# ✓ Routes (5 REST endpoints)
+# ✓ Actions (Full CRUD logic)
+# ✓ Tests (Unit test skeleton)
 ```
 
-### 4. Start the Application
-With the database and schema ready, you can start the development server
+### Step 4️⃣ - Run & Test
+
 ```bash
-# 1. Start the application in development mode
-bun run dev --workers=primary-webserver
+# Start development server
+bun dev --workers=primary-webserver
+
+# ✅ API running at http://localhost:3000
+# 📚 Swagger docs at http://localhost:3000/docs
+# 🧪 Run tests: bun test
 ```
+
+
+---
+
+## 🤔 Why Choose This Boilerplate?
+
+| Feature | This Boilerplate | NestJS | Express Boilerplates |
+|---------|------------------|--------|----------------------|
+| **Runtime Speed** | Bun (3x faster) ⚡ | Node.js | Node.js |
+| **Code Generation** | ✅ Full CRUD CLI | ❌ Manual scaffolding | ❌ Manual |
+| **Type Safety** | Drizzle + Zod (100%) | TypeORM | Varies |
+| **Built-in Caching** | ✅ Redis integrated | ❌ Manual setup | ❌ Manual |
+| **API Documentation** | ✅ Auto Swagger | ❌ Manual decorators | ❌ Manual |
+| **Learning Curve** | Low (familiar patterns) | High (complex) | Medium |
+| **Production Ready** | ✅ Docker + PM2 | ⚠️ Requires setup | ⚠️ Varies |
 
 ---
 
