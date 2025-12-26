@@ -9,7 +9,7 @@
 		"node": ">=20.0.0"
 	},
 	"scripts": {
-		"tests": "bun test",
+		"tests": "bun test --coverage",
 		"pb:health": "bun outdated",
 		"db:migrate:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit generate",
