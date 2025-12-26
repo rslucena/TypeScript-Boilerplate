@@ -15,12 +15,16 @@ describe("Cache Infrastructure", () => {
 	afterEach(() => {
 		mock.restore();
 		redisClientMock.get.mockClear();
+		redisClientMock.get.mockResolvedValue(null);
 		redisClientMock.set.mockClear();
+		redisClientMock.set.mockResolvedValue("OK");
 		redisClientMock.del.mockClear();
 		redisClientMock.scan.mockClear();
 		redisClientMock.expire.mockClear();
 		redisClientMock.json.get.mockClear();
+		redisClientMock.json.get.mockResolvedValue(null);
 		redisClientMock.json.set.mockClear();
+		redisClientMock.json.set.mockResolvedValue("OK");
 	});
 
 	describe("Text Actions", () => {

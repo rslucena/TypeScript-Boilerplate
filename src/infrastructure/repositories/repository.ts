@@ -17,7 +17,7 @@ const primaryDb = postgres({
 	prepare: true,
 	idle_timeout: 5,
 	max_lifetime: 60,
-	max: Number(process.env.POSTGRES_POOL),
+	max: Number(process.env.POSTGRES_POOL) || 10,
 });
 
 const manager = drizzle(primaryDb, { logger: logger });

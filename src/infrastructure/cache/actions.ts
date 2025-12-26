@@ -2,7 +2,7 @@ import { safeParse } from "@infrastructure/server/transforms";
 import client from "./connection";
 import type { actions, setmode } from "./interfaces";
 
-const stack = String(process.env.REDIS_STACK) === "true";
+const isStack = () => String(process.env.REDIS_STACK) === "true";
 
 const cache: actions = {
 	text: {
@@ -28,21 +28,21 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 	};
 	const contents: { [key: string]: t | null } = {};
 	for (let i = 0; i < keys.length; i++) {
-		const action = await actions[stack ? type : "text"]();
+		const action = await actions[isStack() ? type : "text"]();
 		if (!action) contents[hash] = null;
-		else if (stack) contents[hash] = action as t;
+		else if (isStack()) contents[hash] = action as t;
 		else contents[hash] = safeParse<t>(action as string) ?? (action as t);
 	}
 	return contents as t;
 }
 
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
-	if (!stack) vals = JSON.stringify(vals);
+	if (!isStack()) vals = JSON.stringify(vals);
 	const actions = {
 		text: async () => await client.set(hash, vals as string),
 		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))),
 	};
-	const action = actions[stack ? type : "text"]();
+	const action = actions[isStack() ? type : "text"]();
 	if (ttl) await client.expire(hash, ttl);
 	return action;
 }
