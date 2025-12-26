@@ -11,8 +11,9 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 ### This boilerplate is optimized for production and comes with full support for testing and code quality.
 
-[![CodeQL](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml)   [![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml)   [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/pulse)   [![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/rslucena/Template-Typescript?link=https%3A%2F%2Fgithub.com%2Frslucena%2FTemplate-Typescript%2Fcommits%2Fmain%2F)](https://github.com/rslucena/Template-Typescript/graphs/code-frequency)   [![GitHub contributors](https://img.shields.io/github/contributors/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/graphs/contributors)
+[![CodeQL](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml)   [![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml) [![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/rslucena/Template-Typescript?link=https%3A%2F%2Fgithub.com%2Frslucena%2FTemplate-Typescript%2Fcommits%2Fmain%2F)](https://github.com/rslucena/Template-Typescript/graphs/code-frequency)   [![GitHub contributors](https://img.shields.io/github/contributors/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/graphs/contributors)
 
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/pulse)
 
 
 ## 🚀 Quick Start
@@ -113,12 +114,12 @@ tests/
 **Arrange-Act-Assert**:
  ```typescript
  it('should return user when valid ID is provided', async () => {
-   const userId = '1';
-   const expectedUser = createUserBuilder({ id: userId });
-   mockRepository.getById.mockResolvedValue(expectedUser);
-   const result = await userService.getUserById(userId);
-   expect(result).toEqual(expectedUser);
- });
+  const userId = '1';
+  const expectedUser = createUserBuilder({ id: userId });
+  mockRepository.getById.mockResolvedValue(expectedUser);
+  const result = await userService.getUserById(userId);
+  expect(result).toEqual(expectedUser);
+});
  ```
 ```typescript
 it('should throw error when user not found', async () => {
