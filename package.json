@@ -9,6 +9,7 @@
 		"node": ">=20.0.0"
 	},
 	"scripts": {
+		"gen:domain": "bun run src/commands/generate-domain.ts",
 		"tests": "bun test --coverage",
 		"pb:health": "bun outdated",
 		"db:migrate:push": "drizzle-kit push",
