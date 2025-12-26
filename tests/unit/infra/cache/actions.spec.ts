@@ -1,7 +1,7 @@
-import { mockClient } from "@tests/mocks/redis";
+import { redisClientMock } from "@tests/mocks/redis.client.mock";
 import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
 
-mock.module("@infrastructure/cache/connection", () => ({ default: mockClient }));
+mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 
 describe("Cache Infrastructure", () => {
 	let cache: typeof import("@infrastructure/cache/actions").default;
@@ -14,95 +14,88 @@ describe("Cache Infrastructure", () => {
 	});
 	afterEach(() => {
 		mock.restore();
-		mockClient.get.mockClear();
-		mockClient.set.mockClear();
-		mockClient.del.mockClear();
-		mockClient.scan.mockClear();
-		mockClient.expire.mockClear();
-		mockClient.json.get.mockClear();
-		mockClient.json.set.mockClear();
+		redisClientMock.get.mockClear();
+		redisClientMock.set.mockClear();
+		redisClientMock.del.mockClear();
+		redisClientMock.scan.mockClear();
+		redisClientMock.expire.mockClear();
+		redisClientMock.json.get.mockClear();
+		redisClientMock.json.set.mockClear();
 	});
 
 	describe("Text Actions", () => {
 		it("should set value correctly", async () => {
-			// Removed explicit mockResolvedValue to test default mock in redis.ts
 			const result = await cache.text.set("key", "value");
 			expect(result).toBe("OK");
-			expect(mockClient.set).toHaveBeenCalledTimes(1);
-			expect(mockClient.set).toHaveBeenCalledWith("key", "value");
+			expect(redisClientMock.set).toHaveBeenCalledTimes(1);
+			expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
 		});
 
 		it("should handle set error correctly", async () => {
-			mockClient.set.mockRejectedValue(new Error("Redis error"));
+			redisClientMock.set.mockRejectedValue(new Error("Redis error"));
 			const result = await cache.text.set("key", "value");
 			expect(result).toBe("");
-			expect(mockClient.set).toHaveBeenCalledTimes(1);
+			expect(redisClientMock.set).toHaveBeenCalledTimes(1);
 		});
 
 		it("should set value with TTL", async () => {
-			// Removed explicit mockResolvedValue
 			await cache.text.set("key", "value", 60);
-			expect(mockClient.set).toHaveBeenCalledWith("key", "value");
-			expect(mockClient.expire).toHaveBeenCalledWith("key", 60);
+			expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
+			expect(redisClientMock.expire).toHaveBeenCalledWith("key", 60);
 		});
 
 		it("should get value correctly", async () => {
-			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
-			mockClient.get.mockResolvedValue("value");
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
+			redisClientMock.get.mockResolvedValue("value");
 			const result = await cache.text.get("key");
 			expect(result).toEqual({ key: "value" });
-			expect(mockClient.get).toHaveBeenCalledWith("key");
+			expect(redisClientMock.get).toHaveBeenCalledWith("key");
 		});
 
 		it("should delete value correctly", async () => {
-			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
-			// Removed explicit mockResolvedValue to test default mock in redis.ts
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const result = await cache.text.del("key");
 			expect(result).toBe(1);
-			expect(mockClient.del).toHaveBeenCalledWith("key");
+			expect(redisClientMock.del).toHaveBeenCalledWith("key");
 		});
 	});
 
 	describe("JSON Actions", () => {
 		it("should set json value correctly", async () => {
-			// Removed explicit mockResolvedValue to test default mock in redis.ts
 			const data = { foo: "bar" };
 			const result = await cache.json.set("key", data);
 			expect(result).toBe("OK");
-			expect(mockClient.json.set).toHaveBeenCalledWith("key", "$", JSON.parse(JSON.stringify(data)));
+			expect(redisClientMock.json.set).toHaveBeenCalledWith("key", "$", JSON.parse(JSON.stringify(data)));
 		});
 
 		it("should handle json set error correctly", async () => {
-			mockClient.json.set.mockRejectedValue(new Error("Redis error"));
+			redisClientMock.json.set.mockRejectedValue(new Error("Redis error"));
 			const data = { foo: "bar" };
 			const result = await cache.json.set("key", data);
 			expect(result).toBe("");
-			expect(mockClient.json.set).toHaveBeenCalledTimes(1);
+			expect(redisClientMock.json.set).toHaveBeenCalledTimes(1);
 		});
 
 		it("should get json value correctly", async () => {
-			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const data = { foo: "bar" };
-			mockClient.json.get.mockResolvedValue(data);
+			redisClientMock.json.get.mockResolvedValue(data);
 			const result = await cache.json.get("key");
 			expect(result).toEqual({ key: data });
-			expect(mockClient.json.get).toHaveBeenCalledWith("key");
+			expect(redisClientMock.json.get).toHaveBeenCalledWith("key");
 		});
 
 		it("should delete json value correctly", async () => {
-			mockClient.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
-			// Default mock for del returns 1
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const result = await cache.json.del("key");
 			expect(result).toBe(1);
-			expect(mockClient.del).toHaveBeenCalledWith("key");
+			expect(redisClientMock.del).toHaveBeenCalledWith("key");
 		});
 	});
-
-
 
 	it("should ping correctly", async () => {
 		const result = await cache.ping();
 		expect(result).toBe("PONG");
-		expect(mockClient.ping).toHaveBeenCalledTimes(1);
+		expect(redisClientMock.ping).toHaveBeenCalledTimes(1);
 	});
 });

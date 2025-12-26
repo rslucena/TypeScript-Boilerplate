@@ -1,6 +1,6 @@
 import { mock } from "bun:test";
 
-export const mockClient = {
+export const redisClientMock = {
 	get: mock((...args: any[]) => Promise.resolve(null as any)),
 	set: mock((...args: any[]) => Promise.resolve("OK" as any)),
 	del: mock((...args: any[]) => Promise.resolve(1 as any)),

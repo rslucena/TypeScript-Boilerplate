@@ -19,6 +19,6 @@
 			"@tests/*": ["./tests/*"]
 		}
 	},
-	"include": ["src"],
+	"include": ["src", "tests"],
 	"exclude": ["node_modules/**", ".docker/**", ".git/**", ".github/**", ".vscode/**", "dist/**"]
 }
