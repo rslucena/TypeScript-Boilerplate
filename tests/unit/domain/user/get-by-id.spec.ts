@@ -1,10 +1,11 @@
-import { redisClientMock } from "@tests/mocks/redis.client.mock";
+import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { containerMock } from "@tests/mocks/server.mock";
 import { mock } from "bun:test";
 import { z } from "zod/v4";
 
+const redisClientMock = createRedisClientMock();
 mock.module("@infrastructure/cache/connection", () => ({
 	__esModule: true,
 	default: redisClientMock,

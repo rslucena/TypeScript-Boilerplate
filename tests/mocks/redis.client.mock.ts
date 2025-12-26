@@ -1,14 +1,16 @@
 import { mock } from "bun:test";
 
-export const redisClientMock = {
-	get: mock((...args: any[]) => Promise.resolve(null as any)),
-	set: mock((...args: any[]) => Promise.resolve("OK" as any)),
-	del: mock((...args: any[]) => Promise.resolve(1 as any)),
-	scan: mock((...args: any[]) => Promise.resolve({ cursor: "0", keys: [] } as any)),
-	expire: mock((...args: any[]) => Promise.resolve(true as any)),
+export const createRedisClientMock = () => ({
+	get: mock((...args: unknown[]) => Promise.resolve(null)),
+	set: mock((...args: unknown[]) => Promise.resolve("OK")),
+	del: mock((...args: unknown[]) => Promise.resolve(1 )),
+	scan: mock((...args: unknown[]) => Promise.resolve({ cursor: "0", keys: [] as unknown[] })),
+	expire: mock((...args: unknown[]) => Promise.resolve(true)),
 	json: {
-		get: mock((...args: any[]) => Promise.resolve(null as any)),
-		set: mock((...args: any[]) => Promise.resolve("OK" as any)),
+		get: mock((...args: unknown[]) => Promise.resolve(null as unknown)),
+		set: mock((...args: unknown[]) => Promise.resolve("OK")),
 	},
 	ping: mock(() => Promise.resolve("PONG")),
-};
+});
+
+export const redisClientMock = createRedisClientMock();
