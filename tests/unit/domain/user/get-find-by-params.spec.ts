@@ -1,8 +1,11 @@
+import { mock } from "bun:test";
+
+process.env.REDIS_STACK = "true";
+
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
-import { mock } from "bun:test";
 import { z } from "zod/v4";
 
 const redisClientMock = createRedisClientMock();
@@ -11,7 +14,6 @@ const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
 mock.module("@infrastructure/cache/connection", () => ({
-	__esModule: true,
 	default: redisClientMock,
 }));
 
@@ -23,7 +25,6 @@ mock.module("@infrastructure/repositories/repository", () => ({
 
 mock.module("@infrastructure/server/request", () => ({
 	container: mock(() => containerMock),
-	authentication: mock(() => ({ create: mock().mockReturnValue("token") })),
 }));
 
 mock.module("@infrastructure/repositories/references", () => ({
@@ -32,67 +33,62 @@ mock.module("@infrastructure/repositories/references", () => ({
 	withPagination: referencesMock.withPagination,
 	identifier: { id: mock().mockReturnValue("some-string") },
 	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string()},
+	zodIdentifier: { id: z.string() },
 }));
 
 import "@domain/user/schema";
 import { beforeEach, describe, expect, it } from "bun:test";
 
-describe("User Domain Actions : getById", () => {
-	let getById: CallableFunction;
+describe("User Domain Actions : getFindByParams", () => {
+	let getFindByParams: CallableFunction;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();
-		containerMock.headers.mockClear();
-		containerMock.params.mockReturnValue({});
 		containerMock.query.mockReturnValue({});
-		containerMock.body.mockReturnValue({});
-		redisClientMock.get.mockClear();
-		redisClientMock.set.mockClear();
-		redisClientMock.del.mockClear();
-		redisClientMock.scan.mockClear();
-		redisClientMock.expire.mockClear();
 		redisClientMock.json.get.mockClear();
 		redisClientMock.json.set.mockClear();
-		redisClientMock.ping.mockClear();
+		redisClientMock.scan.mockClear();
 		repositoryMock.execute.mockClear();
-		repositoryMock.insert.mockClear();
-		repositoryMock.values.mockClear();
-		repositoryMock.returning.mockClear();
-		getById = (await import("@domain/user/actions/get-by-id")).default;
+		getFindByParams = (await import("@domain/user/actions/get-find-by-params")).default;
 	});
 
-	const validId = "123e4567-e89b-12d3-a456-426614174000";
-
-	it("should return cached user if available", async () => {
+	it("should return cached users if available", async () => {
+		const reference = "user:find{params}:[object Object]";
 		const cachedData = [{ id: 1, name: "Test" }];
-		const reference = referencesMock.tag("user", "find{id}", { id: validId });
 		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [reference] });
 		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
-		containerMock.params.mockReturnValue({ id: validId });
+		containerMock.query.mockReturnValue({ "req.page": [1, 10] });
 
-		const result = await getById(containerMock);
-		expect(result).toEqual([{ id: 1, name: "Test" }]);
+		const result = await getFindByParams(containerMock);
+		expect(result).toEqual(cachedData);
 		expect(redisClientMock.json.get).toHaveBeenCalled();
 		expect(repositoryMock.execute).not.toHaveBeenCalled();
 	});
 
-	it("should return user from repository if not cached", async () => {
+	it("should return users from repository if not cached", async () => {
+		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [] });
 		redisClientMock.json.get.mockResolvedValueOnce(null);
 		repositoryMock.execute.mockResolvedValueOnce([{ id: 1, name: "Test" }]);
-		containerMock.params.mockReturnValue({ id: validId });
+		containerMock.query.mockReturnValue({ name: "John", "req.page": [1, 10] });
 
-		const result = await getById(containerMock);
+		const result = await getFindByParams(containerMock);
 		expect(result).toEqual([{ id: 1, name: "Test" }]);
 		expect(repositoryMock.execute).toHaveBeenCalled();
 		expect(redisClientMock.json.set).toHaveBeenCalled();
 	});
 
-	it("should throw error if user not found", async () => {
+	it("should throw error if no users found", async () => {
+		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [] });
 		redisClientMock.json.get.mockResolvedValueOnce(null);
 		repositoryMock.execute.mockResolvedValueOnce([]);
-		containerMock.params.mockReturnValue({ id: validId });
+		containerMock.query.mockReturnValue({ "req.page": [1, 10] });
 
-		expect(getById(containerMock)).rejects.toThrow();
+		expect(getFindByParams(containerMock)).rejects.toThrow();
+	});
+
+	it("should throw error if validation fails", async () => {
+		containerMock.query.mockReturnValue({ "req.page": "invalid" });
+
+		expect(getFindByParams(containerMock)).rejects.toThrow();
 	});
 });

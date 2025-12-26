@@ -1,7 +1,7 @@
 import { mock } from "bun:test";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-export const containerMock = {
+export const createContainerMock = () => ({
 	status: mock(),
 	params: mock().mockReturnValue({}),
 	query: mock().mockReturnValue({}),
@@ -11,9 +11,11 @@ export const containerMock = {
 	unprocessableEntity: mock((_: string, msg: string) => new Error(msg)),
 	headers: mock(),
 	language: mock().mockReturnValue("en"),
-};
+});
 
-export const serverRequestMock = {
+export const containerMock = createContainerMock();
+
+export const createServerRequestMock = () => ({
 	reply: {},
 	restricted: (fn: CallableFunction) => async (req: FastifyRequest, reply: FastifyReply) => {
 		const auth = req.headers.authorization;
@@ -39,7 +41,9 @@ export const serverRequestMock = {
 		});
 		return reply.send(result);
 	},
-};
+});
+
+export const serverRequestMock = createServerRequestMock();
 
 export const serverActionsMock = (builder: CallableFunction) => {
 	return {

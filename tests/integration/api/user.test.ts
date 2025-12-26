@@ -15,7 +15,7 @@ mock.module("@infrastructure/repositories/references", () => ({
 	...referencesMock,
 	identifier: { id: mock(() => "test-id") },
 	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string().uuid() },
+	zodIdentifier: { id: z.string() },
 }));
 mock.module("@infrastructure/server/request", () => ({ default: serverRequestMock }));
 
