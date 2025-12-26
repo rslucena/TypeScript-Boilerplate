@@ -26,6 +26,7 @@ mock.module("@infrastructure/server/request", () => ({
 	container: mock((...args) => {
 		const instance = Object.create(containerMock);
 		if (args[0]?.params) instance.params = mock().mockReturnValue(args[0].params);
+		if (args[0]?.body) instance.body = mock().mockReturnValue(args[0].body);
 		return instance;
 	}),
 }));
@@ -36,14 +37,10 @@ mock.module("@infrastructure/repositories/references", () => ({
 	hash: referencesMock.hash,
 	identifier: { id: mock().mockReturnValue("some-string") },
 	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string() },
+	zodIdentifier: { id: z.uuid() },
 }));
 
-const getByIdMock = mock().mockResolvedValue([{ id: 1, name: "Created User" }]);
-mock.module("@domain/user/actions/get-by-id", () => ({
-	__esModule: true,
-	default: getByIdMock,
-}));
+const validId = "123e4567-e89b-12d3-a456-426614174000";
 
 import "@domain/user/schema";
 import { beforeEach, describe, expect, it } from "bun:test";
@@ -60,21 +57,21 @@ describe("User Domain Actions : postNewEntity", () => {
 		repositoryMock.values.mockReturnThis();
 		repositoryMock.onConflictDoNothing.mockReturnThis();
 		repositoryMock.returning.mockClear();
-		getByIdMock.mockClear();
+		repositoryMock.execute.mockClear();
 		postNewEntity = (await import("@domain/user/actions/post-new-entity")).default;
 	});
 
 	it("should create new user and return it", async () => {
 		const userData = { name: "John", lastName: "Doe", email: "john@example.com", password: "password123" };
 		containerMock.body.mockReturnValue(userData);
-		repositoryMock.returning.mockResolvedValueOnce([{ id: 1 }]);
+		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
+		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...userData }]);
 		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["user/find:some-key"] });
 
 		const result = await postNewEntity(containerMock);
-		expect(result).toEqual([{ id: 1, name: "Created User" }]);
+		expect(result).toEqual([{ id: validId, ...userData }]);
 		expect(repositoryMock.insert).toHaveBeenCalled();
 		expect(redisClientMock.del).toHaveBeenCalled();
-		expect(getByIdMock).toHaveBeenCalled();
 	});
 
 	it("should throw 422 if conflict (duplicate email)", async () => {
