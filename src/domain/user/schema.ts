@@ -24,7 +24,7 @@ const auth = object({
 
 const actions = {
 	headers,
-	id: select.pick({ id: true }),
+	id: select.pick({ id: true }).required(),
 	read: object({
 		...select.omit({ id: true, password: true }).shape,
 		...withPagination.shape,
