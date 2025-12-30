@@ -47,7 +47,7 @@ const varcharBuilder = mock((name, options) => {
 	return col;
 });
 
-const pgIndexBuilder = mock((...args) => {
+const pgIndexBuilder = mock((..._args) => {
 	return {};
 });
 

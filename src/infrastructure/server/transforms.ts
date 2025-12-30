@@ -1,7 +1,7 @@
 function safeParse<t = unknown>(value: string) {
 	try {
 		return JSON.parse(value) as t;
-	} catch (err) {
+	} catch (_err) {
 		return undefined;
 	}
 }
