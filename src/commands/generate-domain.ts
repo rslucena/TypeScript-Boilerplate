@@ -22,7 +22,7 @@ const ${name} = pgTable("${name}", { ...columns, ...identifier }, (table) => pgI
 type ${name} = typeof ${name}.$inferSelect;
 
 export default ${name};
-`
+`;
 
 const schema = `import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 import { headers } from "@infrastructure/server/interface";
@@ -51,7 +51,7 @@ const actions = {
 };
 
 export default { actions, entity: array(select) };
-`
+`;
 
 const routes = `import request from "@infrastructure/server/request";
 import type { FastifyInstance } from "fastify";
@@ -133,7 +133,7 @@ export default async function ${name}Routes(api: FastifyInstance) {
 		request.restricted(deleteEntity),
 	);
 }
-`
+`;
 
 const id = `import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
@@ -171,7 +171,7 @@ export default async function getById(request: container) {
 
 	return content;
 }
-`
+`;
 
 const find = `import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
@@ -217,7 +217,7 @@ export default async function getFindByParams(request: container) {
 
 	return content;
 }
-`
+`;
 
 const create = `import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
@@ -245,7 +245,7 @@ export default async function postNewEntity(request: container) {
 
 	return getById(new container({ params: { id: content[0].id } }));
 }
-`
+`;
 
 const update = `import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
@@ -277,7 +277,7 @@ export default async function putUpdateEntity(request: container) {
 
 	return getById(new container({ params: { id: content[0].id } }));
 }
-`
+`;
 
 const remove = `import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
@@ -304,7 +304,7 @@ export default async function deleteEntity(request: container) {
 
 	return {};
 }
-`
+`;
 
 console.log(`🚀 Generating name: ${name}...`);
 
