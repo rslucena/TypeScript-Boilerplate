@@ -184,6 +184,37 @@ bun test --watch # Run tests in watch mode
 bun test --coverage # Run tests with coverage
 ```
 ---
+## 🚀 CI/CD & DevOps
+
+This boilerplate comes with a fully configured **GitHub Actions** pipeline to ensure code quality and automate deployments.
+
+### Workflows Included
+
+1.  **Quality Gate (`ci.yml`)**:
+    *   Runs on every Push and Pull Request to `main`.
+    *   **Lint**: Checks code style using Biome (`bun run lint:check`).
+    *   **Test**: Runs unit tests (`bun run tests`).
+    *   **Build**: Verifies the project builds successfully.
+
+2.  **Automated Release (`release.yml`)**:
+    *   Runs only after the Quality Gate passes on `main`.
+    *   Uses **Semantic Release** to analyze commits, generate a Changelog, and publish a GitHub Release (and optionally npm).
+    *   *Requirement*: Use [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: new user route`, `fix: validation bug`).
+
+3.  **Docker Deployment (`deploy-docker.yml`)**:
+    *   Triggered when a new Release is published.
+    *   Builds the Docker image and pushes it to **GitHub Container Registry (GHCR)**.
+
+### Local Quality Check
+Before pushing, you can run the same checks locally:
+```bash
+# Check code style
+bun run lint:check
+
+# Run tests
+bun run tests
+```
+---
 
 ## 💡 Complete Use Case Example: Creating a User
 
