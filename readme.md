@@ -1,6 +1,6 @@
 ![https://github.com/rslucena/TypeScript-Boilerplate](https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png)
 
-### Um Boilerplate Modular e de Alta Performance para Serviços Server-Side
+### Modular and High-Performance Boilerplate for Server-Side Services
 
 A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server-Side Applications** (APIs, Functions, WebSockets, CLI) featuring:
 
