@@ -85,6 +85,8 @@ bun gen:domain product
 # ✓ Routes (5 REST endpoints)
 # ✓ Actions (Full CRUD logic)
 # ✓ Tests (Unit test skeleton)
+# ✓ Automatic Route Registration
+# ✓ Auto-formatting (Biome)
 ```
 
 ### Step 4️⃣ - Run & Test

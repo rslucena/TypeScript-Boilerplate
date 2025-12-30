@@ -306,7 +306,7 @@ export default async function deleteEntity(request: container) {
 }
 `;
 
-console.log(`🚀 Generating name: ${name}...`);
+console.log(`🚀 Generating domain: ${name}...`);
 
 const writers = [
 	Bun.write(path.join(domain, "entity.ts"), entity),
@@ -324,6 +324,58 @@ await Bun.spawn(["mkdir", "-p", tests]);
 
 await Promise.all(writers);
 
-console.log(`✅ name ${name} generated successfully!`);
-console.log(`📍 Location: src/name/${name}`);
-console.log(`🧪 Test: tests/unit/name/${name}/crud.spec.ts`);
+const webserverPath = path.join(process.cwd(), "src", "functions", "http-primary-webserver.ts");
+const webserverFile = Bun.file(webserverPath);
+
+if (await webserverFile.exists()) {
+	let content = await webserverFile.text();
+	const importStatement = `import ${name}Routes from "@domain/${name}/routes";`;
+	const registerStatement = `	server.register(${name}Routes, { prefix: "/api/v1/${name}s" });`;
+	
+	if (!content.includes(importStatement)) {
+		const lastImportIndex = content.lastIndexOf("import ");
+		const endOfLastImport = content.indexOf("\n", lastImportIndex);
+		content = `${content.slice(0, endOfLastImport + 1) + importStatement}\n${content.slice(endOfLastImport + 1)}`;
+
+		const lastRegisterIndex = content.lastIndexOf("server.register(");
+		
+		if (lastRegisterIndex !== -1) {
+			const endOfLastRegister = content.indexOf(");", lastRegisterIndex);
+			const endOfLine = content.indexOf("\n", endOfLastRegister);
+			content = `${content.slice(0, endOfLine + 1) + registerStatement}\n${content.slice(endOfLine + 1)}`;
+		}
+		
+		if (lastRegisterIndex === -1) {
+			const serverCreate = content.indexOf("webserver.create()");
+			
+			if (serverCreate !== -1) {
+				const endOfLine = content.indexOf("\n", serverCreate);
+				content = `${content.slice(0, endOfLine + 1) + registerStatement}\n${content.slice(endOfLine + 1)}`;
+			}
+
+		}
+
+		await Bun.write(webserverPath, content);
+		console.log(`🔗 Injected route into http-primary-webserver.ts`);
+	} 
+} 
+
+console.log(`\n✅ Domain "${name}" generated successfully!`);
+console.log(`\n📂 Created Files:`);
+console.log(`   - src/domain/${name}/entity.ts`);
+console.log(`   - src/domain/${name}/schema.ts`);
+console.log(`   - src/domain/${name}/routes.ts`);
+console.log(`   - src/domain/${name}/actions/...`);
+console.log(`   - tests/unit/domain/${name}/crud.spec.ts`);
+
+console.log(`\n📍 Location: src/domain/${name}`);
+console.log(`\n👇 Next Steps:`);
+console.log(`   1. Review the generated schema in src/domain/${name}/schema.ts`);
+console.log(`   2. Run migration if necessary: bun run db:migrate`);
+console.log(`   3. Run tests: bun test tests/unit/domain/${name}/crud.spec.ts`);
+
+console.log(`\n🎨 Running formatter...`);
+
+await Bun.spawn(["bunx", "biome", "check", "--write", domain, tests, webserverPath]);
+
+console.log(`✨ Formatting complete!`);
