@@ -1,8 +1,8 @@
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
-import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { z } from "zod/v4";
 
 const redisClientMock = createRedisClientMock();

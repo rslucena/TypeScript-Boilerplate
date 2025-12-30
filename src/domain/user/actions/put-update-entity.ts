@@ -12,7 +12,7 @@ export default async function putUpdateEntity(request: container) {
 
 	const validParams = await schema.actions.id.safeParseAsync(request.params());
 	if (!validParams.success) throw request.badRequest(request.language(), tag("user", "put{id}"));
-	
+
 	const validBody = await schema.actions.update.safeParseAsync(request.body());
 	if (!validBody.success) throw request.badRequest(request.language(), tag("user", "put{id}"));
 

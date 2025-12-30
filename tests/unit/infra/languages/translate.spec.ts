@@ -1,5 +1,5 @@
-import translate, { Languages } from "@infrastructure/languages/translate";
 import { describe, expect, it } from "bun:test";
+import translate, { Languages } from "@infrastructure/languages/translate";
 
 describe("Languages Infrastructure", () => {
 	describe("Languages object", () => {

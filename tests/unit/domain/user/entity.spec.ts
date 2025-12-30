@@ -1,5 +1,5 @@
-import { columnBuilder, pgIndexBuilder, pgTableBuilder, varcharBuilder } from "@tests/builders/column.builders";
 import { mock } from "bun:test";
+import { columnBuilder, pgIndexBuilder, pgTableBuilder, varcharBuilder } from "@tests/builders/column.builders";
 
 mock.module("drizzle-orm/pg-core", () => {
 	return {
@@ -23,8 +23,8 @@ mock.module("@infrastructure/repositories/references", () => {
 	};
 });
 
-import user from "@domain/user/entity";
 import { describe, expect, it } from "bun:test";
+import user from "@domain/user/entity";
 
 describe("User Entity", () => {
 	it("should be defined", () => {

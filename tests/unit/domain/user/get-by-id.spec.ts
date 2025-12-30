@@ -1,8 +1,8 @@
+import { mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
-import { mock } from "bun:test";
 import { z } from "zod/v4";
 
 const redisClientMock = createRedisClientMock();
@@ -32,7 +32,7 @@ mock.module("@infrastructure/repositories/references", () => ({
 	withPagination: referencesMock.withPagination,
 	identifier: { id: mock().mockReturnValue("some-string") },
 	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string()},
+	zodIdentifier: { id: z.string() },
 }));
 
 import "@domain/user/schema";

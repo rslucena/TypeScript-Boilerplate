@@ -1,7 +1,7 @@
 {
-  "ERR_UNAUTHORIZED": "No estás autorizado para acceder a este recurso.",
-  "ERR_NOT_FOUND": "No se encontró el recurso solicitado.",
-  "ERR_REQUEST": "No repita esta solicitud sin modificación.",
-  "UNPROCESSABLE_ENTITY": "La solicitud estaba bien formada pero no se pudo seguir debido a errores semánticos.",
-  "CONFLICT": "La solicitud no pudo completarse debido a un conflicto con el estado actual del recurso de destino."
+	"ERR_UNAUTHORIZED": "No estás autorizado para acceder a este recurso.",
+	"ERR_NOT_FOUND": "No se encontró el recurso solicitado.",
+	"ERR_REQUEST": "No repita esta solicitud sin modificación.",
+	"UNPROCESSABLE_ENTITY": "La solicitud estaba bien formada pero no se pudo seguir debido a errores semánticos.",
+	"CONFLICT": "La solicitud no pudo completarse debido a un conflicto con el estado actual del recurso de destino."
 }

@@ -3,7 +3,7 @@ import { mock } from "bun:test";
 export const createRedisClientMock = () => ({
 	get: mock((...args: unknown[]) => Promise.resolve(null)),
 	set: mock((...args: unknown[]) => Promise.resolve("OK")),
-	del: mock((...args: unknown[]) => Promise.resolve(1 )),
+	del: mock((...args: unknown[]) => Promise.resolve(1)),
 	scan: mock((...args: unknown[]) => Promise.resolve({ cursor: "0", keys: [] as unknown[] })),
 	expire: mock((...args: unknown[]) => Promise.resolve(true)),
 	json: {

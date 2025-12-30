@@ -2,8 +2,8 @@ import type { refer } from "@infrastructure/repositories/interface";
 import * as bcrypt from "bcrypt";
 import {
 	boolean,
-	index,
 	type IndexBuilder,
+	index,
 	type PgColumn,
 	type PgTimestampConfig,
 	uuid as puuid,
