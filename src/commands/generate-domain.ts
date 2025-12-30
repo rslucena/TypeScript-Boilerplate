@@ -331,34 +331,33 @@ if (await webserverFile.exists()) {
 	let content = await webserverFile.text();
 	const importStatement = `import ${name}Routes from "@domain/${name}/routes";`;
 	const registerStatement = `	server.register(${name}Routes, { prefix: "/api/v1/${name}s" });`;
-	
+
 	if (!content.includes(importStatement)) {
 		const lastImportIndex = content.lastIndexOf("import ");
 		const endOfLastImport = content.indexOf("\n", lastImportIndex);
 		content = `${content.slice(0, endOfLastImport + 1) + importStatement}\n${content.slice(endOfLastImport + 1)}`;
 
 		const lastRegisterIndex = content.lastIndexOf("server.register(");
-		
+
 		if (lastRegisterIndex !== -1) {
 			const endOfLastRegister = content.indexOf(");", lastRegisterIndex);
 			const endOfLine = content.indexOf("\n", endOfLastRegister);
 			content = `${content.slice(0, endOfLine + 1) + registerStatement}\n${content.slice(endOfLine + 1)}`;
 		}
-		
+
 		if (lastRegisterIndex === -1) {
 			const serverCreate = content.indexOf("webserver.create()");
-			
+
 			if (serverCreate !== -1) {
 				const endOfLine = content.indexOf("\n", serverCreate);
 				content = `${content.slice(0, endOfLine + 1) + registerStatement}\n${content.slice(endOfLine + 1)}`;
 			}
-
 		}
 
 		await Bun.write(webserverPath, content);
 		console.log(`🔗 Injected route into http-primary-webserver.ts`);
-	} 
-} 
+	}
+}
 
 console.log(`\n✅ Domain "${name}" generated successfully!`);
 console.log(`\n📂 Created Files:`);
