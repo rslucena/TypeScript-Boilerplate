@@ -20,10 +20,12 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 ## 📖 Table of Contents
 - [What Makes This Special](#-what-makes-this-special)
 - [Quick Start](#-quick-start)
+- [CLI Code Generator](#-cli-code-generator)
 - [Why Choose This?](#-why-choose-this-boilerplate)
 - [Folder Structure](#-detailed-folder-structure)
-- [Testing Guide](#-testing-guide)
-- [Complete Example](#-complete-use-case-example-creating-a-user)
+- [Testing](#-testing)
+- [CI/CD Pipeline](#-cicd-pipeline)
+- [Documentation](#-documentation)
 - [Main Features](#-main-features)
 - [Resources](#-resources)
 - [Contributing](#-contributing)
@@ -101,6 +103,32 @@ bun dev --workers=primary-webserver
 ```
 
 
+
+
+
+
+---
+
+## 🎨 CLI Code Generator
+
+Generate complete CRUD domains in seconds with a single command:
+
+```bash
+bun gen:domain product
+```
+
+**What you get:**
+- ✅ Database table (Drizzle ORM)
+- ✅ Validation schemas (Zod)
+- ✅ 5 REST endpoints (GET, POST, PUT, DELETE)
+- ✅ Business logic with caching
+- ✅ Auto-registered routes
+- ✅ Type-safe operations
+
+**Unique Approach:** Uses TypeScript files as templates (not `.hbs` or `.ejs`) for native IDE support and zero dependencies.
+
+📚 **Learn More:** [Template System Architecture](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Template-System-Architecture) | [Domain Generator Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Domain-Scaffolding-(Generator))
+
 ---
 
 ## 🤔 Why Choose This Boilerplate?
@@ -141,191 +169,60 @@ tests/              # Automated tests
 
 ---
 
-## ⚓ Testing Guide
+## 🧪 Testing
 
-This directory contains the automated tests for the application. The structure follows best practices for test organization to facilitate maintenance and scalability.
-
-```
-tests/
-├── unit/
-│   ├── domain/              # Pure logic tests (user/user-get-by-id.spec.ts)
-│   └── infra/               # Adapter/gateway testing
-├── integration/
-│   └── api/                 # Route/Endpoint Testing (users.test.ts)
-├── builders/                # Real objects or DTOs with valid data (users.builder.ts)
-└── mocks/                   # Global and reusable mockups
-```
-
-- Test file names: `[name].test.ts` or `[name].spec.ts`
-- Test descriptions: should be descriptive and use `should... when...`
-
-**Arrange-Act-Assert**:
- ```typescript
- it('should return user when valid ID is provided', async () => {
-  const userId = '1';
-  const expectedUser = createUserBuilder({ id: userId });
-  mockRepository.getById.mockResolvedValue(expectedUser);
-  const result = await userService.getUserById(userId);
-  expect(result).toEqual(expectedUser);
-});
- ```
-```typescript
-it('should throw error when user not found', async () => {
-  // Arrange
-  const userId = 'non-existent';
-  mockRepository.getById.mockResolvedValue(null);
-  await expect(userService.getUserById(userId)).rejects.toThrow()
-});
-```
-
-### Executando Testes
+Comprehensive test suite using Bun's blazing-fast test runner:
 
 ```bash
-bun test  # Run all tests
-bun test --watch # Run tests in watch mode
-bun test --coverage # Run tests with coverage
+bun test              # Run all tests
+bun test --watch      # Watch mode
+bun test --coverage   # Coverage report
 ```
+
+**Test Structure:**
+- `tests/unit/` - Pure logic tests
+- `tests/integration/` - API endpoint tests
+- `tests/builders/` - Test data factories
+- `tests/mocks/` - Shared mocks
+
+📚 **Learn More:** [Testing Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Testing-Guide)
+
 ---
-## 🚀 CI/CD & DevOps
 
-This boilerplate comes with a fully configured **GitHub Actions** pipeline to ensure code quality and automate deployments.
+## 🚀 CI/CD Pipeline
 
-### Workflows Included
+Automated quality gates and deployments with GitHub Actions:
 
-1.  **Quality Gate (`ci.yml`)**:
-    *   Runs on every Push and Pull Request to `main`.
-    *   **Lint**: Checks code style using Biome (`bun run lint:check`).
-    *   **Test**: Runs unit tests (`bun run tests`).
-    *   **Build**: Verifies the project builds successfully.
+- **Quality Gate**: Lint, test, and build on every push
+- **Automated Releases**: Semantic versioning with conventional commits
+- **Docker Deployment**: Auto-publish to GitHub Container Registry
 
-2.  **Automated Release (`release.yml`)**:
-    *   Runs only after the Quality Gate passes on `main`.
-    *   Uses **Semantic Release** to analyze commits, generate a Changelog, and publish a GitHub Release (and optionally npm).
-    *   *Requirement*: Use [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: new user route`, `fix: validation bug`).
-
-3.  **Docker Deployment (`deploy-docker.yml`)**:
-    *   Triggered when a new Release is published.
-    *   Builds the Docker image and pushes it to **GitHub Container Registry (GHCR)**.
-
-### Local Quality Check
-Before pushing, you can run the same checks locally:
 ```bash
-# Check code style
+# Run checks locally
 bun run lint:check
-
-# Run tests
 bun run tests
+bun run build
 ```
+
+📚 **Learn More:** [CI/CD Pipeline](https://github.com/rslucena/TypeScript-Boilerplate/wiki/CI-CD-Pipeline)
+
 ---
 
-## 💡 Complete Use Case Example: Creating a User
+## 📚 Documentation
 
-This example demonstrates the visual data flow when a request is made, showing how the architectural layers work together in this modular setup.
+Comprehensive guides available in the [Wiki](https://github.com/rslucena/TypeScript-Boilerplate/wiki):
 
-### 1. Domain Definition: Entity and Validation Schemas
-
-In this structure, the Drizzle table definition (`entity.ts`) and the Zod validation schemas (`schema.ts`) are kept together in the domain layer, making them readily available for the business logic.
-
-#### A. Entity Definition (`src/domain/user/entity.ts`)
-Defines the database table structure using Drizzle ORM.
-
-```typescript
-import { identifier, pgIndex } from "@infrastructure/repositories/references";
-import { pgTable, varchar } from "drizzle-orm/pg-core";
-
-const columns = {
-  name: varchar("name", { length: 50 }).notNull(),
-  lastName: varchar("lastName", { length: 100 }),
-  email: varchar("email", { length: 400 }).unique().notNull(),
-  password: varchar("password", { length: 100 }).notNull(),
-};
-
-const user = pgTable("user", { ...columns, ...identifier }, (table) => pgIndex("user", table, ["name", "email"]));
-type user = typeof user.$inferSelect;
-
-export default user;
-```
-
-#### B. Schema Generation (src/domain/user/schema.ts)
-Generates Zod schemas from the Drizzle entity for runtime validation and defines complex actions/response schemas
-```typescript
-import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
-import { headers } from "@infrastructure/server/interface";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { array, object, string } from "zod/v4";
-import { default as users } from "./entity";
-
-
-// ... (create and select schemas remain the same)
-
-const actions = {
-  // ...
-  create: {
-    entity: create.omit({ id: true }),
-    auth: create.pick({ email: true, password: true }),
-  },
-  // ...
-};
-
-// ... (export defaults)
-export default { actions, entity, auth };
-```
-
-
-### 2. Domain Action (Business Logic) (src/domain/user/actions/post-new-entity.ts)
-This is the core business logic. It handles validation, applies business rules (e.g., password hashing), and directly interacts with the persistence layer via the shared repository module.
-```typescript
-import cache from '@infrastructure/cache/actions'
-import { hash, tag } from '@infrastructure/repositories/references'
-import repository from '@infrastructure/repositories/repository' // Global repository module
-import { container } from '@infrastructure/server/request'
-import user from '../entity' // Uses the Drizzle entity definition
-import { default as schema } from '../schema'
-import getById from './get-by-id'
-
-export default async function postNewEntity(request: container) {
-  request.status(201);
-  const validRequest = await schema.actions.create.entity.safeParseAsync(request.body());
-  if (!validRequest.success) throw request.badRequest(request.language(), "post/user/{params}");
-  const content = await repository
-    .insert(user)
-    .values({
-      ...validRequest.data,
-      password: hash(validRequest.data.password),
-    })
-    .onConflictDoNothing()
-    .returning();
-  if (!content.length) throw request.unprocessableEntity(request.language(), `post/user/${validRequest.data.email}`);
-  await cache.json.del(tag("user", "find*"));
-  return getById(new container({ params: { id: content[0].id } }));
-}
-```
-### 3. Application Entry Point (src/commands/api/routes/user.ts)
-This is the command layer for the API. It defines the Fastify route structure, hooks up the validation schemas for documentation/enforcement, and delegates the execution to the domain action.
-```typescript
-import request from "@infrastructure/server/request";
-import type { FastifyInstance } from "fastify";
-import postNewEntity from "../actions/post-new-entity"; // Imports the Domain Action
-import schema from "../schema";
-
-export default async function userRoutes(api: FastifyInstance) {
-  api.get("/ping", { schema: { tags: ["User"] } }, (_, reply) => reply.code(200).send());
-
-  api.post(
-    "/",
-    {
-      schema: {
-        tags: ["User"],
-        summary: "Create new user",
-        body: schema.actions.create.entity, // Hooks up Zod schema for validation/docs
-        response: { 201: schema.entity, ...request.reply.schemas },
-      },
-    },
-    // Delegates execution to the Domain Action
-    request.noRestricted(postNewEntity),
-  );
-}
-```
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Getting-Started) | Detailed setup and configuration |
+| [Complete Example](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Complete-Example) | Full walkthrough of creating a User domain |
+| [Template System](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Template-System-Architecture) | How the code generator works |
+| [Domain Generator](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Domain-Scaffolding-(Generator)) | Creating CRUD modules |
+| [Architecture](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Architecture) | Project structure deep dive |
+| [Best Practices](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Best-Practices) | Coding standards and patterns |
+| [Testing Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Testing-Guide) | Writing and running tests |
+| [CI/CD Pipeline](https://github.com/rslucena/TypeScript-Boilerplate/wiki/CI-CD-Pipeline) | Automation workflows |
+| [Deployment](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Deployment) | Production deployment |
 
 ---
 
