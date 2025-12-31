@@ -16,7 +16,8 @@
 			"@domain/*": ["./src/domain/*"],
 			"@infrastructure/*": ["./src/infrastructure/*"],
 			"@providers/*": ["./src/functions/*"],
-			"@tests/*": ["./tests/*"]
+			"@tests/*": ["./tests/*"],
+			"@templates/*": ["./src/templates/*"]
 		}
 	},
 	"include": ["src", "tests"],
