@@ -1,5 +1,23 @@
 'github actions':
   - all: ['.github/workflows/*']
 
+source:
+  - any: ['src/**/*']
+
+documentation:
+  - any:
+      - 'wiki/**/*'
+      - '**/*.md'
+
+config:
+  - any:
+      - '*.json'
+      - '*.yml'
+      - '*.yaml'
+      - '*.rc'
+      
 test:
-  - all: ['tests/**/*']
+  - any:
+      - 'tests/**/*'
+      - '**/*.spec.ts'
+      - '**/*.test.ts'
