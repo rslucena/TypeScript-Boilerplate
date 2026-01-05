@@ -133,15 +133,22 @@ bun gen:domain product
 
 ## 🤔 Why Choose This Boilerplate?
 
-| Feature | This Boilerplate | NestJS | Express Boilerplates |
-|---------|------------------|--------|----------------------|
-| **Runtime Speed** | Bun (3x faster) ⚡ | Node.js | Node.js |
-| **Code Generation** | ✅ Full CRUD CLI | ❌ Manual scaffolding | ❌ Manual |
-| **Type Safety** | Drizzle + Zod (100%) | TypeORM | Varies |
-| **Built-in Caching** | ✅ Redis integrated | ❌ Manual setup | ❌ Manual |
-| **API Documentation** | ✅ Auto Swagger | ❌ Manual decorators | ❌ Manual |
-| **Learning Curve** | Low (familiar patterns) | High (complex) | Medium |
-| **Production Ready** | ✅ Docker + PM2 | ⚠️ Requires setup | ⚠️ Varies |
+| Feature | This Boilerplate | NestJS / Adonis | Go (Fiber/Gin) | Elysia / Bare Fastify |
+| :--- | :--- | :--- | :--- | :--- |
+| **Runtime** | **Bun (Ultra Fast)** ⚡ | Node.js | Native Binary | Bun |
+| **Dev Velocity** | **Extreme (CLI Gen)** 🚀 | High (Opinionated) | Low (Manual) | Medium (Minimal) |
+| **CRUD Scaffolding**| **Full Auto-Reg** 🛠️ | Manual / Partial | Non-existent | Minimal |
+| **Type Safety** | **Total (Zod + Drizzle)** 🔒 | Good (Decorators) | Strong (Strict) | Total |
+| **Integrated i18n** | **Native Built-in** 🌍 | Complex Config | Third-party | Manual |
+| **Smart Caching** | **Redis + Auto-Inv** 💾 | Manual setup | Manual | Manual |
+| **API Docs** | **Auto-Generated** 📚 | Decorator heavy | Manual / Swagger | Fast (Static) |
+| **Bundle Size** | **Medium (Modular)** 📦 | Large / Heavy | Tiny | Tiny |
+
+### The "Sweet Spot" of Web Development:
+- **VS NestJS/Adonis**: We offer the same "batteries-included" feel but with **3x the performance** and a much lower cognitive load (no complex Dependency Injection or decorator hell).
+- **VS Go (Fiber/Gin)**: You get **Go-like performance** without leaving the TypeScript ecosystem. You keep the rich npm library access and the fastest developer feedback loop.
+- **VS Elysia/Fastify Bare**: Instead of a "blank slate", you get a **production-ready architecture** with i18n, caching, and database migrations already wired up and ready for scale.
+- **Native CLI Magic**: `bun gen:domain` is our secret weapon. It doesn't just create files—it understands your architecture, registers routes, and ensures consistency.
 
 ---
 
