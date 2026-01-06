@@ -242,6 +242,7 @@ Comprehensive guides available in the [Wiki](https://github.com/rslucena/TypeScr
 - **Docker** and `docker-compose` for containerized development and production
 - **ESLint** and **Biome** for code linting and formatting
 - **Testing** setup (see `tests/` directory)
+- **Plugin System** for modular architecture and easy extensibility
 - **Ready-to-use project structure** separating domain, infrastructure, commands, and utilities
 
 ---

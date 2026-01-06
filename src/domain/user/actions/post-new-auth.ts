@@ -1,7 +1,8 @@
+import jwt from "@infrastructure/authentication/strategies/jwt";
 import cache from "@infrastructure/cache/actions";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
-import { authentication, type container } from "@infrastructure/server/request";
+import type { container } from "@infrastructure/server/request";
 import { desc, eq, sql } from "drizzle-orm";
 import user from "../entity";
 import { default as schema } from "../schema";
@@ -40,7 +41,7 @@ export default async function postNewAuth(request: container) {
 	if (!hash(validRequest.data.password, content[0].password)) throw request.notFound(request.language(), errMessage);
 
 	const secrets = {
-		token: new authentication().create({
+		token: jwt.create({
 			id: content[0].id,
 			email: content[0].email,
 		}),

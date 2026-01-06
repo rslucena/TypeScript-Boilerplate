@@ -1,12 +1,13 @@
-import { mock } from "bun:test";
-
-process.env.REDIS_STACK = "true";
-
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 import { z } from "zod/v4";
+import "@domain/user/schema";
+import { authenticationMock } from "@tests/mocks/authentication.mock";
+
+process.env.REDIS_STACK = "true";
 
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
@@ -27,9 +28,11 @@ mock.module("@infrastructure/repositories/repository", () => ({
 mock.module("@infrastructure/server/request", () => ({
 	__esModule: true,
 	container: mock(() => containerMock),
-	authentication: mock().mockImplementation(() => ({
-		create: mock().mockReturnValue("test-token"),
-	})),
+}));
+
+mock.module("@infrastructure/authentication/strategies/jwt", () => ({
+	__esModule: true,
+	default: authenticationMock,
 }));
 
 mock.module("@infrastructure/repositories/references", () => ({
@@ -40,9 +43,6 @@ mock.module("@infrastructure/repositories/references", () => ({
 	pgIndex: mock(() => []),
 	zodIdentifier: { id: z.string() },
 }));
-
-import "@domain/user/schema";
-import { beforeEach, describe, expect, it } from "bun:test";
 
 describe("User Domain Actions : postNewAuth", () => {
 	let postNewAuth: CallableFunction;

@@ -1,69 +1,8 @@
-import * as crypto from "node:crypto";
 import translate from "@infrastructure/languages/translate";
+import plugins from "@infrastructure/settings/plugins";
 import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
-import { type AnyType, type guise, type JWT, replyErrorSchema } from "./interface";
+import { type AnyType, type guise, replyErrorSchema } from "./interface";
 import { safeParse } from "./transforms";
-
-export class authentication {
-	create(content: guise["session"], exp?: number) {
-		const header = {
-			alg: "HS256",
-			typ: "JWT",
-			exp: Math.floor(Date.now() / 1000) + (exp ?? 60 * 60),
-		};
-		const encodedHeader = Buffer.from(JSON.stringify(header))
-			.toString("base64")
-			.replace(/\+/g, "-")
-			.replace(/\//g, "_")
-			.replace(/=/g, "");
-		const encodedPayload = Buffer.from(JSON.stringify(content))
-			.toString("base64")
-			.replace(/\+/g, "-")
-			.replace(/\//g, "_")
-			.replace(/=/g, "");
-		const signature = crypto
-			.createHmac("sha256", String(process.env.AUTH_SALT))
-			.update(`${encodedHeader}.${encodedPayload}`)
-			.digest("base64")
-			.replace(/\+/g, "-")
-			.replace(/\//g, "_")
-			.replace(/=/g, "");
-		return `${encodedHeader}.${encodedPayload}.${signature}`;
-	}
-	session(request: container) {
-		const { authorization } = request.headers();
-		if (!authorization) return false;
-
-		const jwt = authorization.replace("Bearer", "").replace(" ", "");
-
-		const parts = jwt.split(".");
-		if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
-
-		const encodedHeader = parts[0];
-		const encodedPayload = parts[1];
-		const signature = parts[2];
-
-		const header = safeParse<JWT>(Buffer.from(encodedHeader, "base64").toString());
-		if (!header) return false;
-		if (header.typ !== "JWT" || header.alg !== "HS256") return false;
-
-		const body = safeParse<{ [key: string]: unknown }>(Buffer.from(encodedPayload, "base64").toString());
-		if (!body) return false;
-
-		const expectedSignature = crypto
-			.createHmac("sha256", String(process.env.AUTH_SALT))
-			.update(`${encodedHeader}.${encodedPayload}`)
-			.digest("base64")
-			.replace(/\+/g, "-")
-			.replace(/\//g, "_")
-			.replace(/=/g, "");
-
-		if (signature !== expectedSignature) return false;
-
-		const Now = Math.floor(Date.now() / 1000);
-		return Now > header.exp ? false : body;
-	}
-}
 
 export class err {
 	unauthorized(language?: string) {
@@ -176,7 +115,7 @@ export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, d
 			if (vl === "null") params[key] = null;
 			if (vl === "true") params[key] = true;
 			if (vl === "false") params[key] = false;
-			if (!Number.isNaN(vl)) params[key] = Number(vl);
+			if (!Number.isNaN(vl) && !vl.toString().includes("-")) params[key] = Number(vl);
 			if (typeof vl === "string" && vl.startsWith("[") && vl.endsWith("]")) params[key] = safeParse(vl);
 		}
 		return params;
@@ -205,9 +144,17 @@ function execute(
 		});
 
 		if (isRestricted) {
-			const auth = new authentication().session(receiver);
-			if (!auth) return reply.code(401).send(receiver.unauthorized(receiver.language()));
-			receiver.session(auth);
+			const active = Object.entries(plugins.authentication)
+				.map(([name, plugin]) => ({ name, ...plugin }))
+				.filter((item) => item.active);
+			const sorted = active.sort((a, b) => a.priority - b.priority);
+			const session = new Map();
+			for (const item of sorted) {
+				const auth = await item.strategy(receiver).catch(() => undefined);
+				if (auth) session.set(item.name, auth);
+			}
+			if (!session.size) return reply.code(401).send(receiver.unauthorized(receiver.language()));
+			receiver.session(Object.fromEntries(session));
 		}
 
 		let context: AnyType | unknown;
