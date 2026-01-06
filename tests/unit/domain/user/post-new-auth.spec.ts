@@ -80,7 +80,6 @@ describe("User Domain Actions : postNewAuth", () => {
 		containerMock.body.mockReturnValue({ email: "john@example.com", password: "password123" });
 
 		const result = await postNewAuth(containerMock);
-		console.log(result);
 		expect(result).toHaveProperty("token", "test-token");
 		expect(repositoryMock.execute).toHaveBeenCalled();
 		expect(redisClientMock.json.set).toHaveBeenCalled();
