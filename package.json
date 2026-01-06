@@ -25,7 +25,7 @@
 		"node": ">=20.0.0"
 	},
 	"scripts": {
-		"gen:domain": "bun run src/commands/generate-domain.ts",
+		"gen:domain": "bun src/commands/generate-domain.ts",
 		"lint:check": "bunx biome ci .",
 		"tests": "bun test --coverage",
 		"pb:health": "bun outdated",
