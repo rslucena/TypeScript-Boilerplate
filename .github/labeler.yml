@@ -1,31 +1,21 @@
 # Scope (Where?)
 chore:
-  - 'package.json'
-  - 'bun.lockb'
-  - '.gitignore'
-  - 'README.md'
-  - 'LICENSE'
+  - any: ['package.json', 'bun.lockb', '.gitignore', 'README.md', 'LICENSE']
 
 core:
-  - 'src/commands/**/*'
-  - 'src/functions/**/*'
-  - 'src/templates/**/*'
+  - any: ['src/commands/**/*', 'src/functions/**/*', 'src/templates/**/*']
 
 docs:
-  - 'wiki/**/*'
-  - '**/*.md'
+  - any: ['wiki/**/*', '**/*.md']
 
 domain:
-  - 'src/domain/**/*'
+  - any: ['src/domain/**/*']
 
 infra:
-  - 'src/infrastructure/**/*'
-  - 'docker/**/*'
-  - 'Dockerfile'
+  - any: ['src/infrastructure/**/*', 'docker/**/*', 'Dockerfile']
 
 test:
-  - 'tests/**/*'
-  - '**/*.spec.ts'
+  - any: ['tests/**/*', '**/*.spec.ts']
 
 ci:
-  - '.github/**/*'
+  - any: ['.github/**/*']
