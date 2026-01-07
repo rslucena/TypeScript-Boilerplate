@@ -1,23 +1,31 @@
-'github actions':
-  - all: ['.github/workflows/*']
+# Scope (Where?)
+chore:
+  - any: ['package.json', 'bun.lockb', '.gitignore', 'README.md', 'LICENSE']
 
-source:
-  - any: ['src/**/*']
-
-documentation:
+core:
   - any:
-      - 'wiki/**/*'
-      - '**/*.md'
+    - 'src/commands/**/*'
+    - 'src/functions/**/*'
+    - 'src/templates/**/*'
 
-config:
+docs:
   - any:
-      - '*.json'
-      - '*.yml'
-      - '*.yaml'
-      - '*.rc'
-      
+    - 'wiki/**/*'
+    - '**/*.md'
+
+domain:
+  - any: ['src/domain/**/*']
+
+infra:
+  - any:
+    - 'src/infrastructure/**/*'
+    - 'docker/**/*'
+    - 'Dockerfile'
+
 test:
   - any:
-      - 'tests/**/*'
-      - '**/*.spec.ts'
-      - '**/*.test.ts'
+    - 'tests/**/*'
+    - '**/*.spec.ts'
+
+ci:
+  - any: ['.github/**/*']
