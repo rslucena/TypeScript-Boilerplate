@@ -1,21 +1,28 @@
 # Scope (Where?)
 chore:
-  - any: ['package.json', 'bun.lockb', '.gitignore', 'README.md', 'LICENSE']
+  - changed-files:
+    - any-glob-to-any-file: ['package.json', 'bun.lockb', '.gitignore', 'README.md', 'LICENSE']
 
 core:
-  - any: ['src/commands/**/*', 'src/functions/**/*', 'src/templates/**/*']
+  - changed-files:
+    - any-glob-to-any-file: ['src/commands/**/*', 'src/functions/**/*', 'src/templates/**/*']
 
 docs:
-  - any: ['wiki/**/*', '**/*.md']
+  - changed-files:
+    - any-glob-to-any-file: ['wiki/**/*', '**/*.md']
 
 domain:
-  - any: ['src/domain/**/*']
+  - changed-files:
+    - any-glob-to-any-file: ['src/domain/**/*']
 
 infra:
-  - any: ['src/infrastructure/**/*', 'docker/**/*', 'Dockerfile']
+  - changed-files:
+    - any-glob-to-any-file: ['src/infrastructure/**/*', 'docker/**/*', 'Dockerfile']
 
 test:
-  - any: ['tests/**/*', '**/*.spec.ts']
+  - changed-files:
+    - any-glob-to-any-file: ['tests/**/*', '**/*.spec.ts']
 
 ci:
-  - any: ['.github/**/*']
+  - changed-files:
+    - any-glob-to-any-file: ['.github/**/*']
