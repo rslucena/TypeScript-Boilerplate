@@ -1,23 +1,28 @@
-'github actions':
-  - all: ['.github/workflows/*']
+# Scope (Where?)
+chore:
+  - changed-files:
+    - any-glob-to-any-file: ['package.json', 'bun.lockb', '.gitignore', 'README.md', 'LICENSE']
 
-source:
-  - any: ['src/**/*']
+core:
+  - changed-files:
+    - any-glob-to-any-file: ['src/commands/**/*', 'src/functions/**/*', 'src/templates/**/*']
 
-documentation:
-  - any:
-      - 'wiki/**/*'
-      - '**/*.md'
+docs:
+  - changed-files:
+    - any-glob-to-any-file: ['wiki/**/*', '**/*.md']
 
-config:
-  - any:
-      - '*.json'
-      - '*.yml'
-      - '*.yaml'
-      - '*.rc'
-      
+domain:
+  - changed-files:
+    - any-glob-to-any-file: ['src/domain/**/*']
+
+infra:
+  - changed-files:
+    - any-glob-to-any-file: ['src/infrastructure/**/*', 'docker/**/*', 'Dockerfile']
+
 test:
-  - any:
-      - 'tests/**/*'
-      - '**/*.spec.ts'
-      - '**/*.test.ts'
+  - changed-files:
+    - any-glob-to-any-file: ['tests/**/*', '**/*.spec.ts']
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: ['.github/**/*']
