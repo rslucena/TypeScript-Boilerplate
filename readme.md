@@ -11,9 +11,9 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 ### This boilerplate is optimized for production and comes with full support for testing and code quality.
 
-[![CodeQL](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/check.codeql.yml) [![Build and Test CI](https://github.com/rslucena/Template-Typescript/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/Template-Typescript/actions/workflows/build.nodejs.yml) [![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/rslucena/Template-Typescript?link=https%3A%2F%2Fgithub.com%2Frslucena%2FTemplate-Typescript%2Fcommits%2Fmain%2F)](https://github.com/rslucena/Template-Typescript/graphs/code-frequency)
+[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) [![Quality Gate](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml) [![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency)
 
-[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/graphs/contributors) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/Template-Typescript)](https://github.com/rslucena/Template-Typescript/pulse)
+[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse)
 
 ---
 
@@ -200,9 +200,11 @@ bun test --coverage   # Coverage report
 
 Automated quality gates and deployments with GitHub Actions:
 
-- **Quality Gate**: Lint, test, and build on every push
-- **Automated Releases**: Semantic versioning with conventional commits
-- **Docker Deployment**: Auto-publish to GitHub Container Registry
+- **Quality Gate**: Lint, test, and build on every push to `main` or `staging`.
+- **PR Labeler**: Automatic labeling of pull requests based on file changes.
+- **Release Train**: Structured flow from `staging` to `main` with automated PRs.
+- **Automated Releases**: Semantic versioning with conventional commits.
+- **Docker Deployment**: Auto-publish to GitHub Container Registry.
 
 ```bash
 # Run checks locally
