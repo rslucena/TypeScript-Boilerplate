@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import Logs from "@infrastructure/logs/handler";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
-import { authentication, container } from "./request";
+import authentication from "./authentication";
+import { container } from "./interface";
 import { safeParse } from "./transforms";
 
 type messages = { action: string; session: string; context: string };
@@ -42,7 +43,7 @@ function connection(link: WebSocket, request: IncomingMessage) {
 	link.on("message", (data) => message(id, data));
 }
 
-function message(id: string, data: RawData) {
+async function message(id: string, data: RawData) {
 	const client = clients.get(id);
 	const decoded = safeParse(data.toString());
 	if (!decoded || !client) return disconnect(id);
@@ -53,7 +54,7 @@ function message(id: string, data: RawData) {
 
 	switch (action) {
 		case "authorization":
-			client.authenticated = <boolean>credentials(context);
+			client.authenticated = await credentials(context);
 			if (!client.authenticated) return client.link.send(insession);
 			return client.link.send(authenticated);
 
@@ -88,9 +89,9 @@ function disconnect(id: string) {
 	clients.delete(id);
 }
 
-function credentials(content: string) {
+async function credentials(content: string) {
 	const receiver = new container({ headers: { authorization: `Bearer ${content}` } });
-	return new authentication().session(receiver);
+	return await new authentication().session(receiver);
 }
 
 function subscribe(id: string, action: string, authenticated: boolean) {
