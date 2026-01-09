@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
 import type { AnyType, guise } from "@infrastructure/server/interface";
-import { container, err } from "@infrastructure/server/request?v=real-unit-test";
+import { container, err } from "@infrastructure/server/interface?v=unit";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 describe("Request Infrastructure", () => {
@@ -113,7 +113,7 @@ describe("Request Infrastructure", () => {
 	});
 
 	describe("convertRequestTypes", () => {
-		const { convertRequestTypes } = require("@infrastructure/server/request?v=real-unit-test");
+		const { convertRequestTypes } = require("@infrastructure/server/request?v=unit");
 
 		it("should skip documentation routes", () => {
 			const req = { url: "/documentation/static" } as unknown as FastifyRequest;
@@ -162,7 +162,7 @@ describe("Request Infrastructure", () => {
 	});
 
 	describe("execute wrapper", () => {
-		const requestModule = require("@infrastructure/server/request?v=real-unit-test").default;
+		const requestModule = require("@infrastructure/server/request?v=unit").default;
 
 		it("should execute noRestricted callback successfully", async () => {
 			const callback = mock(() => ({ data: "ok" }));
