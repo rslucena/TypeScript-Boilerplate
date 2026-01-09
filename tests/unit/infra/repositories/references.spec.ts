@@ -51,7 +51,7 @@ describe("Repository References", () => {
 			};
 			const indexes = pgIndex("users", columns as unknown as Record<string, unknown>, ["name", "email"]);
 
-			expect(indexes).toHaveLength(3); // name, email, and auto-added activated
+			expect(indexes).toHaveLength(3);
 			expect(indexes[0]).toBeDefined();
 		});
 	});

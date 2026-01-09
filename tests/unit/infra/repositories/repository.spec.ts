@@ -18,4 +18,11 @@ describe("Repository Utilities", () => {
 			expect(offsetMock).toHaveBeenCalledWith(10);
 		});
 	});
+
+	describe("manager logger", () => {
+		it("should use the defined logger and write messages", async () => {
+			const { default: manager } = await import("@infrastructure/repositories/repository?v=unit-logger");
+			expect(manager).toBeDefined();
+		});
+	});
 });

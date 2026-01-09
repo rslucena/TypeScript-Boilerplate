@@ -70,7 +70,6 @@ describe("JWT Strategy", () => {
 		});
 
 		it("should throw 'Unauthorized' if token is expired", async () => {
-			// Create a token that expires in the past
 			const token = jwt.create(mockSession, -3600);
 			const mockRequest = new container({
 				headers: {
