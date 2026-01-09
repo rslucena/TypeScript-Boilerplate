@@ -106,17 +106,22 @@ export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, d
 		done();
 		return;
 	}
+	const transform = (vl: AnyType): AnyType => {
+		if (vl === "null") return null;
+		if (vl === "true") return true;
+		if (vl === "false") return false;
+		const num = Number(vl);
+		if (!Number.isNaN(num) && !vl?.toString().includes("-")) return num;
+		if (typeof vl === "string" && vl.startsWith("[") && vl.endsWith("]")) return safeParse(vl);
+		return vl;
+	};
+
 	const convert = (params: { [key: string]: AnyType } | undefined) => {
 		if (!params) return {};
 		for (const key in params) {
 			const vl = params[key];
-			if (!vl) continue;
-			if (vl === "") continue;
-			if (vl === "null") params[key] = null;
-			if (vl === "true") params[key] = true;
-			if (vl === "false") params[key] = false;
-			if (!Number.isNaN(vl) && !vl.toString().includes("-")) params[key] = Number(vl);
-			if (typeof vl === "string" && vl.startsWith("[") && vl.endsWith("]")) params[key] = safeParse(vl);
+			if (!vl || vl === "") continue;
+			params[key] = transform(vl);
 		}
 		return params;
 	};
