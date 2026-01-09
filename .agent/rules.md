@@ -67,8 +67,9 @@ Always consult the [wiki/](../wiki/) folder for deep details on:
     - **Implemented Changes**: Step-by-step summary.
     - **Lessons Learned**: Insights for future agents/sessions.
 - **Implementation Proposal**: For any non-trivial task, I must create an `IMPLEMENTATION_PROPOSAL.md` file in the root containing:
-    - **Branch Name**: Following the pattern `feature/name`, `fix/name`, or `docs/name`.
-    - **Branch Title**: A descriptive title for the branch (e.g., # [Feature] Setup Agent Directives).
+    - **Branch Name**: Following the pattern `feat/name`, `fix/name`, or `docs/name`.
+    - **Branch Title**: A descriptive title for the branch (e.g., # [Feat] Setup Agent Directives).
+    - **PR Name**: Following the format `type(scope): description` (e.g., `feat(agents): setup-agent-directives`).
     - **Standard PR Template**: Mandatory use of sections from `.github/pull_request_template.md` (Changes, Motivation/Context, Benefits, Is it resolved?, Type of Change, Checklist).
     - **Commit Plan**: A detailed plan for git commits:
         - **Minimum**: At least **2 commits** to separate different types of changes.
