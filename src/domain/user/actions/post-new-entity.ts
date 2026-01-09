@@ -1,7 +1,7 @@
 import cache from "@infrastructure/cache/actions";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
-import { container } from "@infrastructure/server/request";
+import { container } from "@infrastructure/server/interface";
 import user from "../entity";
 import { default as schema } from "../schema";
 import getById from "./get-by-id";

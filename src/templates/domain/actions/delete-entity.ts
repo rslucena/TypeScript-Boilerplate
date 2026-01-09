@@ -1,7 +1,7 @@
 import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
-import type { container } from "@infrastructure/server/request";
+import type { container } from "@infrastructure/server/interface";
 import { eq } from "drizzle-orm";
 import __name__ from "../entity";
 import { default as schema } from "../schema";
