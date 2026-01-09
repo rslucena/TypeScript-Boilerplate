@@ -1,6 +1,5 @@
 import crypto from "node:crypto";
-import type { guise, JWT } from "@infrastructure/server/interface";
-import type { container } from "@infrastructure/server/request";
+import type { container, guise, JWT } from "@infrastructure/server/interface";
 import { safeParse } from "@infrastructure/server/transforms";
 
 function create(content: guise["session"], exp?: number) {

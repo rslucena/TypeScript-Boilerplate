@@ -1,7 +1,7 @@
 import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository, { withPagination } from "@infrastructure/repositories/repository";
-import type { container } from "@infrastructure/server/request";
+import type { container } from "@infrastructure/server/interface";
 import { and, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import user from "../entity";
 import { default as schema } from "../schema";
