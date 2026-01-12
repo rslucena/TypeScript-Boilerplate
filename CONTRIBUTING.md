@@ -33,7 +33,7 @@ bun install
 
 ### 5. Make Your Changes
 
-- Follow the existing code style (Biome and ESLint are configured).
+- Follow the existing code style (Biome is configured).
 - Add or update tests if necessary (`tests/` directory).
 - Update documentation as needed.
 

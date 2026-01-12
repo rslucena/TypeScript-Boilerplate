@@ -28,7 +28,6 @@
 	"editor.fontFamily": "Jetbrains Mono, Menlo, Monaco, 'Courier New', monospace",
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit",
-		"source.fixAll.eslint": "explicit",
 		"source.organizeImports.biome": "explicit"
 	},
 	"editor.tokenColorCustomizations": {
