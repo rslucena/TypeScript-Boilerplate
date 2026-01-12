@@ -9,6 +9,7 @@ import { SettingOptions, SettingOptionsUI } from "@infrastructure/settings/swagg
 import fastify from "fastify";
 import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 import { err, type server } from "./interface";
+import { rateLimit } from "./rate-limit";
 import { convertRequestTypes } from "./request";
 
 const logger = Logs.handler("webserver");
@@ -24,6 +25,7 @@ async function webserver(): Promise<server> {
 			ignoreDuplicateSlashes: false,
 		},
 	}).withTypeProvider<ZodTypeProvider>();
+	instance.addHook("onRequest", rateLimit);
 	instance.addHook("preValidation", convertRequestTypes);
 	instance.setValidatorCompiler(validatorCompiler);
 	instance.setSerializerCompiler(serializerCompiler);
