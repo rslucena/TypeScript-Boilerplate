@@ -187,7 +187,7 @@ bun test --coverage   # Coverage report
 ```
 
 **Test Structure:**
-- `tests/unit/` - Pure logic tests
+- `tests/unit/` - Pure logic tests (isolated via `?v=unit`)
 - `tests/integration/` - API endpoint tests
 - `tests/builders/` - Test data factories
 - `tests/mocks/` - Shared mocks

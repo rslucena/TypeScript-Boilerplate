@@ -2,7 +2,7 @@ import jwt from "@infrastructure/authentication/strategies/jwt";
 import cache from "@infrastructure/cache/actions";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
-import type { container } from "@infrastructure/server/request";
+import type { container } from "@infrastructure/server/interface";
 import { desc, eq, sql } from "drizzle-orm";
 import user from "../entity";
 import { default as schema } from "../schema";

@@ -20,7 +20,7 @@ cd TypeScript-Boilerplate
 Always create a new branch for your work:
 
 ```bash
-git checkout -b feature/your-feature-name
+git checkout -b feat/your-feature-name
 ```
 
 ### 4. Install Dependencies
@@ -50,8 +50,8 @@ bun test
 
 ```bash
 git add .
-git commit -m "Describe your changes"
-git push origin feature/your-feature-name
+git commit -m "feat: Describe your changes"
+git push origin feat/your-feature-name
 ```
 
 ### 8. Open a Pull Request

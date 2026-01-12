@@ -8,8 +8,8 @@ import helmet from "@infrastructure/settings/helmet";
 import { SettingOptions, SettingOptionsUI } from "@infrastructure/settings/swagger";
 import fastify from "fastify";
 import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-import type { server } from "./interface";
-import { convertRequestTypes, err } from "./request";
+import { err, type server } from "./interface";
+import { convertRequestTypes } from "./request";
 
 const logger = Logs.handler("webserver");
 

@@ -30,6 +30,8 @@ const columnBuilder = () => {
 			return col;
 		}),
 		default: mock(() => col),
+		defaultConfig: {},
+		indexConfig: {},
 	};
 	return col;
 };

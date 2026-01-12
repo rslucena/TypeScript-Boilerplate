@@ -83,3 +83,7 @@ api/_assets*
 # Drizzle
 **/migrations/*.sql
 **/migrations/meta/*
+
+# Agents
+/.agent/tasks/
+/.agent/reflections/
