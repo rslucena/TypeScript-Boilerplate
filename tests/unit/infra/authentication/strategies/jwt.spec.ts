@@ -11,7 +11,6 @@ describe("JWT Strategy", () => {
 	describe("create", () => {
 		it("should create a valid JWT string", () => {
 			const token = jwt.create(mockSession);
-			console.log("DEBUG TOKEN:", token);
 			expect(token).toBeString();
 			expect(token.split(".")).toHaveLength(3);
 		});
