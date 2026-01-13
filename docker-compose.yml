@@ -16,6 +16,22 @@ services:
       timeout: 5s
       retries: 5
 
+  app:
+    build: .
+    container_name: app_server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DATABASE}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   postgres:
     image: postgres:alpine
     restart: unless-stopped
