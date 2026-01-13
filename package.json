@@ -32,9 +32,9 @@
 		"db:migrate:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit generate",
 		"db:studio": "drizzle-kit studio --host localhost",
-		"build": "tsx -- src/commands/exec-builder.ts",
+		"build": "bun src/commands/exec-builder.ts",
 		"start": "bun dist/commands/exec-process.js",
-		"dev": "tsx watch --env-file=.env -- src/commands/exec-process.ts",
+		"dev": "bun --watch src/commands/exec-process.ts",
 		"prebuild": "bunx biome format --write ./src/**/*.ts",
 		"postinstall": "lefthook install"
 	},

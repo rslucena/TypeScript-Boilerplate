@@ -64,15 +64,15 @@ cp .env.exemple .env
 # Configure your environment variables (DATABASE_URL, REDIS_URL, etc.)
 ```
 
-### Step 2️⃣ - Start Infrastructure
+### Step 2️⃣ - Start Infrastructure & App
 
 ```bash
-# Start PostgreSQL + Redis containers
-docker-compose up -d --build
+# Start PostgreSQL, Redis, and Application containers
+podman compose up -d --build
 
 # Run database migrations
-bun db:migrate        # Generate migration files
-bun db:migrate:push   # Apply to database
+# You can run migrations directly through the app container
+podman exec -it app_server bun db:migrate:push
 ```
 
 ### Step 3️⃣ - Generate Your First Domain (Optional)
