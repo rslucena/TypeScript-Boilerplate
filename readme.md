@@ -102,6 +102,15 @@ bun dev --workers=primary-webserver
 # 🧪 Run tests: bun test
 ```
 
+### Step 5️⃣ - Production with Docker
+
+```bash
+# Build and start the full stack (App + DB + Redis)
+docker-compose up -d --build
+
+# The application will be available at http://localhost:3000
+```
+
 
 
 
