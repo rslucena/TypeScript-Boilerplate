@@ -1,8 +1,7 @@
 import pm2Workers from "@commands/pm2-workers";
 import pm2Workspace, { type worker } from "@commands/pm2-workspace";
 
-const [command] = process.argv.slice(2) as [string | undefined];
-if (!command) throw new Error("Command not found.");
+const command = (process.argv.slice(2)[0] as string | undefined) ?? "--group=primary";
 
 const scripts = command.replace("--", "").split("=");
 if (!["workers", "group"].includes(scripts[0])) throw new Error("Worker not found.");

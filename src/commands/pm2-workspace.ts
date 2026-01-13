@@ -5,6 +5,7 @@ export type ProcHeart = pm2.Proc & { heartbeat: string };
 export interface worker {
 	tsx: string;
 	node: string;
+	bun: string;
 	name: string;
 	group: string;
 	activated: boolean;
@@ -17,7 +18,7 @@ const defaultConfigs: pm2.StartOptions = {
 	max_restarts: 5,
 	exec_mode: "fork",
 	autorestart: true,
-	interpreter: "node",
+	interpreter: "bun",
 	max_memory_restart: "100M",
 	ignore_watch: ["node_modules"],
 };
@@ -29,6 +30,7 @@ export default (<worker[]>[
 		name: "primary-webserver",
 		tsx: "./src/functions/http-primary-webserver.ts",
 		node: "./dist/functions/http-primary-webserver.js",
+		bun: "./dist/functions/http-primary-webserver.js",
 		options: { ...defaultConfigs },
 		heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
 	},
@@ -38,6 +40,7 @@ export default (<worker[]>[
 		name: "primary-websocket",
 		tsx: "./src/functions/udp-primary-websocket.ts",
 		node: "./dist/functions/udp-primary-websocket.js",
+		bun: "./dist/functions/udp-primary-websocket.js",
 		options: { ...defaultConfigs },
 		heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/asdasd`,
 	},

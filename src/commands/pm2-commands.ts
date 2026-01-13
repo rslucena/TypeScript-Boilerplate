@@ -13,13 +13,13 @@ function format(args: ProcessDescription, eng: string) {
 	};
 }
 
-const list = (engine: "tsx" | "node") =>
+const list = (engine: "tsx" | "node" | "bun") =>
 	pm2.list((err, list) => {
 		if (err) return Logs.console.error("Unable to list the workers.", err);
 		console.table(list.map((worker) => format(worker, engine)));
 	});
 
-const start = (engine: "tsx" | "node", worker: worker, force?: boolean) =>
+const start = (engine: "tsx" | "node" | "bun", worker: worker, force?: boolean) =>
 	new Promise((resolve, reject) => {
 		if (engine === "tsx")
 			Object.assign(worker.options, {
