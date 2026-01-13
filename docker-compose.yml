@@ -22,9 +22,12 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DATABASE}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      REDIS_SERVER: redis
+      POSTGRES_SERVER: postgres
+      NODE_ENV: production
       PORT: 3000
     depends_on:
       postgres:
