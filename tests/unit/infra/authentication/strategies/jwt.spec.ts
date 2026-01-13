@@ -7,12 +7,11 @@ const jwt = jwtDefault.default || jwtDefault;
 
 describe("JWT Strategy", () => {
 	const mockSession: guise["session"] = { id: "123", name: "Test User" };
-	const salt = "test-salt";
-	process.env.AUTH_SALT = salt;
 
 	describe("create", () => {
 		it("should create a valid JWT string", () => {
 			const token = jwt.create(mockSession);
+			console.log("DEBUG TOKEN:", token);
 			expect(token).toBeString();
 			expect(token.split(".")).toHaveLength(3);
 		});

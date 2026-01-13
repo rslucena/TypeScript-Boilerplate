@@ -7,8 +7,6 @@ import { z } from "zod/v4";
 import "@domain/user/schema";
 import { authenticationMock } from "@tests/mocks/authentication.mock";
 
-process.env.REDIS_STACK = "true";
-
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();

@@ -1,7 +1,5 @@
 import { mock } from "bun:test";
 
-process.env.REDIS_STACK = "true";
-
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
