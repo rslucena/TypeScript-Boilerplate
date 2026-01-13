@@ -75,6 +75,7 @@ api/_assets*
 # envars
 .env
 .env.*
+!.env.exemple
 
 # Docker
 **/.dockerignore

@@ -30,13 +30,18 @@ const schema = z.object({
 const result = schema.safeParse(process.env);
 
 if (!result.success) {
-	const { fieldErrors } = result.error.flatten();
-	const errorMessages = Object.entries(fieldErrors)
-		.map(([field, errors]) => `  - ${field}: ${errors?.join(", ")}`)
-		.join("\n");
+	const isTest = process.env.NODE_ENV === "test";
+	const isBuild = process.argv.some((arg) => arg.includes("exec-builder.ts"));
 
-	console.error(`❌ Invalid environment variables:\n${errorMessages}`);
-	process.exit(1);
+	if (!isTest && !isBuild) {
+		const { fieldErrors } = result.error.flatten();
+		const errorMessages = Object.entries(fieldErrors)
+			.map(([field, errors]) => `  - ${field}: ${errors?.join(", ")}`)
+			.join("\n");
+
+		console.error(`❌ Invalid environment variables:\n${errorMessages}`);
+		process.exit(1);
+	}
 }
 
-export const env = result.data;
+export const env = result.success ? result.data : (process.env as unknown as z.infer<typeof schema>);
