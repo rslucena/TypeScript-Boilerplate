@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const envSchema = z.object({
+const schema = z.object({
 	NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 	PROCESS_PORT: z.coerce.number(),
 	APP_NAME: z.string(),
@@ -27,7 +27,7 @@ const envSchema = z.object({
 	PROCESS_CORS_ORIGIN: z.string(),
 });
 
-const result = envSchema.safeParse(process.env);
+const result = schema.safeParse(process.env);
 
 if (!result.success) {
 	const { fieldErrors } = result.error.flatten();
