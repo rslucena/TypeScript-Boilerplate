@@ -1,8 +1,9 @@
 import { safeParse } from "@infrastructure/server/transforms";
+import { env } from "@infrastructure/settings/environment";
 import client from "./connection";
 import type { actions, setmode } from "./interfaces";
 
-const isStack = () => String(process.env.REDIS_STACK) === "true";
+const isStack = () => env.REDIS_STACK;
 
 const cache: actions = {
 	text: {

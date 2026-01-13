@@ -17,8 +17,6 @@ describe("Rate Limit Middleware", () => {
 	let mockReply: FastifyReply;
 
 	beforeEach(() => {
-		process.env.RATE_LIMIT_MAX = "100";
-		process.env.RATE_LIMIT_WINDOW = "60";
 		mockRedis.incr.mockReset();
 		mockRedis.expire.mockReset();
 

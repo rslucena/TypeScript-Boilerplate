@@ -8,8 +8,6 @@ describe("Cache Infrastructure", () => {
 	let cache: typeof import("@infrastructure/cache/actions").default;
 
 	beforeAll(async () => {
-		const originalEnv = process.env;
-		process.env = { ...originalEnv, REDIS_STACK: "true" };
 		const module = await import("@infrastructure/cache/actions");
 		cache = module.default;
 	});

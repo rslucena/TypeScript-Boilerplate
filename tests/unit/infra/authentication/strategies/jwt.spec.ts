@@ -7,8 +7,6 @@ const jwt = jwtDefault.default || jwtDefault;
 
 describe("JWT Strategy", () => {
 	const mockSession: guise["session"] = { id: "123", name: "Test User" };
-	const salt = "test-salt";
-	process.env.AUTH_SALT = salt;
 
 	describe("create", () => {
 		it("should create a valid JWT string", () => {

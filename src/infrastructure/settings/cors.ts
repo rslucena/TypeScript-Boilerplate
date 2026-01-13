@@ -1,4 +1,5 @@
 import type { FastifyCorsOptions } from "@fastify/cors";
+import { env } from "@infrastructure/settings/environment";
 
 export default (<FastifyCorsOptions>{
 	credentials: true,
@@ -7,8 +8,8 @@ export default (<FastifyCorsOptions>{
 	optionsSuccessStatus: 204,
 	hook: "onRequest",
 	origin: (origin, cb) => {
-		if (process.env.NODE_ENV !== "production") return cb(null, true);
-		const allowedOrigins = process.env.PROCESS_CORS_ORIGIN?.split(",") || [];
+		if (env.NODE_ENV !== "production") return cb(null, true);
+		const allowedOrigins = env.PROCESS_CORS_ORIGIN.split(",") || [];
 		const allowed = !origin || allowedOrigins.some((allowedOrigin) => origin.startsWith(allowedOrigin.trim()));
 		cb(null, allowed);
 	},

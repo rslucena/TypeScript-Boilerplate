@@ -1,3 +1,4 @@
+import { env } from "@infrastructure/settings/environment";
 import type pm2 from "pm2";
 
 export type ProcHeart = pm2.Proc & { heartbeat: string };
@@ -32,7 +33,7 @@ export default (<worker[]>[
 		node: "./dist/functions/http-primary-webserver.js",
 		bun: "./dist/functions/http-primary-webserver.js",
 		options: { ...defaultConfigs },
-		heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
+		heartbeat: `${env.UPTIME_SERVER}:${env.UPTIME_PORT}/api/push/xyVlTFF0j6`,
 	},
 	{
 		activated: true,
@@ -42,6 +43,6 @@ export default (<worker[]>[
 		node: "./dist/functions/udp-primary-websocket.js",
 		bun: "./dist/functions/udp-primary-websocket.js",
 		options: { ...defaultConfigs },
-		heartbeat: `${process.env.UPTIME_SERVER}:${process.env.UPTIME_PORT}/api/push/asdasd`,
+		heartbeat: `${env.UPTIME_SERVER}:${env.UPTIME_PORT}/api/push/asdasd`,
 	},
 ]);

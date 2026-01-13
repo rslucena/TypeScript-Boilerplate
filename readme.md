@@ -61,7 +61,9 @@ bun install
 
 # Create environment file
 cp .env.exemple .env
-# Configure your environment variables (DATABASE_URL, REDIS_URL, etc.)
+
+> [!CAUTION]
+> **Strict Environment Validation**: All variables in `.env` are now **mandatory**. The application will fail to start if any variable is missing or invalid. Configure your `DATABASE_URL`, `REDIS_URL`, `AUTH_SALT`, etc., before running.
 ```
 
 ### Step 2️⃣ - Start Infrastructure & App
