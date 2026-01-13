@@ -1,12 +1,13 @@
 import Logs from "@infrastructure/logs/handler";
+import { env } from "@infrastructure/settings/environment";
 import { createClient, type RedisClientOptions } from "redis";
 
 const connection: RedisClientOptions = {
-	password: process.env.REDIS_PASSWORD,
+	password: env.REDIS_PASSWORD ?? undefined,
 	socket: {
-		servername: process.env.REDIS_SSL !== "false" ? "rediss" : "redis",
-		host: process.env.REDIS_SERVER,
-		port: Number(process.env.REDIS_PORT),
+		servername: env.REDIS_SSL ? "rediss" : "redis",
+		host: env.REDIS_SERVER,
+		port: env.REDIS_PORT,
 		reconnectStrategy: 10000,
 	},
 };
@@ -15,6 +16,6 @@ const client = createClient(connection);
 
 client.on("error", (err) => Logs.console.error("redis error", err));
 
-if (process.env.NODE_ENV !== "test") await client.connect();
+if (env.NODE_ENV !== "test") await client.connect();
 
 export default client;

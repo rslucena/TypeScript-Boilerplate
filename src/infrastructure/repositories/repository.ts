@@ -1,4 +1,5 @@
 import Logs from "@infrastructure/logs/handler";
+import { env } from "@infrastructure/settings/environment";
 import { DefaultLogger } from "drizzle-orm";
 import type { PgSelect } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -17,7 +18,7 @@ const primaryDb = postgres({
 	prepare: true,
 	idle_timeout: 5,
 	max_lifetime: 60,
-	max: Number(process.env.POSTGRES_POOL) || 10,
+	max: env.POSTGRES_POOL,
 });
 
 const manager = drizzle(primaryDb, { logger: logger });

@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import type { container, guise, JWT } from "@infrastructure/server/interface";
 import { safeParse } from "@infrastructure/server/transforms";
+import { env } from "@infrastructure/settings/environment";
 
 function create(content: guise["session"], exp?: number) {
 	const header = {
@@ -19,7 +20,7 @@ function create(content: guise["session"], exp?: number) {
 		.replace(/\//g, "_")
 		.replace(/=/g, "");
 	const signature = crypto
-		.createHmac("sha256", String(process.env.AUTH_SALT))
+		.createHmac("sha256", env.AUTH_SALT)
 		.update(`${encodedHeader}.${encodedPayload}`)
 		.digest("base64")
 		.replace(/\+/g, "-")
@@ -50,7 +51,7 @@ async function session<T = guise["session"]>(request: container): Promise<T> {
 	if (!body) throw new Error("Unauthorized");
 
 	const expectedSignature = crypto
-		.createHmac("sha256", String(process.env.AUTH_SALT))
+		.createHmac("sha256", env.AUTH_SALT)
 		.update(`${encodedHeader}.${encodedPayload}`)
 		.digest("base64")
 		.replace(/\+/g, "-")
