@@ -4,7 +4,9 @@ import pm2 from "pm2";
 import pm2Commands from "./pm2-commands";
 import type { ProcHeart, worker } from "./pm2-workspace";
 
-const engineer = process.env.npm_lifecycle_event === "dev" ? "tsx" : "node";
+const isDev = process.env.npm_lifecycle_event === "dev";
+const isBun = typeof Bun !== "undefined";
+const engineer = isDev ? (isBun ? "bun" : "tsx") : isBun ? "bun" : "node";
 const abort = { signal: AbortSignal.timeout(1000) };
 
 async function debug(jobs: worker[]) {

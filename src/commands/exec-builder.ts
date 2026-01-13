@@ -108,9 +108,14 @@ async function execute(dependency: string[]) {
 
 async function saveouthers(files: string[]) {
 	for (let i = 0; i < files.length; i++) {
-		const paths = files[i].replace("/src/", "/dist/");
-		const content = fs.readFileSync(files[i], "utf-8");
-		fs.writeFileSync(paths, content);
+		const sourcePath = files[i];
+		const destPath = sourcePath.replace(path.join(rootdir, "src"), path.join(rootdir, "dist"));
+
+		const destDir = path.dirname(destPath);
+		if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+
+		const content = fs.readFileSync(sourcePath, "utf-8");
+		fs.writeFileSync(destPath, content);
 	}
 }
 

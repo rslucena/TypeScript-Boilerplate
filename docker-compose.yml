@@ -16,6 +16,25 @@ services:
       timeout: 5s
       retries: 5
 
+  app:
+    build: .
+    container_name: app_server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      REDIS_SERVER: redis
+      POSTGRES_SERVER: postgres
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   postgres:
     image: postgres:alpine
     restart: unless-stopped
