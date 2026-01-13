@@ -1,4 +1,5 @@
 import type { FastifyHelmetOptions } from "@fastify/helmet";
+import { env } from "@infrastructure/settings/environment";
 
 const helmetConfig: FastifyHelmetOptions = {
 	xPoweredBy: false,
@@ -20,7 +21,7 @@ const helmetConfig: FastifyHelmetOptions = {
 			imgSrc: ["'self'", "data:", "validator.swagger.io"],
 			connectSrc: ["'self'", "http:", "https:"],
 			objectSrc: ["'none'"],
-			upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+			upgradeInsecureRequests: env.NODE_ENV === "production" ? [] : null,
 		},
 	},
 	referrerPolicy: {

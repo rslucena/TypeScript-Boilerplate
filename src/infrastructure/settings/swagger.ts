@@ -1,13 +1,14 @@
 import type { SwaggerOptions } from "@fastify/swagger";
 import type { FastifySwaggerUiOptions } from "@fastify/swagger-ui";
+import { env } from "@infrastructure/settings/environment";
 import { jsonSchemaTransform } from "fastify-type-provider-zod";
 
 export const SettingOptions: SwaggerOptions = {
 	openapi: {
 		info: {
-			title: String(process.env.APP_NAME),
-			description: String(process.env.APP_DESCRIPTION),
-			version: String(process.env.APP_VERSION),
+			title: env.APP_NAME,
+			description: env.APP_DESCRIPTION,
+			version: env.APP_VERSION,
 		},
 		components: {
 			securitySchemes: {
@@ -25,7 +26,7 @@ export const SettingOptions: SwaggerOptions = {
 export const SettingOptionsUI: FastifySwaggerUiOptions = {
 	routePrefix: "/documentation",
 	theme: {
-		title: String(process.env.APP_NAME),
+		title: env.APP_NAME,
 	},
 	uiConfig: {
 		docExpansion: "list",

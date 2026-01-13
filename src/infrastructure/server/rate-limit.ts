@@ -1,10 +1,10 @@
 import client from "@infrastructure/cache/connection";
 import { tag } from "@infrastructure/repositories/references";
+import { env } from "@infrastructure/settings/environment";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export async function rateLimit(request: FastifyRequest, reply: FastifyReply) {
-	const limit = Number(process.env.RATE_LIMIT_MAX);
-	const window = Number(process.env.RATE_LIMIT_WINDOW);
+	const { RATE_LIMIT_MAX: limit, RATE_LIMIT_WINDOW: window } = env;
 
 	const ip = request.ip;
 	const key = tag("rate-limit", "check", { ip });
