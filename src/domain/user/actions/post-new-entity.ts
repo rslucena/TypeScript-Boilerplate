@@ -21,7 +21,7 @@ export default async function postNewEntity(request: container) {
 		.onConflictDoNothing()
 		.returning();
 
-	if (!content.length) throw request.unprocessableEntity(request.language(), `post/user/${validRequest.data.email}`);
+	if (!content.length) throw request.conflict(request.language(), `post/user/${validRequest.data.email}`);
 
 	await cache.json.del(tag("user", "find*"));
 
