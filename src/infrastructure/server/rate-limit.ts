@@ -7,7 +7,7 @@ export async function rateLimit(request: FastifyRequest, reply: FastifyReply) {
 	const { RATE_LIMIT_MAX: limit, RATE_LIMIT_WINDOW: window } = env;
 
 	const ip = request.ip;
-	const key = tag("rate-limit", "check", { ip });
+	const { hash: key } = tag("rate-limit", "check", { ip });
 
 	const current = await client.incr(key);
 
