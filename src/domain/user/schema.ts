@@ -1,7 +1,7 @@
 import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { array, object, string } from "zod/v4";
+import { array, object, string } from "zod";
 import { default as users } from "./entity";
 
 const create = createInsertSchema(users, {

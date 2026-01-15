@@ -9,7 +9,7 @@ import {
 	uuid as puuid,
 	timestamp,
 } from "drizzle-orm/pg-core";
-import { array, number, z } from "zod/v4";
+import { array, number, z } from "zod";
 
 const dateSettings: PgTimestampConfig = { mode: "date", precision: 6 };
 
