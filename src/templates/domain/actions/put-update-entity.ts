@@ -11,10 +11,10 @@ export default async function putUpdateEntity(request: container) {
 	request.status(200);
 
 	const validParams = await schema.actions.id.safeParseAsync(request.params());
-	if (!validParams.success) throw request.badRequest(request.language(), tag("__name__", "update{id}"));
+	if (!validParams.success) throw request.badRequest(request.language(), tag("__name__", "update{id}").hash);
 
 	const validBody = await schema.actions.update.safeParseAsync(request.body());
-	if (!validBody.success) throw request.badRequest(request.language(), tag("__name__", "update{id}"));
+	if (!validBody.success) throw request.badRequest(request.language(), tag("__name__", "update{id}").hash);
 
 	const content = await repository
 		.update(__name__)
@@ -22,9 +22,10 @@ export default async function putUpdateEntity(request: container) {
 		.where(eq(__name__.id, validParams.data.id))
 		.returning();
 
-	if (!content.length) throw request.notFound(request.language(), tag("__name__", "update{id}"));
+	if (!content.length) throw request.notFound(request.language(), tag("__name__", "update{id}").hash);
 
-	await cache.json.del(tag("__name__", "find*"));
+	await cache.invalidate(`__name__:${validParams.data.id}`);
+	await cache.invalidate("__name__");
 
 	return getById(new container({ params: { id: content[0].id } }));
 }
