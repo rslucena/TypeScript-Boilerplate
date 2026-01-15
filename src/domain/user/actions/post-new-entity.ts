@@ -10,7 +10,7 @@ export default async function postNewEntity(request: container) {
 	request.status(201);
 
 	const validRequest = await schema.actions.create.entity.safeParseAsync(request.body());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "post/user/{params}").hash);
+	if (!validRequest.success) throw request.badRequest(request.language(), "post/user/{params}");
 
 	const content = await repository
 		.insert(user)
@@ -21,9 +21,9 @@ export default async function postNewEntity(request: container) {
 		.onConflictDoNothing()
 		.returning();
 
-	if (!content.length) throw request.conflict(request.language(), tag("user", "post/user/{params}").hash);
+	if (!content.length) throw request.conflict(request.language(), `post/user/${validRequest.data.email}`);
 
-	await cache.invalidate("user");
+	await cache.json.del(tag("user", "find*"));
 
 	return getById(new container({ params: { id: content[0].id } }));
 }

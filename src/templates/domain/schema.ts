@@ -1,6 +1,7 @@
 import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { array, object } from "zod/v4";
 import __name__ from "./entity";
 
 const create = createInsertSchema(__name__, {
@@ -14,10 +15,13 @@ const select = createSelectSchema(__name__, {
 const actions = {
 	headers,
 	id: select.pick({ id: true }).required(),
-	read: select.omit({ id: true }).extend(withPagination.shape),
+	read: object({
+		...select.omit({ id: true }).shape,
+		...withPagination.shape,
+	}),
 	create: create.omit({ id: true }),
 	update: create.omit({ id: true }).partial(),
 	delete: create.pick({ id: true }),
 };
 
-export default { actions, entity: select };
+export default { actions, entity: array(select) };

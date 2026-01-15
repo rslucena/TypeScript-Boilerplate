@@ -65,13 +65,14 @@ describe("User Domain Actions : getById", () => {
 	const validId = "123e4567-e89b-12d3-a456-426614174000";
 
 	it("should return cached user if available", async () => {
-		const cachedData = { id: 1, name: "Test" };
-		redisClientMock.json.get.mockResolvedValueOnce([cachedData]);
+		const cachedData = [{ id: 1, name: "Test" }];
+		const reference = referencesMock.tag("user", "find{id}", { id: validId });
+		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [reference] });
+		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
 		containerMock.params.mockReturnValue({ id: validId });
 
 		const result = await getById(containerMock);
-
-		expect(result).toEqual({ id: 1, name: "Test" });
+		expect(result).toEqual([{ id: 1, name: "Test" }]);
 		expect(redisClientMock.json.get).toHaveBeenCalled();
 		expect(repositoryMock.execute).not.toHaveBeenCalled();
 	});
@@ -82,8 +83,7 @@ describe("User Domain Actions : getById", () => {
 		containerMock.params.mockReturnValue({ id: validId });
 
 		const result = await getById(containerMock);
-
-		expect(result).toEqual({ id: 1, name: "Test" });
+		expect(result).toEqual([{ id: 1, name: "Test" }]);
 		expect(repositoryMock.execute).toHaveBeenCalled();
 		expect(redisClientMock.json.set).toHaveBeenCalled();
 	});

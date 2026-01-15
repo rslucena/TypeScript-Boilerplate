@@ -10,13 +10,13 @@ export default async function getById(request: container) {
 	request.status(200);
 
 	const validRequest = await schema.actions.id.safeParseAsync(request.params());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("__name__", "find{id}").hash);
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("__name__", "find{id}"));
 
 	const { id } = validRequest.data;
-	const { hash: reference, tags } = tag("__name__", "find{id}", { id });
+	const reference = tag("__name__", "find{id}", { id });
 
 	const cached = await cache.json.get<{ [key: string]: (typeof __name__)[] }>(reference);
-	if (cached?.[reference]) return cached[reference][0];
+	if (cached?.[reference]) return cached[reference];
 
 	const prepare = repository
 		.select()
@@ -28,9 +28,9 @@ export default async function getById(request: container) {
 
 	const content = await prepare.execute({ id });
 
-	if (!content.length) throw request.notFound(request.language(), tag("__name__", "find{id}").hash);
+	if (!content.length) throw request.notFound(request.language(), tag("__name__", "find{id}"));
 
-	await cache.json.set(reference, content, 60 * 10, tags);
+	await cache.json.set(reference, content, 60 * 10);
 
-	return content[0];
+	return content;
 }

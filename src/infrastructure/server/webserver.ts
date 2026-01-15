@@ -63,17 +63,15 @@ async function webserver(): Promise<server> {
 }
 
 async function start(instance: server, port: number): Promise<void> {
-	try {
-		await instance.ready();
-		const address = await instance.listen({ port, host: "0.0.0.0" });
+	instance.ready((err) => {
+		if (err) return logger.error(err.message);
+		instance.swagger();
+	});
+	instance.listen({ port, host: "0.0.0.0" }, (err, address) => {
+		if (err) return logger.error(err.message);
 		Logs.console.info(`Server listening on ${address}`);
 		Logs.console.info(`${instance.printRoutes({ commonPrefix: false })}`);
-	} catch (err) {
-		if (err instanceof Error) {
-			logger.error(err.message);
-		}
-		process.exit(1);
-	}
+	});
 }
 
 export default {
