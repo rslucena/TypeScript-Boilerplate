@@ -66,10 +66,11 @@ describe("User Domain Actions : getById", () => {
 
 	it("should return cached user if available", async () => {
 		const cachedData = { id: 1, name: "Test" };
-		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
+		redisClientMock.json.get.mockResolvedValueOnce([cachedData]);
 		containerMock.params.mockReturnValue({ id: validId });
 
 		const result = await getById(containerMock);
+
 		expect(result).toEqual({ id: 1, name: "Test" });
 		expect(redisClientMock.json.get).toHaveBeenCalled();
 		expect(repositoryMock.execute).not.toHaveBeenCalled();
