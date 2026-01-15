@@ -2,7 +2,7 @@ import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import translate from "@infrastructure/languages/translate";
 import type { FastifyBaseLogger, FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 interface guise {
 	status?: number;

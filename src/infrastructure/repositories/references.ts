@@ -9,7 +9,7 @@ import {
 	uuid as puuid,
 	timestamp,
 } from "drizzle-orm/pg-core";
-import { array, number, z } from "zod/v4";
+import { array, number, z } from "zod";
 
 const dateSettings: PgTimestampConfig = { mode: "date", precision: 6 };
 
@@ -46,12 +46,18 @@ function hash(data: object | string, compare?: string) {
 	return bcrypt.hashSync(dump, 10);
 }
 
-function tag(domain: refer["domain"], method: refer["method"], conditions?: refer["conditions"]): string {
-	let collection = `${domain}/${method}`;
-	if (!conditions) return collection.toLowerCase().trim();
-	collection += "/";
-	for (const [key, value] of Object.entries(conditions)) collection += `{${key.replace("_", "")}:${value}}`;
-	return collection.toLowerCase().trim();
+function tag(domain: refer["domain"], method: refer["method"], conditions?: refer["conditions"]) {
+	const hash = conditions
+		? `${domain}/${method}/${Object.entries(conditions)
+				.map(([k, v]) => `{${k.replace("_", "")}:${v}}`)
+				.join("")}`.toLowerCase()
+		: `${domain}/${method}`.toLowerCase();
+
+	const tags = [domain.toLowerCase(), `${domain}/${method}`.toLowerCase()];
+
+	if (conditions?.id) tags.push(`${domain}:${conditions.id}`.toLowerCase());
+
+	return { hash, tags };
 }
 
 export { hash, identifier, pgIndex, tag, withPagination, zodIdentifier };
