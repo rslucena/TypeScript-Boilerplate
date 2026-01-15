@@ -15,10 +15,7 @@ const select = createSelectSchema(__name__, {
 const actions = {
 	headers,
 	id: select.pick({ id: true }).required(),
-	read: object({
-		...select.omit({ id: true }).shape,
-		...withPagination.shape,
-	}),
+	read: select.omit({ id: true }).extend(withPagination.shape),
 	create: create.omit({ id: true }),
 	update: create.omit({ id: true }).partial(),
 	delete: create.pick({ id: true }),
