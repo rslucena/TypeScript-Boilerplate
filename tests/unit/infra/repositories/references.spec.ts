@@ -29,12 +29,14 @@ describe("Repository References", () => {
 	describe("tag", () => {
 		it("should generate a simple tag", () => {
 			const result = tag("User", "findById");
-			expect(result).toBe("user/findbyid");
+			expect(result.hash).toBe("user/findbyid");
+			expect(result.tags).toContain("user");
 		});
 
 		it("should generate a tag with conditions", () => {
 			const result = tag("User", "findById", { id: "123", status_active: "true" });
-			expect(result).toBe("user/findbyid/{id:123}{statusactive:true}");
+			expect(result.hash).toBe("user/findbyid/{id:123}{statusactive:true}");
+			expect(result.tags).toContain("user:123");
 		});
 	});
 

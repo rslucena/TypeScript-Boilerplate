@@ -57,9 +57,7 @@ describe("User Domain Actions : postNewAuth", () => {
 	});
 
 	it("should return cached auth if available", async () => {
-		const reference = "user:auth{params}:[object Object]";
 		const cachedData = { token: "cached-token", refresh: "cached-refresh" };
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [reference] });
 		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
 		containerMock.body.mockReturnValue({ email: "john@example.com", password: "password123" });
 

@@ -11,15 +11,15 @@ export default async function postNewAuth(request: container) {
 	request.status(201);
 
 	const validRequest = await schema.actions.create.auth.safeParseAsync(request.body());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "auth{params}"));
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "auth{params}").hash);
 
 	const { data } = validRequest;
-	const reference = tag("user", "auth{params}", { email: data.email });
+	const { hash: reference, tags } = tag("user", "auth{params}", { email: data.email });
 
-	const cached = await cache.json.get<{ [key: string]: { token: string; refresh: string } }>(reference);
-	if (cached?.[reference]) {
-		request.headers({ authorization: `Bearer ${cached[reference].token}` });
-		return cached[reference];
+	const cached = await cache.json.get<{ token: string; refresh: string }>(reference);
+	if (cached) {
+		request.headers({ authorization: `Bearer ${cached.token}` });
+		return cached;
 	}
 
 	const prepare = repository
@@ -36,7 +36,7 @@ export default async function postNewAuth(request: container) {
 
 	const content = await prepare.execute(validRequest.data);
 
-	const errMessage = tag("user", "auth{params}", { email: validRequest.data.email });
+	const errMessage = tag("user", "auth{params}", { email: validRequest.data.email }).hash;
 	if (!content.length) throw request.unprocessableEntity(request.language(), errMessage);
 	if (!hash(validRequest.data.password, content[0].password)) throw request.notFound(request.language(), errMessage);
 
@@ -50,7 +50,7 @@ export default async function postNewAuth(request: container) {
 
 	request.headers({ authorization: `Bearer ${secrets.token}` });
 
-	await cache.json.set(reference, secrets, 60 * 10);
+	await cache.json.set(reference, secrets, 60 * 10, tags);
 
 	return secrets;
 }

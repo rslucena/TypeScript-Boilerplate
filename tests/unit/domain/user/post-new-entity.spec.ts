@@ -10,6 +10,19 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
+const cacheMock = {
+	invalidate: mock(() => Promise.resolve(1)),
+	json: {
+		get: mock(() => Promise.resolve(null)),
+		set: mock(() => Promise.resolve("OK")),
+	},
+};
+
+mock.module("@infrastructure/cache/actions", () => ({
+	__esModule: true,
+	default: cacheMock,
+}));
+
 mock.module("@infrastructure/cache/connection", () => ({
 	__esModule: true,
 	default: redisClientMock,
@@ -23,12 +36,7 @@ mock.module("@infrastructure/repositories/repository", () => ({
 
 mock.module("@infrastructure/server/request", () => ({
 	__esModule: true,
-	container: mock((...args) => {
-		const instance = Object.create(containerMock);
-		if (args[0]?.params) instance.params = mock().mockReturnValue(args[0].params);
-		if (args[0]?.body) instance.body = mock().mockReturnValue(args[0].body);
-		return instance;
-	}),
+	container: mock(() => containerMock),
 }));
 
 mock.module("@infrastructure/repositories/references", () => ({
@@ -53,11 +61,16 @@ describe("User Domain Actions : postNewEntity", () => {
 		containerMock.body.mockReturnValue({});
 		redisClientMock.del.mockClear();
 		redisClientMock.scan.mockClear();
+		cacheMock.invalidate.mockClear();
+		cacheMock.json.get.mockClear();
+		cacheMock.json.set.mockClear();
 		repositoryMock.insert.mockReturnThis();
 		repositoryMock.values.mockReturnThis();
 		repositoryMock.onConflictDoNothing.mockReturnThis();
 		repositoryMock.returning.mockClear();
 		repositoryMock.execute.mockClear();
+		redisClientMock.sMembers.mockClear();
+		redisClientMock.sAdd.mockClear();
 		postNewEntity = (await import("@domain/user/actions/post-new-entity")).default;
 	});
 
@@ -66,12 +79,11 @@ describe("User Domain Actions : postNewEntity", () => {
 		containerMock.body.mockReturnValue(userData);
 		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
 		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...userData }]);
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["user/find:some-key"] });
 
 		const result = await postNewEntity(containerMock);
-		expect(result).toEqual([{ id: validId, ...userData }]);
+		expect(result).toEqual({ id: validId, ...userData });
 		expect(repositoryMock.insert).toHaveBeenCalled();
-		expect(redisClientMock.del).toHaveBeenCalled();
+		expect(cacheMock.invalidate).toHaveBeenCalledWith("user");
 	});
 
 	it("should throw 409 if conflict (duplicate email)", async () => {
