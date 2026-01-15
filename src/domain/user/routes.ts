@@ -8,7 +8,6 @@ import schema from "./schema";
 
 export default async function userRoutes(api: FastifyInstance) {
 	api.get("/ping", { schema: { tags: ["User"] } }, (_, reply) => reply.code(200).send());
-
 	api.get(
 		"/:id",
 		{
@@ -22,7 +21,6 @@ export default async function userRoutes(api: FastifyInstance) {
 		},
 		request.restricted(getById),
 	);
-
 	api.get(
 		"/",
 		{
@@ -31,12 +29,11 @@ export default async function userRoutes(api: FastifyInstance) {
 				summary: "Find users",
 				headers: schema.actions.headers,
 				querystring: schema.actions.read,
-				response: { 200: schema.read, ...request.reply.schemas },
+				response: { 200: schema.entity, ...request.reply.schemas },
 			},
 		},
 		request.restricted(getFindByParams),
 	);
-
 	api.post(
 		"/",
 		{
@@ -44,20 +41,18 @@ export default async function userRoutes(api: FastifyInstance) {
 				tags: ["User"],
 				summary: "Create new user",
 				body: schema.actions.create.entity,
-				headers: schema.actions.headers.omit({ authorization: true }),
 				response: { 201: schema.entity, ...request.reply.schemas },
 			},
 		},
 		request.noRestricted(postNewEntity),
 	);
-
 	api.post(
 		"/auth",
 		{
 			schema: {
 				tags: ["User"],
 				summary: "Create new authorization",
-				headers: schema.actions.headers.omit({ authorization: true }),
+				headers: schema.actions.headers,
 				body: schema.actions.create.auth,
 				response: { 201: schema.auth, ...request.reply.schemas },
 			},

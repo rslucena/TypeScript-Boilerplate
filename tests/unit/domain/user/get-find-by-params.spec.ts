@@ -51,7 +51,9 @@ describe("User Domain Actions : getFindByParams", () => {
 	});
 
 	it("should return cached users if available", async () => {
+		const reference = "user:find{params}:[object Object]";
 		const cachedData = [{ id: 1, name: "Test" }];
+		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [reference] });
 		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
 		containerMock.query.mockReturnValue({ "req.page": [1, 10] });
 

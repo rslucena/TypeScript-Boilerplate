@@ -10,13 +10,13 @@ export default async function getFindByParams(request: container) {
 	request.status(200);
 
 	const validRequest = await schema.actions.read.safeParseAsync(request.query());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{params}").hash);
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{params}"));
 
 	const { data } = validRequest;
-	const { hash: reference } = tag("user", "find{params}", data);
+	const reference = tag("user", "find{params}", data);
 
-	const cached = await cache.json.get<user[]>(reference);
-	if (cached) return cached;
+	const cached = await cache.json.get<{ [key: string]: user[] }>(reference);
+	if (cached?.[reference]) return cached[reference];
 
 	if (data.name) data.name = `%${data.name}%`;
 	if (data.lastName) data.lastName = `%${data.lastName}%`;
@@ -48,7 +48,7 @@ export default async function getFindByParams(request: container) {
 
 	const content = await prepare.execute(validRequest.data);
 
-	if (!content.length) throw request.notFound(request.language(), tag("user", "find{params}").hash);
+	if (!content.length) throw request.notFound(request.language(), tag("user", "find{params}"));
 
 	await cache.json.set(reference, content, 60 * 10);
 
