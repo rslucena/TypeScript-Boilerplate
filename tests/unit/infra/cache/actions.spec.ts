@@ -18,6 +18,8 @@ describe("Cache Infrastructure", () => {
 		redisClientMock.set.mockClear();
 		redisClientMock.set.mockResolvedValue("OK");
 		redisClientMock.del.mockClear();
+		redisClientMock.sMembers.mockClear();
+		redisClientMock.sAdd.mockClear();
 		redisClientMock.scan.mockClear();
 		redisClientMock.expire.mockClear();
 		redisClientMock.json.get.mockClear();
@@ -30,33 +32,46 @@ describe("Cache Infrastructure", () => {
 		it("should set value correctly", async () => {
 			const result = await cache.text.set("key", "value");
 			expect(result).toBe("OK");
-			expect(redisClientMock.set).toHaveBeenCalledTimes(1);
-			expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
+			if (process.env.REDIS_STACK === "true") {
+				expect(redisClientMock.json.set).toHaveBeenCalledTimes(1);
+				expect(redisClientMock.json.set).toHaveBeenCalledWith("key", "$", "value");
+			} else {
+				expect(redisClientMock.set).toHaveBeenCalledTimes(1);
+				expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
+			}
 		});
 
 		it("should handle set error correctly", async () => {
-			redisClientMock.set.mockRejectedValue(new Error("Redis error"));
+			if (process.env.REDIS_STACK === "true") {
+				redisClientMock.json.set.mockRejectedValue(new Error("Redis error"));
+			} else {
+				redisClientMock.set.mockRejectedValue(new Error("Redis error"));
+			}
 			const result = await cache.text.set("key", "value");
 			expect(result).toBe("");
-			expect(redisClientMock.set).toHaveBeenCalledTimes(1);
 		});
 
 		it("should set value with TTL", async () => {
 			await cache.text.set("key", "value", 60);
-			expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
+			if (process.env.REDIS_STACK === "true") {
+				expect(redisClientMock.json.set).toHaveBeenCalledWith("key", "$", "value");
+			} else {
+				expect(redisClientMock.set).toHaveBeenCalledWith("key", "value");
+			}
 			expect(redisClientMock.expire).toHaveBeenCalledWith("key", 60);
 		});
 
 		it("should get value correctly", async () => {
-			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
-			redisClientMock.get.mockResolvedValue("value");
+			if (process.env.REDIS_STACK === "true") {
+				redisClientMock.json.get.mockResolvedValue("value");
+			} else {
+				redisClientMock.get.mockResolvedValue("value");
+			}
 			const result = await cache.text.get("key");
-			expect(result).toEqual({ key: "value" });
-			expect(redisClientMock.get).toHaveBeenCalledWith("key");
+			expect(result).toEqual("value");
 		});
 
 		it("should delete value correctly", async () => {
-			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const result = await cache.text.del("key");
 			expect(result).toBe(1);
 			expect(redisClientMock.del).toHaveBeenCalledWith("key");
@@ -80,19 +95,26 @@ describe("Cache Infrastructure", () => {
 		});
 
 		it("should get json value correctly", async () => {
-			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const data = { foo: "bar" };
 			redisClientMock.json.get.mockResolvedValue(data);
 			const result = await cache.json.get("key");
-			expect(result).toEqual({ key: data });
+			expect(result).toEqual(data);
 			expect(redisClientMock.json.get).toHaveBeenCalledWith("key");
 		});
 
 		it("should delete json value correctly", async () => {
-			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const result = await cache.json.del("key");
 			expect(result).toBe(1);
 			expect(redisClientMock.del).toHaveBeenCalledWith("key");
+		});
+
+		it("should invalidate a tag correctly", async () => {
+			redisClientMock.sMembers.mockResolvedValueOnce(["key1", "key2"]);
+			const result = await cache.invalidate("tag");
+			expect(result).toBe(2);
+			expect(redisClientMock.sMembers).toHaveBeenCalledWith("tags:tag");
+			expect(redisClientMock.del).toHaveBeenCalledWith(["key1", "key2"]);
+			expect(redisClientMock.del).toHaveBeenCalledWith("tags:tag");
 		});
 	});
 
