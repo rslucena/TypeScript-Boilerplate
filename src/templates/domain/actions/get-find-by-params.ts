@@ -13,7 +13,7 @@ export default async function getFindByParams(request: container) {
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("__name__", "find{params}").hash);
 
 	const { data } = validRequest;
-	const { hash: reference } = tag("__name__", "find{params}", data);
+	const { hash: reference, tags } = tag("__name__", "find{params}", data);
 
 	const cached = await cache.json.get<{ [key: string]: (typeof __name__.$inferSelect)[] }>(reference);
 	if (cached?.[reference]) return cached[reference];
@@ -38,7 +38,7 @@ export default async function getFindByParams(request: container) {
 
 	if (!content.length) throw request.notFound(request.language(), tag("__name__", "find{params}").hash);
 
-	await cache.json.set(reference, content, 60 * 10);
+	await cache.json.set(reference, content, 60 * 10, tags);
 
 	return content;
 }

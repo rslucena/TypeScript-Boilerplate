@@ -13,10 +13,10 @@ export default async function getById(request: container) {
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("__name__", "find{id}").hash);
 
 	const { id } = validRequest.data;
-	const { hash: reference } = tag("__name__", "find{id}", { id });
+	const { hash: reference, tags } = tag("__name__", "find{id}", { id });
 
 	const cached = await cache.json.get<{ [key: string]: (typeof __name__)[] }>(reference);
-	if (cached?.[reference]) return cached[reference];
+	if (cached?.[reference]) return cached[reference][0];
 
 	const prepare = repository
 		.select()
@@ -30,7 +30,7 @@ export default async function getById(request: container) {
 
 	if (!content.length) throw request.notFound(request.language(), tag("__name__", "find{id}").hash);
 
-	await cache.json.set(reference, content, 60 * 10);
+	await cache.json.set(reference, content, 60 * 10, tags);
 
-	return content;
+	return content[0];
 }
