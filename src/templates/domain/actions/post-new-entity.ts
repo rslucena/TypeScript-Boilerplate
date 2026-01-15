@@ -15,8 +15,8 @@ export default async function postNewEntity(request: container) {
 
 	const content = await repository.insert(__name__).values(validRequest.data).onConflictDoNothing().returning();
 
-  if (!content.length) throw request.conflict(request.language(), tag("__name__", "create"));
-  
+	if (!content.length) throw request.conflict(request.language(), tag("__name__", "post/__name__/{params}").hash);
+
 	await cache.invalidate("__name__");
 
 	return getById(new container({ params: { id: content[0].id } }));
