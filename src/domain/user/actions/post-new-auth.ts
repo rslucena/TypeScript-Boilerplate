@@ -14,7 +14,7 @@ export default async function postNewAuth(request: container) {
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "auth{params}").hash);
 
 	const { data } = validRequest;
-	const { hash: reference } = tag("user", "auth{params}", { email: data.email });
+	const { hash: reference, tags } = tag("user", "auth{params}", { email: data.email });
 
 	const cached = await cache.json.get<{ token: string; refresh: string }>(reference);
 	if (cached) {
@@ -50,7 +50,7 @@ export default async function postNewAuth(request: container) {
 
 	request.headers({ authorization: `Bearer ${secrets.token}` });
 
-	await cache.json.set(reference, secrets, 60 * 10);
+	await cache.json.set(reference, secrets, 60 * 10, tags);
 
 	return secrets;
 }

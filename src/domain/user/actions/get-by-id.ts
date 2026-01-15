@@ -13,10 +13,10 @@ export default async function getById(request: container) {
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{id}").hash);
 
 	const { id } = validRequest.data;
-	const { hash: reference } = tag("user", "find{id}", { id });
+	const { hash: reference, tags } = tag("user", "find{id}", { id });
 
 	const cached = await cache.json.get<user[]>(reference);
-	if (cached) return cached;
+	if (cached) return cached[0];
 
 	const { password, ...outhers } = getTableColumns(user);
 
@@ -32,7 +32,7 @@ export default async function getById(request: container) {
 
 	if (!content.length) throw request.notFound(request.language(), tag("user", "find{id}").hash);
 
-	await cache.json.set(reference, content[0], 60 * 10);
+	await cache.json.set(reference, content[0], 60 * 10, tags);
 
 	return content[0];
 }
