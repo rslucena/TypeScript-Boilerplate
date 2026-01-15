@@ -10,13 +10,13 @@ export default async function getById(request: container) {
 	request.status(200);
 
 	const validRequest = await schema.actions.id.safeParseAsync(request.params());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{id}"));
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{id}").hash);
 
 	const { id } = validRequest.data;
-	const reference = tag("user", "find{id}", { id });
+	const { hash: reference } = tag("user", "find{id}", { id });
 
-	const cached = await cache.json.get<{ [key: string]: user[] }>(reference);
-	if (cached?.[reference]) return cached[reference];
+	const cached = await cache.json.get<user[]>(reference);
+	if (cached) return cached;
 
 	const { password, ...outhers } = getTableColumns(user);
 
@@ -30,9 +30,9 @@ export default async function getById(request: container) {
 
 	const content = await prepare.execute({ id });
 
-	if (!content.length) throw request.notFound(request.language(), tag("user", "find{id}"));
+	if (!content.length) throw request.notFound(request.language(), tag("user", "find{id}").hash);
 
-	await cache.json.set(reference, content, 60 * 10);
+	await cache.json.set(reference, content[0], 60 * 10);
 
-	return content;
+	return content[0];
 }
