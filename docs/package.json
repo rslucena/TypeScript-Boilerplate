@@ -1,0 +1,24 @@
+{
+	"name": "documentation",
+	"module": "index.md",
+	"type": "module",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest",
+		"gh-pages": "^6.3.0",
+		"vitepress": "^2.0.0-alpha.15"
+	},
+	"scripts": {
+		"dev": "vitepress dev",
+		"build": "vitepress build",
+		"preview": "vitepress preview",
+		"deploy": "gh-pages -d .vitepress/dist"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"vitepress-mermaid-preview": "^0.1.1",
+		"vitepress-plugin-group-icons": "^1.6.9"
+	}
+}

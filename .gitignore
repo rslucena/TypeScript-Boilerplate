@@ -88,3 +88,7 @@ api/_assets*
 # Agents
 /.agent/tasks/
 /.agent/reflections/
+
+# Docs
+docs/.vitepress/dist
+docs/.vitepress/cache
