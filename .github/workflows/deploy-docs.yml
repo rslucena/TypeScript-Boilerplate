@@ -3,7 +3,8 @@ name: Deploy Docs (Preview)
 on:
   push:
     branches:
-      - feat/add-new-model-documentation
+      - staging
+      
   workflow_dispatch:
 
 jobs:
