@@ -1,9 +1,11 @@
+import { env } from "@infrastructure/settings/environment";
+
 const connection = {
-	port: Number(process.env.POSTGRES_PORT),
-	host: String(process.env.POSTGRES_SERVER),
-	password: String(process.env.POSTGRES_PASSWORD),
-	username: String(process.env.POSTGRES_USER),
-	database: String(process.env.POSTGRES_DATABASE),
+	port: env.POSTGRES_PORT,
+	host: env.POSTGRES_SERVER,
+	password: env.POSTGRES_PASSWORD,
+	username: env.POSTGRES_USER,
+	database: env.POSTGRES_DATABASE,
 };
 
 export default connection;

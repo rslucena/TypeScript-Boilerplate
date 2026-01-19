@@ -1,23 +1,38 @@
-import { spawn } from "node:child_process";
+import { type ChildProcess, spawn } from "node:child_process";
 import { messages } from "@infrastructure/messages/actions";
 import pm2 from "pm2";
 import pm2Commands from "./pm2-commands";
 import type { ProcHeart, worker } from "./pm2-workspace";
 
-const engineer = process.env.npm_lifecycle_event === "dev" ? "tsx" : "node";
+const isDev = process.env.npm_lifecycle_event === "dev";
+const isBun = typeof Bun !== "undefined";
+const engineer = isDev ? (isBun ? "bun" : "tsx") : isBun ? "bun" : "node";
 const abort = { signal: AbortSignal.timeout(1000) };
 
 async function debug(jobs: worker[]) {
+	const children: ChildProcess[] = [];
+
 	for (let i = 0; i < jobs.length; i++) {
-		const command = `tsx watch --env-file=.env -- ${jobs[i].tsx}`;
+		const command = `${engineer} ${isBun ? "--watch" : "watch"} --env-file=.env -- ${jobs[i].tsx}`;
 		const child = spawn(command, { stdio: "inherit", shell: true });
-		const { stdout, stderr } = child;
-		child.on("message", (message) => console.debug(message));
+		children.push(child);
 		child.on("error", (error) => console.error("command error:", error));
-		child.on("close", (code) => console.error(`command exited with code ${code}`));
-		stdout?.on("data", (data) => console.debug(data));
-		stderr?.on("data", (data) => console.debug(data));
+		child.on("close", (code) => {
+			if (code !== 0) console.error(`command exited with code ${code}`);
+		});
 	}
+
+	const cleanup = () => {
+		for (const child of children) {
+			child.kill();
+		}
+		process.exit();
+	};
+
+	process.on("SIGINT", cleanup);
+	process.on("SIGTERM", cleanup);
+
+	setInterval(() => {}, 1000);
 }
 
 async function execute(jobs: worker[], force?: boolean) {

@@ -2,7 +2,7 @@ import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import translate from "@infrastructure/languages/translate";
 import type { FastifyBaseLogger, FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 interface guise {
 	status?: number;
@@ -46,6 +46,7 @@ const replyErrorSchema = {
 		400: errorSchema(400),
 		401: errorSchema(401),
 		404: errorSchema(404),
+		409: errorSchema(409),
 		500: errorSchema(500),
 		503: errorSchema(503),
 	},

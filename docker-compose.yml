@@ -10,6 +10,30 @@ services:
     volumes:
       - ./.docker/redis/storage:/data
       - ./.docker/redis/modules:/usr/lib/redis/modules
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: app_server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      REDIS_SERVER: redis
+      POSTGRES_SERVER: postgres
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   postgres:
     image: postgres:alpine
@@ -26,6 +50,11 @@ services:
     volumes:
       - ./.docker/postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./.docker/postgres/storage:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   uptime:
     restart: unless-stopped

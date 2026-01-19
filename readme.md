@@ -61,18 +61,20 @@ bun install
 
 # Create environment file
 cp .env.exemple .env
-# Configure your environment variables (DATABASE_URL, REDIS_URL, etc.)
+
+> [!CAUTION]
+> **Strict Environment Validation**: All variables in `.env` are now **mandatory**. The application will fail to start if any variable is missing or invalid. Configure your `DATABASE_URL`, `REDIS_URL`, `AUTH_SALT`, etc., before running.
 ```
 
-### Step 2️⃣ - Start Infrastructure
+### Step 2️⃣ - Start Infrastructure & App
 
 ```bash
-# Start PostgreSQL + Redis containers
-docker-compose up -d --build
+# Start PostgreSQL, Redis, and Application containers
+podman compose up -d --build
 
 # Run database migrations
-bun db:migrate        # Generate migration files
-bun db:migrate:push   # Apply to database
+# You can run migrations directly through the app container
+podman exec -it app_server bun db:migrate:push
 ```
 
 ### Step 3️⃣ - Generate Your First Domain (Optional)
@@ -100,6 +102,15 @@ bun dev --workers=primary-webserver
 # ✅ API running at http://localhost:3000
 # 📚 Swagger docs at http://localhost:3000/docs
 # 🧪 Run tests: bun test
+```
+
+### Step 5️⃣ - Production with Docker
+
+```bash
+# Build and start the full stack (App + DB + Redis)
+docker-compose up -d --build
+
+# The application will be available at http://localhost:3000
 ```
 
 
@@ -242,7 +253,7 @@ Comprehensive guides available in the [Wiki](https://github.com/rslucena/TypeScr
 - **Vite** for fast builds and hot-module replacement (HMR)
 - **Drizzle ORM** for modern and type-safe database access
 - **Docker** and `docker-compose` for containerized development and production
-- **ESLint** and **Biome** for code linting and formatting
+- **Biome** for code linting and formatting
 - **Testing** setup (see `tests/` directory)
 - **Plugin System** for modular architecture and easy extensibility
 - **Ready-to-use project structure** separating domain, infrastructure, commands, and utilities

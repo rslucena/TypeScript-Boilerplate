@@ -1,14 +1,15 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
+import { env } from "@infrastructure/settings/environment";
 import pino from "pino";
 import type actions from "./interfaces";
 
 const bindings = (bindings: pino.Bindings) => ({ ...bindings, node_version: process.versions.node });
 
 const configs = {
-	level: process.env.LOG_LEVEL ?? "info",
+	level: env.LOG_LEVEL,
 	redact: ["headers.authorization"],
-	enabled: process.env.SHOW_LOG === "true",
+	enabled: env.SHOW_LOG,
 	formatters: { bindings },
 };
 

@@ -1,7 +1,7 @@
 import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { array, object, string } from "zod/v4";
+import { array, object, string } from "zod";
 import { default as users } from "./entity";
 
 const create = createInsertSchema(users, {
@@ -25,10 +25,7 @@ const auth = object({
 const actions = {
 	headers,
 	id: select.pick({ id: true }).required(),
-	read: object({
-		...select.omit({ id: true, password: true }).shape,
-		...withPagination.shape,
-	}),
+	read: select.omit({ id: true, password: true }).extend(withPagination.shape),
 	create: {
 		entity: create.omit({ id: true }),
 		auth: create.pick({ email: true, password: true }),

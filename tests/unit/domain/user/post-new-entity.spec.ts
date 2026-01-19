@@ -3,7 +3,7 @@ import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
@@ -74,12 +74,13 @@ describe("User Domain Actions : postNewEntity", () => {
 		expect(redisClientMock.del).toHaveBeenCalled();
 	});
 
-	it("should throw 422 if conflict (duplicate email)", async () => {
+	it("should throw 409 if conflict (duplicate email)", async () => {
 		const userData = { name: "John", lastName: "Doe", email: "john@example.com", password: "password123" };
 		containerMock.body.mockReturnValue(userData);
 		repositoryMock.returning.mockResolvedValueOnce([]);
+		containerMock.conflict.mockReturnValue(new Error("Conflict"));
 
-		expect(postNewEntity(containerMock)).rejects.toThrow();
+		expect(postNewEntity(containerMock)).rejects.toThrow("Conflict");
 	});
 
 	it("should throw 400 if validation fails", async () => {

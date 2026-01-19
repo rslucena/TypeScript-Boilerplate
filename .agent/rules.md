@@ -58,6 +58,7 @@ Always consult the [wiki/](../wiki/) folder for deep details on:
 - **Agenic Memory**: 
     - **Task Logging**: For every significant implementation, I must create a task log in `.agent/tasks/YYYY-MM/DD_{TIMESTAMP}.md`.
     - **Self-Correction**: Check for similar past tasks in `.agent/tasks/` before starting to avoid duplicating efforts or repeating mistakes.
+    - **Never Commit**: `IMPLEMENTATION_PROPOSAL.md` is for planning only and must **NEVER** be committed to the repository. It should remain local.
     - **Reflection**: Periodically update `.agent/reflections/` with broad architectural insights or recurring patterns discovered.
 - **Log Template**: Each task log must include:
     - **Description**: What the task is.
@@ -67,14 +68,19 @@ Always consult the [wiki/](../wiki/) folder for deep details on:
     - **Implemented Changes**: Step-by-step summary.
     - **Lessons Learned**: Insights for future agents/sessions.
 - **Implementation Proposal**: For any non-trivial task, I must create an `IMPLEMENTATION_PROPOSAL.md` file in the root containing:
-    - **Branch Name**: Following the pattern `feat/name`, `fix/name`, or `docs/name`.
-    - **Branch Title**: A descriptive title for the branch (e.g., # [Feat] Setup Agent Directives).
-    - **PR Name**: Following the format `type(scope): description` (e.g., `feat(agents): setup-agent-directives`).
-    - **Standard PR Template**: Mandatory use of sections from `.github/pull_request_template.md` (Changes, Motivation/Context, Benefits, Is it resolved?, Type of Change, Checklist).
-    - **Commit Plan**: A detailed plan for git commits:
-        - **Minimum**: At least **2 commits** to separate different types of changes.
-        - **Format**: Each commit must have a title (Conventional Commits) and a list of specific files included.
-    - **Additional Details**: Any extra technical info (e.g., Mermaid diagrams, specific deployment steps) should be added *after* the standard template sections.
+    - **Branch Information**: Branch Name (`feat/name`) and PR Name (`type(scope): description`).
+    - **Context**: Brief explanation of the problem and improved solution.
+    - **Proposed Changes**:
+        - Focus on **textual summaries** of logic and architecture.
+        - **Logic Diagram**: A generic Mermaid diagram showing how the new feature connects/flows in the system.
+        - **Avoid large code blocks**. Use short references to files/functions.
+        - Mention design patterns or structural changes.
+    - **PR Template Sections**: Align structure with `.github/pull_request_template.md` (e.g., Benefits, Checklist, Type of Change).
+    - **Verification Plan**: Step-by-step instructions for automated and manual testing.
+    - **Commit Plan**:
+        - **Distinct**: Commit messages should NOT be identical to the PR title but must share the same context.
+        - **Granularity**: Separate logical changes (e.g., one commit for infra, one for docs).
+        - **Convention**: Use Conventional Commits.
 - **Code Review**: Before submitting, I will run a self-check for N+1 queries, missing database indexes, and `any` usage.
 - **Proactivity**: Before creating something new, check if a similar template or pattern exists in the project.
 - **Documentation**: 

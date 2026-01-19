@@ -3,7 +3,7 @@ import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const redisClientMock = createRedisClientMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
