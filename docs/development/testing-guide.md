@@ -1,3 +1,10 @@
+---
+title: Testing Guide
+description: Comprehensive testing guide with patterns and best practices
+---
+
+# Testing Guide
+
 This guide covers the testing strategy, structure, and best practices for the TypeScript Boilerplate project. The project uses **Bun's built-in test runner**, which is significantly faster than Jest while maintaining a familiar API.
 
 ## Test Structure
@@ -190,7 +197,9 @@ describe("Cache Service", () => {
 
 ### Basic Commands
 
-```bash
+::: code-group
+
+```bash [bun]
 # Run all tests
 bun test
 
@@ -207,6 +216,59 @@ bun test --watch
 bun test --coverage
 ```
 
+```bash [npm]
+# Run all tests
+npm test
+
+# Run specific file
+npm test tests/unit/domain/user/user-get-by-id.spec.ts
+
+# Run tests matching pattern
+npm test user
+
+# Watch mode (re-run on file changes)
+npm test -- --watch
+
+# Coverage report
+npm test -- --coverage
+```
+
+```bash [yarn]
+# Run all tests
+yarn test
+
+# Run specific file
+yarn test tests/unit/domain/user/user-get-by-id.spec.ts
+
+# Run tests matching pattern
+yarn test user
+
+# Watch mode (re-run on file changes)
+yarn test --watch
+
+# Coverage report
+yarn test --coverage
+```
+
+```bash [pnpm]
+# Run all tests
+pnpm test
+
+# Run specific file
+pnpm test tests/unit/domain/user/user-get-by-id.spec.ts
+
+# Run tests matching pattern
+pnpm test user
+
+# Watch mode (re-run on file changes)
+pnpm test --watch
+
+# Coverage report
+pnpm test --coverage
+```
+
+:::
+
 ### Coverage Requirements
 
 The project aims for:
@@ -216,10 +278,30 @@ The project aims for:
 - **Lines:** 80%+
 
 **View coverage:**
-```bash
+
+::: code-group
+
+```bash [bun]
 bun test --coverage
 # Opens coverage/index.html in browser
 ```
+
+```bash [npm]
+npm test -- --coverage
+# Opens coverage/index.html in browser
+```
+
+```bash [yarn]
+yarn test --coverage
+# Opens coverage/index.html in browser
+```
+
+```bash [pnpm]
+pnpm test --coverage
+# Opens coverage/index.html in browser
+```
+
+:::
 
 ## Integration Tests
 
@@ -452,6 +534,6 @@ test:
 ---
 
 **See Also:**
-- [CI/CD Pipeline](../devops/ci-cd-pipeline.md) - Automated testing in CI
-- [Best Practices](./best-practices.md) - General coding standards
-- [Architecture](../architecture/index.md) - Understanding the codebase structure
+- [CI/CD Pipeline](/devops/ci-cd-pipeline) - Automated testing in CI
+- [Best Practices](/development/best-practices) - General coding standards
+- [Architecture](/architecture/) - Understanding the codebase structure

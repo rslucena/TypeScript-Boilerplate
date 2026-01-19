@@ -1,111 +1,313 @@
 ---
 title: Getting Started
+description: Complete guide to setting up and creating your first feature with TypeScript Boilerplate
 ---
 
 # Getting Started
 
-This guide walks you through setting up your development environment and getting your first feature up and running quickly.
+Welcome to the TypeScript Boilerplate! This guide will walk you through creating your first feature from scratch.
 
-## Installation
+## Prerequisites
 
-Before you begin, ensure your system meets the following requirements.
+Before starting, ensure you have:
+- ✅ Bun installed (`curl -fsSL https://bun.sh/install | bash`)
+- ✅ Docker and Docker Compose
+- ✅ PostgreSQL and Redis running (via `docker-compose up -d`)
+- ✅ Database migrations applied (`bun db:migrate:push`)
 
-### Prerequisites
+## Tutorial: Building a Blog Post API (5 minutes)
 
-- A terminal or command-line interface to run VitePress commands
-- [Bun](https://bun.sh) The JavaScript/TypeScript runtime
-- [Docker & Docker Compose](https://docs.docker.com/get-docker/) — For containerized services
-- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) — For version control
+### Step 1: Generate the Domain
 
-::: details Installation steps (Ubuntu / Debian)
-```bash
-# Update system and install base dependencies
-sudo apt-get update
-sudo apt-get install -y curl ca-certificates gnupg lsb-release software-properties-common
-
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
-
-# Install Docker Engine and Docker Compose (official script)
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-
-# Allow current user to run Docker without sudo
-sudo usermod -aG docker $USER
-
-# Install Git (latest stable via official PPA)
-sudo add-apt-repository -y ppa:git-core/ppa
-sudo apt-get update
-sudo apt-get install -y git
-```
-:::
-
-## Initial Setup
-
-Follow the steps below to get the project up and running locally.
-
-### 1. Clone the repository
-::: code-group [bash]
-```bash
-git clone https://github.com/your-username/TypeScript-Boilerplate.git
-cd TypeScript-Boilerplate
-```
-:::
-
-### 2. Install dependencies
-::: code-group [bash]
-```bash
-bun install
-```
-:::
-
-### 3. Start development services
 ::: code-group
-```bash [bash]
-docker compose up -d
+
+```bash [bun]
+bun gen:domain post
+
+# Output:
+# 🚀 Generating domain: post...
+# ✅ Domain post generated successfully!
+# 📍 Location: src/domain/post
+# 🧪 Test: tests/unit/domain/post/crud.spec.ts
 ```
+
+```bash [npm]
+npm run gen:domain post
+
+# Output:
+# 🚀 Generating domain: post...
+# ✅ Domain post generated successfully!
+# 📍 Location: src/domain/post
+# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+```
+
+```bash [yarn]
+yarn gen:domain post
+
+# Output:
+# 🚀 Generating domain: post...
+# ✅ Domain post generated successfully!
+# 📍 Location: src/domain/post
+# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+```
+
+```bash [pnpm]
+pnpm gen:domain post
+
+# Output:
+# 🚀 Generating domain: post...
+# ✅ Domain post generated successfully!
+# 📍 Location: src/domain/post
+# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+```
+
 :::
 
-### 4. Apply database migrations
-::: code-group [bash]
-```bash
+### Step 2: Customize the Entity
+
+Edit `src/domain/post/entity.ts`:
+
+```typescript
+import { identifier, pgIndex } from "@infrastructure/repositories/references";
+import { pgTable, varchar, text } from "drizzle-orm/pg-core";
+
+const columns = {
+	title: varchar("title", { length: 255 }).notNull(),
+	content: text("content").notNull(),
+	authorId: varchar("author_id", { length: 36 }).notNull(),
+	slug: varchar("slug", { length: 255 }).unique().notNull(),
+};
+
+const post = pgTable("post", { ...columns, ...identifier }, (table) =>
+	pgIndex("post", table, ["title", "slug"])
+);
+
+type post = typeof post.$inferSelect;
+
+export default post;
+```
+
+### Step 3: Update the Schema Validation
+
+Edit `src/domain/post/schema.ts`:
+
+```typescript
+import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
+import { headers } from "@infrastructure/server/interface";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { array, object } from "zod/v4";
+import { default as entity } from "./entity";
+
+const create = createInsertSchema(entity, {
+	title: (schema) => schema.min(5).max(255),
+	content: (schema) => schema.min(10),
+	slug: (schema) => schema.min(3).max(255).regex(/^[a-z0-9-]+$/),
+});
+
+const select = createSelectSchema(entity, {
+	...zodIdentifier,
+}).partial();
+
+const actions = {
+	headers,
+	id: select.pick({ id: true }),
+	read: object({
+		...select.omit({ id: true }).shape,
+		...withPagination.shape,
+	}),
+	create: create.omit({ id: true }),
+	update: create.omit({ id: true }).partial(),
+	delete: create.pick({ id: true }),
+};
+
+const response = array(select);
+
+export default { actions, entity: response };
+```
+
+#### Migration Flow
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Code as Source Code
+    participant DB as Postgres
+    
+    Dev->>Code: Edit entity.ts
+    Dev->>Code: Run bun db:migrate
+    Code->>Code: Generate SQL Migration
+    Dev->>Code: Run bun db:migrate:push
+    Code->>DB: Apply SQL Changes
+```
+
+### Step 4: Generate and Apply Migration
+
+::: code-group
+
+```bash [bun]
+# Generate migration file
+bun db:migrate
+
+# Apply to database
 bun db:migrate:push
 ```
-:::
 
-## File Structure
+```bash [npm]
+# Generate migration file
+npm run db:migrate
 
-The project is organized to enforce clear separation of concerns, improve maintainability, and support scalability. Each top-level directory has a well-defined responsibility within the application architecture.
-
-```text
-.
-├─ commands
-├─ domain
-├─ functions
-└─ infrastructure
+# Apply to database
+npm run db:migrate:push
 ```
 
-## Directory Overview
+```bash [yarn]
+# Generate migration file
+yarn db:migrate
 
-| Folder           | Description |
-|------------------|-------------|
-| `commands`       | Application entry points and process handlers responsible for bootstrapping and orchestrating workflows. |
-| `domain`         | Core business logic, including entities, use cases, schemas, and route definitions. |
-| `functions`      | Reusable utility functions and shared helpers used across the application. |
-| `infrastructure` | Technical and external concerns such as database access, caching, server setup, logging, messaging, and internationalization (i18n). |
+# Apply to database
+yarn db:migrate:push
+```
 
-## Design Notes
+```bash [pnpm]
+# Generate migration file
+pnpm db:migrate
 
-- The `domain` layer is framework-agnostic and contains no infrastructure-specific code.
-- The `infrastructure` layer encapsulates all external integrations and technical implementations.
-- This structure promotes:
-    - Clear boundaries between business logic and technical concerns
-    - Easier testing and refactoring
-    - Long-term scalability
+# Apply to database
+pnpm db:migrate:push
+```
 
+:::
 
-## What's Next?
+### Step 5: Verify Route Registration
 
-- [Scripts & Development](./scripts-&-development.md) — Overview of all available `package.json` scripts for development, database management, testing, and build processes.
+When using `bun gen:domain`, the routes are **automatically registered** in `src/functions/http-primary-webserver.ts`. 
 
+You just need to verify the injection or customize the prefix if necessary:
 
+```typescript
+// src/functions/http-primary-webserver.ts
+import postRoutes from "@domain/post/routes"; // Auto-added
+
+(async () => {
+  const server = await webserver.create();
+  // ...
+  server.register(postRoutes, { prefix: "/api/v1/posts" }); // Auto-added
+  // ...
+})();
+```
+
+### Step 6: Test Your API
+
+```bash
+# Start the server
+bun dev --workers=primary-webserver
+
+# In another terminal, test the endpoints:
+
+# Create a post
+curl -X POST http://localhost:3000/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My First Post",
+    "content": "This is the content of my first post!",
+    "authorId": "123e4567-e89b-12d3-a456-426614174000",
+    "slug": "my-first-post"
+  }'
+
+# Get all posts
+curl http://localhost:3000/api/v1/posts
+
+# Check Swagger docs
+open http://localhost:3000/docs
+```
+
+### Step 7: Write Tests
+
+Edit `tests/unit/domain/post/crud.spec.ts`:
+
+```typescript
+import { describe, expect, it, mock } from "bun:test";
+import postNewEntity from "@domain/post/actions/post-new-entity";
+import { container } from "@infrastructure/server/request";
+
+describe("Post Domain", () => {
+	it("should create a new post", async () => {
+		const mockRequest = {
+			body: () => ({
+				title: "Test Post",
+				content: "Test content",
+				authorId: "123e4567-e89b-12d3-a456-426614174000",
+				slug: "test-post"
+			}),
+			status: mock(() => {}),
+			language: () => "en",
+		} as unknown as container;
+
+		// Add your test logic here
+		expect(true).toBe(true);
+	});
+});
+```
+
+Run tests:
+
+::: code-group
+
+```bash [bun]
+bun test tests/unit/domain/post
+```
+
+```bash [npm]
+npm test tests/unit/domain/post
+```
+
+```bash [yarn]
+yarn test tests/unit/domain/post
+```
+
+```bash [pnpm]
+pnpm test tests/unit/domain/post
+```
+
+:::
+
+## Next Steps
+
+- ✅ **Add business logic**: Implement custom validation in actions
+- ✅ **Add relationships**: Link posts to users via foreign keys
+- ✅ **Add authentication**: Protect routes with JWT middleware
+- ✅ **Add more features**: Comments, likes, tags, etc.
+
+## Common Patterns
+
+### Adding a Foreign Key
+
+```typescript
+// In entity.ts
+import { references } from "drizzle-orm";
+import user from "../user/entity";
+
+const columns = {
+	// ... other columns
+	authorId: varchar("author_id", { length: 36 })
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+};
+```
+
+## Troubleshooting
+
+**Problem**: Migration fails with "column already exists"
+**Solution**: Drop the table or run `bun db:migrate` to generate a fresh migration
+
+**Problem**: Routes not appearing in Swagger
+**Solution**: Ensure `schema` is properly defined in routes with `tags`, `summary`, and `response`
+
+**Problem**: Cache not invalidating
+**Solution**: Check that `tag("domain", "find*")` matches your cache key pattern
+
+## Resources
+
+- [Architecture Overview](/architecture/)
+- [Domain Scaffolding Reference](/development/domain-scaffolding)
+- [Troubleshooting Guide](/reference/troubleshooting)

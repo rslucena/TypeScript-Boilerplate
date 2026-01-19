@@ -1,15 +1,38 @@
+---
+title: Domain Scaffolding
+description: CLI generator tool for creating complete CRUD domains
+---
+
+# Domain Scaffolding
+
 To accelerate development and maintain consistency across domain modules, the project includes a CLI generator tool that creates complete CRUD domains in seconds. It also automatically registers the new routes and formats the code.
 
 > **💡 Want to understand how the generator works internally?**  
-> See [Template System Architecture](./template-system-architecture.md) for a deep dive into the zero-dependency template engine.
+> See [Template System Architecture](/development/template-system-architecture) for a deep dive into the zero-dependency template engine.
 
 ## How to use
 
 Run the following command in your terminal:
 
-```bash
+::: code-group
+
+```bash [bun]
 bun gen:domain <name>
 ```
+
+```bash [npm]
+npm run gen:domain <name>
+```
+
+```bash [yarn]
+yarn gen:domain <name>
+```
+
+```bash [pnpm]
+pnpm gen:domain <name>
+```
+
+:::
 
 Replace `<name>` with the singular name of your domain (e.g., `product`, `category`, `order`). The name will be used to:
 - Create the domain folder structure
@@ -217,13 +240,41 @@ bun gen:domain category
 3. **Write tests**: Implement actual test cases in `crud.spec.ts`
 4. **Run migrations**: Generate and run Drizzle migrations
 
-```bash
+::: code-group
+
+```bash [bun]
 # Generate migration
 bun db:migrate
 
 # Apply to database
 bun db:migrate:push
 ```
+
+```bash [npm]
+# Generate migration
+npm run db:migrate
+
+# Apply to database
+npm run db:migrate:push
+```
+
+```bash [yarn]
+# Generate migration
+yarn db:migrate
+
+# Apply to database
+yarn db:migrate:push
+```
+
+```bash [pnpm]
+# Generate migration
+pnpm db:migrate
+
+# Apply to database
+pnpm db:migrate:push
+```
+
+:::
 
 ## Behavioral Notes
 
