@@ -1,47 +1,37 @@
 ---
+title: Home
+description: TypeScript Boilerplate - A minimalistic project template for Node.js back-end applications with Bun runtime
 layout: home
 
 hero:
-  name: "High-Performance TypeScript Boilerplate"
-  tagline: "A modern, modular, and scalable TypeScript boilerplate for server-side applications — APIs, Functions, WebSockets, and CLI tools."
+  name: TypeScript Boilerplate
+  text: Blazing-fast TypeScript Backend
+  tagline: Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Experience the speed of Go with the familiarity of TypeScript.
   actions:
-    - text: "Get Started"
-      link: "/guide/getting-started"
-      type: primary
-    - text: "GitHub Repository"
-      link: "https://github.com/rslucena/TypeScript-Boilerplate"
-      type: secondary
+    - theme: brand
+      text: Quick Navigation
+      link: /guide/quick-navigation
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/rslucena/TypeScript-Boilerplate
 
 features:
   - icon: ⚡
-    title: "Blazing Fast"
-    details: "Powered by Bun runtime for exceptional speed, enabling near-native performance in TypeScript projects."
-    color: "#FF9800" # laranja suave para destaque
+    title: Near Go-like Performance
+    details: Powered by the Bun runtime for exceptional speed and efficiency
   - icon: 🛠️
-    title: "Full-Featured Tooling"
-    details: "Includes Vite, Drizzle ORM, Docker support, and smart scaffolding for rapid development."
-    color: "#2196F3" # azul
-  - icon: 🧪
-    title: "Production Ready"
-    details: "Built with testing, CI/CD pipelines, and best practices to ensure reliability and maintainability."
-    color: "#4CAF50" # verde
-  - icon: 🌐
-    title: "Internationalization"
-    details: "Built-in i18n support for global applications and easy language management."
-    color: "#9C27B0" # roxo
+    title: Batteries Included
+    details: CLI scaffolding, i18n support, and integrated caching out of the box
+  - icon: 🏗️
+    title: Clean Architecture
+    details: Zero-dependency TypeScript templates with maintainable code structure
+  - icon: 🚀
+    title: Auto-CRUD Generation
+    details: Scaffold complete domains with a single command
+  - icon: 🌍
+    title: Internationalization
+    details: Built-in i18n support for multi-language applications
   - icon: 🔄
-    title: "Scalable Architecture"
-    details: "Modular template system and domain scaffolding for projects of any size."
-    color: "#F44336" # vermelho
-
+    title: Smart Caching
+    details: Redis-powered caching with automatic invalidation
 ---
-
-::: warning
-🚧 **Documentation Under Reconstruction**
-
-This documentation is currently being **completely rewritten**.  
-Some sections may contain **errors**, **broken links**, or **outdated information**.  
-Content is actively evolving, so please **check back frequently** for updates.
-
-We appreciate your patience and understanding as we improve this documentation.
-:::

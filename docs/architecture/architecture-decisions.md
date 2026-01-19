@@ -1,3 +1,10 @@
+---
+title: Architecture Decisions
+description: Architecture Decision Records (ADRs)
+---
+
+# Architecture Decisions
+
 This document records the architectural decisions made for the project, providing context on "why" certain technologies or patterns were chosen.
 
 ## ADR-001: Runtime Environment

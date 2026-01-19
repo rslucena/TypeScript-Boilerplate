@@ -1,3 +1,10 @@
+---
+title: CI/CD Pipeline
+description: Continuous integration and deployment setup
+---
+
+# CI/CD Pipeline
+
 This boilerplate comes with a fully configured **GitHub Actions** pipeline to ensure code quality and automate deployments. The pipeline is designed to be zero-configuration for public repositories and provides a complete DevOps workflow out of the box.
 
 ## Overview
@@ -321,12 +328,12 @@ rm -rf dist && bun run build
    ```
 
 2. **Quality Gate failed**
-    - Check Actions tab for errors
-    - Fix issues and push again
+   - Check Actions tab for errors
+   - Fix issues and push again
 
 3. **No releasable commits**
-    - `docs:` and `chore:` don't trigger releases
-    - Need at least one `feat:` or `fix:` commit
+   - `docs:` and `chore:` don't trigger releases
+   - Need at least one `feat:` or `fix:` commit
 
 ### Docker Push Failing
 
@@ -412,6 +419,6 @@ jobs:
 
 
 **See Also:**
-- [Deployment](./deployment.md) - Production deployment guide
-- [Testing Guide](../development/testing-guide.md) - Writing and running tests
-- [Troubleshooting](../reference/troubleshooting.md) - Common issues and solutions
+- [Deployment](/devops/deployment) - Production deployment guide
+- [Testing Guide](/development/testing-guide) - Writing and running tests
+- [Troubleshooting](/reference/troubleshooting) - Common issues and solutions

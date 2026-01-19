@@ -1,3 +1,10 @@
+---
+title: Troubleshooting
+description: Common issues and solutions
+---
+
+# Troubleshooting
+
 Common issues and solutions when working with the TypeScript Boilerplate.
 
 ## Installation Issues

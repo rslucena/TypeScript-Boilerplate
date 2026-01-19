@@ -1,3 +1,10 @@
+---
+title: Logs Actions Reference
+description: Logging API reference
+---
+
+# Logs Actions Reference
+
 This document presents the actions available for interacting with the logs system.
 
 ## Types
@@ -5,7 +12,7 @@ This document presents the actions available for interacting with the logs syste
 - **console** _Using the Node:console_
 - **provider** _Access to the Pino provider directly_
 
-## Methods:
+## Methods: 
 ```typescript
   error: (message: string, props: Error | any, exit?: boolean) => void
   warn: (props: any, message?: string) => void

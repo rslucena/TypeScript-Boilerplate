@@ -1,3 +1,10 @@
+---
+title: Deployment Guide
+description: Production deployment guide
+---
+
+# Deployment Guide
+
 Complete guide to deploying your TypeScript Boilerplate application to production.
 
 ## Pre-Deployment Checklist
@@ -241,18 +248,18 @@ Visit [render.com](https://render.com) and connect your GitHub repo
 #### Step 2: Create Services
 
 1. **Create PostgreSQL Database:**
-    - New → PostgreSQL
-    - Note the Internal Database URL
+   - New → PostgreSQL
+   - Note the Internal Database URL
 
 2. **Create Redis:**
-    - New → Redis
-    - Note the Internal Redis URL
+   - New → Redis
+   - Note the Internal Redis URL
 
 3. **Create Web Service:**
-    - New → Web Service
-    - Connect your repo
-    - Build Command: `bun install && bun db:migrate:push`
-    - Start Command: `bun start`
+   - New → Web Service
+   - Connect your repo
+   - Build Command: `bun install && bun db:migrate:push`
+   - Start Command: `bun start`
 
 #### Step 3: Configure Environment
 
@@ -458,5 +465,5 @@ fly releases rollback <version>
 ## Support
 
 For deployment issues:
-- Check [Troubleshooting Guide](../reference/troubleshooting.md)
+- Check [Troubleshooting Guide](/reference/troubleshooting)
 - Open [GitHub Issue](https://github.com/rslucena/TypeScript-Boilerplate/issues)

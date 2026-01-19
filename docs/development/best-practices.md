@@ -1,3 +1,10 @@
+---
+title: Best Practices
+description: Recommended patterns and practices for working with the TypeScript Boilerplate
+---
+
+# Best Practices
+
 This guide outlines recommended patterns and practices when working with this boilerplate.
 
 ## Domain Design

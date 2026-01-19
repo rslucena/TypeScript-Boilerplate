@@ -1,3 +1,10 @@
+---
+title: Architecture Overview
+description: Project architecture and design principles
+---
+
+# Architecture Overview
+
 This project follows a clean, modular architecture inspired by Domain-Driven Design (DDD) principles, focused on performance and developer productivity using TypeScript and Bun.
 
 ## Technology Stack

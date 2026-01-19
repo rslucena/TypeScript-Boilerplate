@@ -1,3 +1,10 @@
+---
+title: Process Manager Reference
+description: PM2 process management reference
+---
+
+# Process Manager Reference
+
 This document describes the functions available for executing and managing processes.
 
 ## Types
@@ -23,7 +30,7 @@ graph TD
     style PM2 fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-## Worker configs:
+## Worker configs: 
 ```typescript
 export interface worker {
   tsx: string
@@ -47,14 +54,14 @@ const defaultConfigs: pm2.StartOptions = {
 }
 ```
 
-## Methods:
+## Methods: 
 ```typescript
   dev: Promise<void>
   start: Promise<void>
 ```
 
-### dev
-_bun --watch src/commands/exec-process.ts_
+### dev 
+_bun --watch src/commands/exec-process.ts_ 
 `Returns: Promise void.`
 
 The `bun` runner will watch the project files for any changes and automatically restart the process using the entry point `exec-process.ts`. In development mode, the system efficiently manages worker processes, ensuring that file changes trigger immediate reloads and that all child processes are properly cleaned up on exit (SIGINT/SIGTERM support).
@@ -82,7 +89,7 @@ Example:
 ```
 
 ### start
-_bun dist/commands/exec-process.js_
+_bun dist/commands/exec-process.js_ 
 `Returns: Promise void.`
 
 Runs the process in production mode using the Bun runtime and the pre-built files.

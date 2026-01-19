@@ -1,3 +1,10 @@
+---
+title: Template System Architecture
+description: Zero-dependency template engine architecture and implementation details
+---
+
+# Template System Architecture
+
 The boilerplate includes a **powerful, zero-dependency template engine** that generates complete CRUD domains in seconds. Unlike traditional code generators that use string concatenation or external libraries, this system uses **native TypeScript files as templates** with intelligent placeholder replacement.
 
 ## Overview
@@ -294,6 +301,6 @@ Potential improvements to the template system:
 ---
 
 **See Also:**
-- [Domain Scaffolding (Generator)](./domain-scaffolding.md) - How to use the generator
-- [Architecture](../architecture/index.md) - Overall project structure
-- [Best Practices](./best-practices.md) - Coding standards
+- [Domain Scaffolding (Generator)](/development/domain-scaffolding) - How to use the generator
+- [Architecture](/architecture/) - Overall project structure
+- [Best Practices](/development/best-practices) - Coding standards

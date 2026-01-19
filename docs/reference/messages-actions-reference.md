@@ -1,3 +1,10 @@
+---
+title: Messages Actions Reference
+description: Message/Event system API reference
+---
+
+# Messages Actions Reference
+
 This document presents the actions available for interacting with the messaging system, which supports both Redis Pub/Sub and Node.js Internal Events.
 
 ## Types

@@ -1,3 +1,8 @@
+---
+title: Plugin System
+description: Modular plugin system architecture
+---
+
 # Plugins & Agents System
 
 The boilerplate introduces a **Plugin/Agent System** to handle cross-cutting concerns and feature extensions in a modular way. This allows you to "plug in" functionality like authentication, logging, or other middleware-like behaviors without cluttering the core request handling logic.

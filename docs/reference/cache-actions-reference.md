@@ -1,6 +1,12 @@
+---
+title: Cache Actions Reference
+description: Redis caching API reference
+---
+# Cache Actions Reference
+
 This document presents the available actions for interacting with the cache system.
 
-## Types:
+## Types: 
 ```typescript
 export interface actions {
   text: functions

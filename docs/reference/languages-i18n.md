@@ -1,3 +1,10 @@
+---
+title: Languages (i18n)
+description: Internationalization guide
+---
+
+# Languages (i18n)
+
 The project includes a lightweight internationalization system to handle multi-language responses. This is particularly useful for returning error messages or notifications in the user's preferred language.
 
 ## Location
@@ -26,7 +33,7 @@ You can import the `translate` function directly.
 import translate from '@infrastructure/languages/translate';
 
 // Default (English)
-const msg = translate('ERR_UNAUTHORIZED');
+const msg = translate('ERR_UNAUTHORIZED'); 
 
 // Specific language
 const msgPt = translate('ERR_UNAUTHORIZED', 'pt-br');
