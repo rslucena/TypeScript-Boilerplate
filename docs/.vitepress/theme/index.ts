@@ -7,6 +7,10 @@ import 'vitepress-mermaid-preview/dist/index.css';
 import Footer from './Footer.vue'
 import './style.css'
 
+
+import InteractiveFlow from './components/InteractiveFlow.vue'
+import DiagramBuilder from './components/DiagramBuilder.vue'
+
 export default {
     extends: DefaultTheme,
     Layout: () => {
@@ -16,5 +20,7 @@ export default {
     },
     enhanceApp({ app }) {
         initComponent(app);
+        app.component('InteractiveFlow', InteractiveFlow)
+        app.component('DiagramBuilder', DiagramBuilder)
     },
 } satisfies Theme;
