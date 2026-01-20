@@ -284,38 +284,64 @@ api.post("/", async (req, reply) => {
 
 ### Clean Architecture Flow
 
-```mermaid
-graph LR
-    subgraph "✅ Clean Flow"
-    R[Route] -->|Delegates| A[Action]
-    A -->|Validates| S[Schema]
-    A -->|Persists| D[Database/Repo]
-    end
+<script setup>
+import { MarkerType } from '@vue-flow/core'
 
-    subgraph "❌ Spaghetti Flow"
-    BR[Bad Route] -->|SQL Logic| BD[Database]
-    BR -->|Validation| BZ[Ad-hoc Checks]
-    BR -->|Business Logic| BB[Inline Code]
-    end
-    
-    style R fill:#4CAF50,stroke:#333
-    style A fill:#4CAF50,stroke:#333
-    style BR fill:#f44336,stroke:#333
-```
+/* --- Clean Flow Diagram --- */
+const cleanNodes = [
+  // Clean Flow
+  { id: 'clean', label: '✅ Clean Flow', position: { x: 0, y: -50 }, type: 'output', style: { width: '150px', border: 'none', background: 'transparent', fontWeight: 'bold' } },
+  { id: 'r', label: 'Route', position: { x: 0, y: 0 } },
+  { id: 'a', label: 'Action', position: { x: 200, y: 0 } },
+  { id: 's', label: 'Schema', position: { x: 200, y: 100 } },
+  { id: 'd', label: 'Database', position: { x: 400, y: 0 } },
+  
+  // Spaghetti Flow
+  { id: 'spag', label: '❌ Spaghetti Flow', position: { x: 0, y: 150 }, type: 'output', style: { width: '150px', border: 'none', background: 'transparent', fontWeight: 'bold' } },
+  { id: 'br', label: 'Bad Route', position: { x: 0, y: 200 } },
+  { id: 'bd', label: 'Database', position: { x: 250, y: 200 } },
+  { id: 'bz', label: 'Ad-hoc Check', position: { x: 250, y: 270 } },
+  { id: 'bb', label: 'Inline Code', position: { x: 250, y: 340 } }
+]
+
+const cleanEdges = [
+  { id: 'c1', source: 'r', target: 'a', label: 'Delegates', markerEnd: MarkerType.ArrowClosed },
+  { id: 'c2', source: 'a', target: 's', label: 'Validates', markerEnd: MarkerType.ArrowClosed },
+  { id: 'c3', source: 'a', target: 'd', label: 'Persists', markerEnd: MarkerType.ArrowClosed },
+  { id: 's1', source: 'br', target: 'bd', label: 'SQL Logic', markerEnd: MarkerType.ArrowClosed },
+  { id: 's2', source: 'br', target: 'bz', label: 'Validation', markerEnd: MarkerType.ArrowClosed },
+  { id: 's3', source: 'br', target: 'bb', label: 'Business Logic', markerEnd: MarkerType.ArrowClosed }
+]
+
+/* --- Caching Strategy Diagram --- */
+const cacheNodes = [
+  { id: 'req', label: 'Request', position: { x: 0, y: 0 } },
+  { id: 'cache', label: 'Cache Hit?', position: { x: 200, y: 0 } },
+  { id: 'res1', label: 'Response', position: { x: 400, y: -50 } },
+  { id: 'db', label: 'Database', position: { x: 200, y: 150 } },
+  { id: 'set', label: 'Set Cache', position: { x: 400, y: 150 } },
+  { id: 'res2', label: 'Response', position: { x: 600, y: 150 } }
+]
+
+const cacheEdges = [
+  { id: 'ca1', source: 'req', target: 'cache', label: '1. Check Key', markerEnd: MarkerType.ArrowClosed },
+  { id: 'ca2', source: 'cache', target: 'res1', label: 'Yes: 2. Return', sourceHandle: 'top', markerEnd: MarkerType.ArrowClosed },
+  { id: 'ca3', source: 'cache', target: 'db', label: 'No: 3. Query', sourceHandle: 'bottom', markerEnd: MarkerType.ArrowClosed },
+  { id: 'ca4', source: 'db', target: 'set', label: '4. Result', markerEnd: MarkerType.ArrowClosed },
+  { id: 'ca5', source: 'set', target: 'res2', label: '5. Return', markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+## Visual Guides
+
+### Clean Architecture Flow
+
+<InteractiveFlow :nodes="cleanNodes" :edges="cleanEdges" />
 
 ### Caching Strategy Flow
 
-```mermaid
-graph TD
-    Req[Request] -->|1. Check Key| Cache{Cache Hit?}
-    Cache -->|Yes: 2. Return| Res[Response]
-    Cache -->|No: 3. Query| DB[(Database)]
-    DB -->|4. Result| Set[Set Cache]
-    Set -->|5. Return| Res
-    
-    style Cache fill:#FF9800
-    style DB fill:#2196F3
-```
+<InteractiveFlow :nodes="cacheNodes" :edges="cacheEdges" />
+
 
 ## Deployment
 

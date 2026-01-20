@@ -13,22 +13,33 @@ This document describes the functions available for executing and managing proce
 
 ## Process Flow
 
-```mermaid
-graph TD
-    User[User Terminal] -->|bun dev| BunWatch[bun watch]
-    User -->|bun start| BunRun[bun dist/...]
-    
-    BunWatch --> Exec[exec-process.ts]
-    BunRun --> Exec
-    
-    Exec -->|Load Config| Env[.env]
-    Exec -->|Initialize| PM2[PM2 Manager]
-    
-    PM2 -->|Spawn| API[API Worker]
-    PM2 -->|Spawn| Worker[Background Worker]
-    
-    style PM2 fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
-```
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const processNodes = [
+  { id: 'user', type: 'multi-handle', label: 'User Terminal', position: { x: 0, y: 75 } },
+  { id: 'watch', type: 'multi-handle', label: 'bun watch', position: { x: 200, y: 25 } },
+  { id: 'run', type: 'multi-handle', label: 'bun dist/...', position: { x: 200, y: 125 } },
+  { id: 'exec', type: 'multi-handle', label: 'exec-process.ts', position: { x: 400, y: 75 } },
+  { id: 'env', type: 'multi-handle', label: '.env', position: { x: 550, y: 0 } },
+  { id: 'pm2', type: 'multi-handle', label: 'PM2 Manager', position: { x: 550, y: 150 } },
+  { id: 'api', type: 'multi-handle', label: 'API Worker', position: { x: 750, y: 100 } },
+  { id: 'bg', type: 'multi-handle', label: 'Bg Worker', position: { x: 750, y: 200 } }
+]
+
+const processEdges = [
+  { id: 'e1', source: 'user', target: 'watch', sourceHandle: 'right-source', targetHandle: 'left', label: 'bun dev', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'user', target: 'run', sourceHandle: 'right-source', targetHandle: 'left', label: 'bun start', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'watch', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'run', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'exec', target: 'env', sourceHandle: 'top-source', targetHandle: 'left', label: 'Load Config', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'exec', target: 'pm2', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Init', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e7', source: 'pm2', target: 'api', sourceHandle: 'right-source', targetHandle: 'left', label: 'Spawn', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e8', source: 'pm2', target: 'bg', sourceHandle: 'right-source', targetHandle: 'left', label: 'Spawn', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="processNodes" :edges="processEdges" />
 
 ## Worker configs: 
 ```typescript

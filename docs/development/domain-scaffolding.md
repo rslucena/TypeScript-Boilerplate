@@ -44,33 +44,64 @@ Replace `<name>` with the singular name of your domain (e.g., `product`, `catego
 
 The tool automatically creates a **complete CRUD structure** following the project's architectural patterns:
 
-```mermaid
-graph TD
-    A[bun gen:domain product] --> B[src/domain/product/]
-    A --> C[tests/unit/domain/product/]
-    
-    B --> D[entity.ts]
-    B --> E[schema.ts]
-    B --> F[routes.ts]
-    B --> G[actions/]
-    
-    G --> H[get-by-id.ts]
-    G --> I[get-find-by-params.ts]
-    G --> J[post-new-entity.ts]
-    G --> K[put-update-entity.ts]
-    G --> L[delete-entity.ts]
-    
-    C --> M[crud.spec.ts]
+<script setup>
+import { MarkerType } from '@vue-flow/core'
 
-    F -.-> F1[Swagger Tags]
-    F -.-> F2[Response Schemas]
-    
-    style A fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
-    style B fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
-    style C fill:#FF9800,stroke:#333,stroke-width:2px,color:#fff
-    style F1 fill:#9C27B0,stroke:#333,stroke-width:1px,color:#fff,stroke-dasharray: 5 5
-    style F2 fill:#9C27B0,stroke:#333,stroke-width:1px,color:#fff,stroke-dasharray: 5 5
-```
+/* --- Structure Diagram --- */
+const structNodes = [
+  { id: 'cmd', label: 'bun gen:domain product', position: { x: 250, y: 0 } },
+  { id: 'dir', label: 'src/domain/product/', position: { x: 250, y: 100 } },
+  { id: 'test', label: 'tests/.../product/', position: { x: 50, y: 100 } },
+  { id: 'ent', label: 'entity.ts', position: { x: 100, y: 200 } },
+  { id: 'sch', label: 'schema.ts', position: { x: 250, y: 200 } },
+  { id: 'rou', label: 'routes.ts', position: { x: 400, y: 200 } },
+  { id: 'act', label: 'actions/', position: { x: 550, y: 200 } },
+  { id: 'list', label: 'actions files...', position: { x: 550, y: 280 } },
+  { id: 'spec', label: 'crud.spec.ts', position: { x: 50, y: 200 } }
+]
+
+const structEdges = [
+  { id: 's1', source: 'cmd', target: 'dir', markerEnd: MarkerType.ArrowClosed },
+  { id: 's2', source: 'cmd', target: 'test', markerEnd: MarkerType.ArrowClosed },
+  { id: 's3', source: 'dir', target: 'ent', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's4', source: 'dir', target: 'sch', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's5', source: 'dir', target: 'rou', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's6', source: 'dir', target: 'act', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's7', source: 'act', target: 'list', type: 'step', markerEnd: MarkerType.ArrowClosed },
+  { id: 's8', source: 'test', target: 'spec', markerEnd: MarkerType.ArrowClosed }
+]
+
+/* --- Action Flows --- */
+/* Helper to create simple linear flows */
+const createFlow = (idPrefix, steps) => ({
+  nodes: steps.map((label, i) => ({ 
+    id: `${idPrefix}-${i}`, 
+    label, 
+    position: { x: i * 200, y: 0 },
+    ...(label.includes('DB') ? {} : {}),
+    ...(label.includes('Cache') ? {} : {})
+  })),
+  edges: steps.slice(0, -1).map((_, i) => ({ 
+    id: `${idPrefix}-e${i}`, 
+    source: `${idPrefix}-${i}`, 
+    target: `${idPrefix}-${i+1}`, 
+    markerEnd: MarkerType.ArrowClosed 
+  }))
+})
+
+const getById = createFlow('get', ['Request', 'Validate', 'Check Cache', 'Query DB', 'Cache Result', 'Return'])
+const list = createFlow('list', ['Request', 'Validate', 'Check Cache', 'Apply Filters', 'Paginate', 'Cache & Return'])
+const create = createFlow('create', ['Request', 'Validate', 'Insert to DB', 'Invalidate Cache', 'Return New'])
+const update = createFlow('update', ['Request', 'Validate', 'Update DB', 'Invalidate Cache', 'Return Updated'])
+const delFlow = createFlow('del', ['Request', 'Validate', 'Delete from DB', 'Invalidate Cache', 'Confirm'])
+
+</script>
+
+## Generated Structure
+
+The tool automatically creates a **complete CRUD structure** following the project's architectural patterns:
+
+<InteractiveFlow :nodes="structNodes" :edges="structEdges" />
 
 ### File Details
 
@@ -107,77 +138,37 @@ Fastify routes for complete REST API:
 **Endpoint:** `GET /:id`
 **File:** `get-by-id.ts`
 **Flow:**
-```mermaid
-graph LR
-    A[Request] --> B{Validate Params}
-    B --> C{Check Cache}
-    C -- Hit --> D[Return Cached]
-    C -- Miss --> E[Query DB]
-    E --> F[Cache Result]
-    F --> G[Return Data]
-    
-    style C fill:#FF9800,stroke:#333,stroke-width:2px
-    style D fill:#4CAF50,stroke:#333,stroke-width:2px
-    style E fill:#2196F3,stroke:#333,stroke-width:2px
-```
+
+<InteractiveFlow :nodes="getById.nodes" :edges="getById.edges" />
 
 #### 2. List Entities (Paginated)
 **Endpoint:** `GET /`
 **File:** `get-find-by-params.ts`
 **Flow:**
-```mermaid
-graph LR
-    A[Request] --> B{Validate Query}
-    B --> C{Check Cache}
-    C -- Hit --> D[Return Cached]
-    C -- Miss --> E[Apply Filters]
-    E --> F[Paginate]
-    F --> G[Cache & Return]
 
-    style C fill:#FF9800,stroke:#333,stroke-width:2px
-    style D fill:#4CAF50,stroke:#333,stroke-width:2px
-    style E fill:#2196F3,stroke:#333,stroke-width:2px
-```
+<InteractiveFlow :nodes="list.nodes" :edges="list.edges" />
 
 #### 3. Create Entity
 **Endpoint:** `POST /`
 **File:** `post-new-entity.ts`
 **Flow:**
-```mermaid
-graph LR
-    A[Request] --> B{Validate Body}
-    B --> C[Insert to DB]
-    C --> D[Invalidate Cache]
-    D --> E[Return New Entity]
 
-    style C fill:#2196F3,stroke:#333,stroke-width:2px
-    style D fill:#f44336,stroke:#333,stroke-width:2px
-```
+<InteractiveFlow :nodes="create.nodes" :edges="create.edges" />
 
 #### 4. Update Entity
 **Endpoint:** `PUT /:id`
 **File:** `put-update-entity.ts`
 **Flow:**
-```mermaid
-graph LR
-    A[Request] --> B{Validate}
-    B --> C[Update DB]
-    C --> D[Invalidate Cache]
-    D --> E[Return Updated]
 
-    style C fill:#FF9800,stroke:#333,stroke-width:2px
-    style D fill:#f44336,stroke:#333,stroke-width:2px
-```
+<InteractiveFlow :nodes="update.nodes" :edges="update.edges" />
 
 #### 5. Delete Entity
 **Endpoint:** `DELETE /:id`
 **File:** `delete-entity.ts`
 **Flow:**
-```mermaid
-graph LR
-    A[Request] --> B{Validate Params}
-    B --> C[Delete from DB]
-    C --> D[Invalidate Cache]
+
+<InteractiveFlow :nodes="delFlow.nodes" :edges="delFlow.edges" />
+
     D --> E[Return Empty]
 
     style C fill:#f44336,stroke:#333,stroke-width:2px

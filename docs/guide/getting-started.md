@@ -127,18 +127,25 @@ export default { actions, entity: response };
 
 #### Migration Flow
 
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant Code as Source Code
-    participant DB as Postgres
-    
-    Dev->>Code: Edit entity.ts
-    Dev->>Code: Run bun db:migrate
-    Code->>Code: Generate SQL Migration
-    Dev->>Code: Run bun db:migrate:push
-    Code->>DB: Apply SQL Changes
-```
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const migrationNodes = [
+  { id: '1', type: 'multi-handle', label: 'Developer', position: { x: 0, y: 0 } },
+  { id: '2', type: 'multi-handle', label: 'Source Code', position: { x: 250, y: 0 } },
+  { id: '3', type: 'multi-handle', label: 'Postgres', position: { x: 500, y: 0 } }
+]
+
+const migrationEdges = [
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Edit entity.ts', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e1-2b', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Run bun db:migrate', type: 'smoothstep', animated: true, style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2-2', source: '2', target: '2', label: 'Generate SQL', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e1-2c', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Run bun db:migrate:push', type: 'smoothstep', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'right-source', targetHandle: 'left', label: 'Apply SQL Changes', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="migrationNodes" :edges="migrationEdges" />
 
 ### Step 4: Generate and Apply Migration
 

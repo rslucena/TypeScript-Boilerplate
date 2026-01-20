@@ -11,29 +11,58 @@ This boilerplate comes with a fully configured **GitHub Actions** pipeline to en
 
 The CI/CD system follows a **Release Train** model using a `staging` branch for stabilization before production:
 
-```mermaid
-graph TD
-    subgraph Development
-        PR[Pull Request] --> L[PR Labeler]
-        L --> QG[Quality Gate]
-    end
-    
-    subgraph Staging
-        QG --> S[Push to staging]
-        S --> RT[Release Train]
-    end
-    
-    subgraph Production
-        RT --> M[Merge to main]
-        M --> R[Automated Release]
-        R --> D[Docker Deployment]
-    end
-    
-    style QG fill:#2196F3,color:#fff
-    style RT fill:#9C27B0,color:#fff
-    style R fill:#4CAF50,color:#fff
-    style D fill:#FF9800,color:#fff
-```
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const overviewNodes = [
+  // Development
+  { id: 'dev-box', type: 'multi-handle', label: 'Development', position: { x: 0, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(33, 150, 243, 0.1)', border: '2px dashed #2196F3', zIndex: -1 } },
+  { id: 'pr', type: 'multi-handle', label: 'Pull Request', position: { x: 25, y: 50 }},
+  { id: 'l', type: 'multi-handle', label: 'PR Labeler', position: { x: 25, y: 150 } },
+  { id: 'qg', type: 'multi-handle', label: 'Quality Gate', position: { x: 25, y: 250 }},
+  
+  // Staging
+  { id: 'stg-box', type: 'multi-handle', label: 'Staging', position: { x: 250, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(156, 39, 176, 0.1)', border: '2px dashed #9C27B0', zIndex: -1 } },
+  { id: 's', type: 'multi-handle', label: 'Push to Staging', position: { x: 275, y: 250 } },
+  { id: 'rt', type: 'multi-handle', label: 'Release Train', position: { x: 275, y: 350 }, style: { backgroundColor: '#9C27B0', color: 'white' } },
+  
+  // Production
+  { id: 'prod-box', type: 'multi-handle', label: 'Production', position: { x: 500, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(76, 175, 80, 0.1)', border: '2px dashed #4CAF50', zIndex: -1 } },
+  { id: 'm', type: 'multi-handle', label: 'Merge to Main', position: { x: 525, y: 350 } },
+  { id: 'r', type: 'multi-handle', label: 'Automated Release', position: { x: 525, y: 450 } },
+  { id: 'd', type: 'multi-handle', label: 'Docker Deploy', position: { x: 525, y: 550 } }
+]
+
+const overviewEdges = [
+  { id: 'e1', source: 'pr', target: 'l', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'l', target: 'qg', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'qg', target: 's', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 's', target: 'rt', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'rt', target: 'm', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, style: { stroke: '#9C27B0' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'm', target: 'r', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e7', source: 'r', target: 'd', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+]
+
+const releaseNodes = [
+  { id: 'dev', type: 'multi-handle', label: 'Developer', position: { x: 0, y: 50 } },
+  { id: 'git', type: 'multi-handle', label: 'Git', position: { x: 200, y: 50 } },
+  { id: 'ci', type: 'multi-handle', label: 'GitHub Actions', position: { x: 400, y: 50 }, style: { backgroundColor: '#24292e', color: 'white' } },
+  { id: 'sr', type: 'multi-handle', label: 'Semantic Rel.', position: { x: 600, y: 50 }, style: { backgroundColor: '#E10098', color: 'white' } },
+  { id: 'gh', type: 'multi-handle', label: 'GH Releases', position: { x: 800, y: 50 } }
+]
+
+const releaseEdges = [
+  { id: 're1', source: 'dev', target: 'git', sourceHandle: 'right-source', targetHandle: 'left', label: 'git commit/push', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 're2', source: 'git', target: 'ci', sourceHandle: 'right-source', targetHandle: 'left', label: 'Trigger', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 're3', source: 'ci', target: 'ci', sourceHandle: 'top-source', targetHandle: 'right', label: 'Test/Build', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 're4', source: 'ci', target: 'sr', sourceHandle: 'right-source', targetHandle: 'left', label: 'Success', type: 'smoothstep', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 're5', source: 'sr', target: 'sr', sourceHandle: 'top-source', targetHandle: 'right', label: 'Version Bump', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 're6', source: 'sr', target: 'git', sourceHandle: 'bottom-source', targetHandle: 'bottom', label: 'Tag v1.0.0', type: 'smoothstep', animated: true, style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 're7', source: 'sr', target: 'gh', sourceHandle: 'right-source', targetHandle: 'left', label: 'Create Release', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="overviewNodes" :edges="overviewEdges" />
 
 ## Workflows
 
@@ -137,25 +166,7 @@ jobs:
 
 **How it works:**
 
-```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant Git as Git
-    participant CI as GitHub Actions
-    participant SR as Semantic Release
-    participant GH as GitHub Releases
-    
-    Dev->>Git: git commit -m "feat: new feature"
-    Dev->>Git: git push origin main
-    Git->>CI: Trigger Quality Gate
-    CI->>CI: Run lint, test, build
-    CI->>SR: Quality Gate passed
-    SR->>SR: Analyze commits
-    SR->>SR: Determine version bump
-    SR->>Git: Create git tag (v1.2.0)
-    SR->>GH: Create GitHub Release
-    SR->>GH: Generate changelog
-```
+<InteractiveFlow :nodes="releaseNodes" :edges="releaseEdges" />
 
 **Commit Message Format:**
 

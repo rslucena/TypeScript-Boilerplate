@@ -16,18 +16,78 @@ The template system is designed with three core principles:
 
 ## Architecture
 
-```mermaid
-graph LR
-    A[User runs<br/>bun gen:domain pokemon] --> B[generate-domain.ts]
-    B --> C[Load Templates<br/>from src/templates/]
-    C --> D[Replace Placeholders<br/>__name__ → pokemon<br/>__Capitalized__ → Pokemon]
-    D --> E[Write to<br/>src/domain/pokemon/]
-    E --> F[Auto-inject Routes<br/>in webserver.ts]
-    F --> G[Format with Biome]
-    
-    style A fill:#4CAF50,color:#fff
-    style G fill:#2196F3,color:#fff
-```
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+/* --- Architecture Diagram --- */
+const archNodes = [
+  { id: 'a', label: 'User runs bun gen:domain', position: { x: 0, y: 100 } },
+  { id: 'b', label: 'generate-domain.ts', position: { x: 250, y: 100 } },
+  { id: 'c', label: 'Load Templates', position: { x: 500, y: 0 } },
+  { id: 'd', label: 'Replace Placeholders', position: { x: 500, y: 100 } },
+  { id: 'e', label: 'Write to src/domain/', position: { x: 500, y: 200 } },
+  { id: 'f', label: 'Auto-inject Routes', position: { x: 750, y: 100 } },
+  { id: 'g', label: 'Biome Format', position: { x: 1000, y: 100 } }
+]
+
+const archEdges = [
+  { id: 'e1', source: 'a', target: 'b', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'b', target: 'c', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'c', target: 'd', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'd', target: 'e', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'e', target: 'f', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'f', target: 'g', markerEnd: MarkerType.ArrowClosed }
+]
+
+/* --- Generation Flow Diagram --- */
+const genNodes = [
+  { id: 'u', type: 'multi-handle', label: 'User', position: { x: 0, y: 0 } },
+  { id: 'cli', type: 'multi-handle', label: 'CLI', position: { x: 200, y: 0 } },
+  { id: 'tmp', type: 'multi-handle', label: 'Templates', position: { x: 400, y: 0 } },
+  { id: 'fs', type: 'multi-handle', label: 'File System', position: { x: 600, y: 0 } },
+  { id: 'srv', type: 'multi-handle', label: 'Webserver', position: { x: 800, y: 0 } }
+]
+
+const genEdges = [
+  { id: 'g1', source: 'u', target: 'cli', sourceHandle: 'right-source', targetHandle: 'left', label: 'gen:domain', markerEnd: MarkerType.ArrowClosed },
+  { id: 'g2', source: 'cli', target: 'tmp', sourceHandle: 'right-source', targetHandle: 'left', label: 'Load', markerEnd: MarkerType.ArrowClosed },
+  { id: 'g3', source: 'tmp', target: 'cli', sourceHandle: 'left-source', targetHandle: 'right', label: 'Content', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'g4', source: 'cli', target: 'cli', label: 'Replace', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'g5', source: 'cli', target: 'fs', sourceHandle: 'right-source', targetHandle: 'left', label: 'Write Files', markerEnd: MarkerType.ArrowClosed },
+  { id: 'g6', source: 'cli', target: 'srv', sourceHandle: 'right-source', targetHandle: 'left', label: 'Inject Route', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'g7', source: 'cli', target: 'u', sourceHandle: 'left-source', targetHandle: 'right', label: 'Done', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+]
+
+/* --- Structure Diagram --- */
+const structNodes = [
+  { id: 'cmd', label: 'bun gen:domain', position: { x: 300, y: 0 } },
+  { id: 'dir', label: 'src/domain/product/', position: { x: 300, y: 100 } },
+  { id: 'ent', label: 'entity.ts', position: { x: 100, y: 200 } },
+  { id: 'sch', label: 'schema.ts', position: { x: 250, y: 200 } },
+  { id: 'rou', label: 'routes.ts', position: { x: 400, y: 200 } },
+  { id: 'act', label: 'actions/', position: { x: 550, y: 200 } },
+  { id: 'a1', label: 'get-by-id', position: { x: 550, y: 300 } },
+  { id: 'a2', label: 'find-by-params', position: { x: 550, y: 360 } },
+  { id: 'a3', label: 'post-new', position: { x: 550, y: 420 } },
+  { id: 'sv', label: 'server.register', position: { x: 400, y: 300 } }
+]
+
+const structEdges = [
+  { id: 's1', source: 'cmd', target: 'dir', markerEnd: MarkerType.ArrowClosed },
+  { id: 's2', source: 'dir', target: 'ent', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's3', source: 'dir', target: 'sch', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's4', source: 'dir', target: 'rou', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's5', source: 'dir', target: 'act', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 's6', source: 'act', target: 'a1', type: 'step', markerEnd: MarkerType.ArrowClosed },
+  { id: 's7', source: 'act', target: 'a2', type: 'step', markerEnd: MarkerType.ArrowClosed },
+  { id: 's8', source: 'act', target: 'a3', type: 'step', markerEnd: MarkerType.ArrowClosed },
+  { id: 's9', source: 'rou', target: 'sv', type: 'step', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+## Architecture
+
+<InteractiveFlow :nodes="archNodes" :edges="archEdges" />
 
 ## Template Directory Structure
 
@@ -76,26 +136,7 @@ export default pokemon;
 
 ## Generation Flow
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant CLI as generate-domain.ts
-    participant Templates as Template Files
-    participant FS as File System
-    participant Webserver as http-primary-webserver.ts
-    
-    User->>CLI: bun gen:domain pokemon
-    CLI->>Templates: Load all .ts templates
-    Templates-->>CLI: Return template content
-    CLI->>CLI: Replace __name__ → pokemon<br/>Replace __Capitalized__ → Pokemon
-    CLI->>FS: Write entity.ts
-    CLI->>FS: Write schema.ts
-    CLI->>FS: Write routes.ts
-    CLI->>FS: Write 5 action files
-    CLI->>Webserver: Inject import & register route
-    CLI->>CLI: Run biome format
-    CLI-->>User: ✅ Domain "pokemon" generated!
-```
+<InteractiveFlow :nodes="genNodes" :edges="genEdges" />
 
 ## Placeholder System
 
@@ -126,25 +167,8 @@ const render = (content: string, vars: Record<string, string>) =>
 
 Running `bun gen:domain product` creates a complete, production-ready CRUD module:
 
-```mermaid
-graph TD
-    A[bun gen:domain product] --> B[src/domain/product/]
-    B --> C[entity.ts<br/>📦 Drizzle table schema]
-    B --> D[schema.ts<br/>✅ Zod validation]
-    B --> E[routes.ts<br/>🛣️ 5 REST endpoints]
-    B --> F[actions/<br/>⚡ CRUD logic]
-    
-    F --> F1[get-by-id.ts]
-    F --> F2[get-find-by-params.ts]
-    F --> F3[post-new-entity.ts]
-    F --> F4[put-update-entity.ts]
-    F --> F5[delete-entity.ts]
-    
-    E --> G[Auto-registered in<br/>http-primary-webserver.ts]
-    
-    style A fill:#FF9800,color:#fff
-    style G fill:#4CAF50,color:#fff
-```
+<InteractiveFlow :nodes="structNodes" :edges="structEdges" />
+
 
 ### Generated Files
 

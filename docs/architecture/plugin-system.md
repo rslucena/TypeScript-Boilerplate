@@ -1,6 +1,6 @@
 ---
-title: Plugin System
-description: Modular plugin system architecture
+title: Plugins & Agents System
+description: Plugin/Agent System overview
 ---
 
 # Plugins & Agents System
@@ -36,33 +36,28 @@ export default {
 
 When a request is marked as `restricted` (requiring authentication/plugins), the system iterates through active plugins for the `authentication` agent, sorted by priority.
 
-```mermaid
-sequenceDiagram
-    participant S as Server
-    participant H as Auth Handler
-    participant P as Plugin Manager
-    participant JWT as JWT Strategy
-    participant C as Context/Session
+<script setup>
+import { MarkerType } from '@vue-flow/core'
 
-    S->>H: Authenticate Request
-    H->>P: Filter & Sort Active Plugins
-    
-    loop For each Plugin
-        H->>JWT: Execute Strategy(container)
-        alt Success
-            JWT-->>H: Return Auth Data
-            H->>C: session.set("JWT", data)
-        else Failure
-            JWT-->>H: Return undefined/error
-        end
-    end
+const pluginNodes = [
+  { id: 's', type: 'multi-handle', label: 'Server', position: { x: 0, y: 100 } },
+  { id: 'h', type: 'multi-handle', label: 'Auth Handler', position: { x: 250, y: 100 }},
+  { id: 'p', type: 'multi-handle', label: 'Plugin Mgr', position: { x: 250, y: 0 } },
+  { id: 'jwt', type: 'multi-handle', label: 'JWT Strategy', position: { x: 500, y: 0 } },
+  { id: 'c', type: 'multi-handle', label: 'Session', position: { x: 500, y: 200 }}
+]
 
-    alt Session has Data
-        H->>S: Proceed (Session Populated)
-    else Session Empty
-        H-->>S: 401 Unauthorized
-    end
-```
+const pluginEdges = [
+  { id: 'p1', source: 's', target: 'h', sourceHandle: 'right-source', targetHandle: 'left', label: 'Authenticate', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'p2', source: 'h', target: 'p', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Get Plugins', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'p3', source: 'p', target: 'jwt', sourceHandle: 'right-source', targetHandle: 'left', label: 'Execute', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'p4', source: 'jwt', target: 'h', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Return Data', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'p5', source: 'h', target: 'c', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Set Session', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'p6', source: 'h', target: 's', sourceHandle: 'left-source', targetHandle: 'right', label: 'Proceed/401', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="pluginNodes" :edges="pluginEdges" />
 
 ## How to Add a New Plugin
 

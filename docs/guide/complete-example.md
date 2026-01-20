@@ -3,6 +3,49 @@ title: Complete Example
 description: Complete data flow demonstration when creating a User domain with all architectural layers
 ---
 
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const flowNodes = [
+  { id: '1', type: 'multi-handle', label: 'Client', position: { x: 250, y: 0 } },
+  { id: '2', type: 'multi-handle', label: 'Route', position: { x: 250, y: 100 } },
+  { id: '3', type: 'multi-handle', label: 'Action', position: { x: 250, y: 200 } },
+  { id: '4', type: 'multi-handle', label: 'Validation', position: { x: 50, y: 200 } },
+  { id: '5', type: 'multi-handle', label: 'DB', position: { x: 250, y: 350 } },
+  { id: '6', type: 'multi-handle', label: 'Cache', position: { x: 450, y: 200 } }
+]
+
+const flowEdges = [
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'POST /api/v1/users', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'postNewEntity()', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'left-source', targetHandle: 'right', label: 'Validate body', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4-3', source: '4', target: '3', sourceHandle: 'right-source', targetHandle: 'left', label: 'Valid data', type: 'smoothstep', style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT user', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created user', animated: true, style: { stroke: '#10b981' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3-6', source: '3', target: '6', sourceHandle: 'right-source', targetHandle: 'left', label: 'Invalidate keys', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'User data', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2-1', source: '2', target: '1', sourceHandle: 'top-source', targetHandle: 'bottom', label: '201 Created', type: 'step', markerEnd: MarkerType.ArrowClosed }
+]
+
+const cacheNodes = [
+  { id: 'c1', type: 'multi-handle', label: 'Request', position: { x: 0, y: 150 } },
+  { id: 'c2', type: 'multi-handle', label: 'Check Cache', position: { x: 200, y: 150 }, style: {color: 'white', border: 'none' } },
+  { id: 'c3', type: 'multi-handle', label: 'Return Cached', position: { x: 400, y: 50 }, style: { color: 'white', border: 'none' } },
+  { id: 'c4', type: 'multi-handle', label: 'Query Database', position: { x: 400, y: 250 }, style: {color: 'white', border: 'none' } },
+  { id: 'c5', type: 'multi-handle', label: 'Store in Cache', position: { x: 600, y: 250 } },
+  { id: 'c6', type: 'multi-handle', label: 'Return Data', position: { x: 800, y: 150 } }
+]
+
+const cacheEdges = [
+  { id: 'ce1', source: 'c1', target: 'c2', sourceHandle: 'right-source', targetHandle: 'left', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'ce2', source: 'c2', target: 'c3', sourceHandle: 'top-source', targetHandle: 'left',animated: true, label: 'Hit', style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce3', source: 'c2', target: 'c4', sourceHandle: 'bottom-source', targetHandle: 'left', animated: true,label: 'Miss', style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce4', source: 'c4', target: 'c5', sourceHandle: 'right-source', targetHandle: 'left', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'ce5', source: 'c5', target: 'c6', sourceHandle: 'right-source', targetHandle: 'bottom', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce6', source: 'c3', target: 'c6', sourceHandle: 'right-source', targetHandle: 'top', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' }
+]
+</script>
+
 # Complete Example
 
 This example demonstrates the complete data flow when creating a User domain, showing how all architectural layers work together. We'll walk through each file and explain how they interact.
@@ -218,29 +261,9 @@ export default async function postNewEntity(request: container) {
 }
 ```
 
-**Flow Diagram:**
+### Flow Diagram
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Route
-    participant Action
-    participant Validation
-    participant DB
-    participant Cache
-    
-    Client->>Route: POST /api/v1/users
-    Route->>Action: postNewEntity()
-    Action->>Validation: Validate body
-    Validation-->>Action: Valid data
-    Action->>Action: Hash password
-    Action->>DB: INSERT user
-    DB-->>Action: Created user
-    Action->>Cache: Invalidate user:find*
-    Action->>Action: getById()
-    Action-->>Route: User data
-    Route-->>Client: 201 Created
-```
+<InteractiveFlow :nodes="flowNodes" :edges="flowEdges" />
 
 ## Step 3: Request Flow Example
 
@@ -295,18 +318,7 @@ curl http://localhost:3000/api/v1/users/123e4567-e89b-12d3-a456-426614174000 \
 
 **Flow with Caching:**
 
-```mermaid
-graph LR
-    A[Request] --> B{Check Cache}
-    B -->|Hit| C[Return Cached]
-    B -->|Miss| D[Query Database]
-    D --> E[Store in Cache]
-    E --> F[Return Data]
-    
-    style B fill:#FF9800
-    style C fill:#4CAF50
-    style D fill:#2196F3
-```
+<InteractiveFlow :nodes="cacheNodes" :edges="cacheEdges" />
 
 **Code (`get-by-id.ts`):**
 ```typescript
