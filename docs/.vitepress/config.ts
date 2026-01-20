@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import { vitepressMermaidPreview } from 'vitepress-mermaid-preview';
 
+
 export default defineConfig({
     base: '/TypeScript-Boilerplate/',
     markdown: {
