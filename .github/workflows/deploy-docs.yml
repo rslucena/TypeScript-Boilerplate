@@ -15,17 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
+          bun-version: latest
 
       - name: Install documentation dependencies
-        run: npm install
+        run: bun install
         working-directory: docs
 
       - name: Build VitePress docs
-        run: npm run build
+        run: bun run build
         working-directory: docs
 
       - name: Deploy to GitHub Pages
