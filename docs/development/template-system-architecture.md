@@ -2,6 +2,76 @@
 title: Template System Architecture
 description: Zero-dependency template engine architecture and implementation details
 ---
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 2}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 2}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
+/* --- Architecture Diagram --- */
+const archNodes = [
+  { id: 'a', type: 'multi-handle', label: 'User runs bun gen:domain', position: { x: 0, y: -20 } },
+  { id: 'b', type: 'multi-handle', label: 'generate-domain.ts', position: { x: 25, y: 150 } },
+  { id: 'c', type: 'multi-handle', label: 'Load Templates', position: { x: 40, y: 300 } },
+  { id: 'd', type: 'multi-handle', label: 'Replace Placeholders', position: { x: 300, y: 0 } },
+  { id: 'e', type: 'multi-handle', label: 'Write to src/domain/', position: { x: 304, y: 150 } },
+  { id: 'f', type: 'multi-handle', label: 'Auto-inject Routes', position: { x: 311, y: 300 } },
+  { id: 'g', type: 'multi-handle', label: 'Biome Format', position: { x: 329, y: 440 } }
+]
+
+const archEdges = [
+  { id: 'e1', source: 'a', target: 'b', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 'e2', source: 'b', target: 'c', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 'e3', source: 'c', target: 'd', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 'e4', source: 'd', target: 'e', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 'e5', source: 'e', target: 'f', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 'e6', source: 'f', target: 'g', sourceHandle: 'bottom-source', targetHandle: 'top', ...style }
+]
+
+/* --- Generation Flow Diagram --- */
+const genNodes = [
+  { id: 'u', type: 'multi-handle', label: 'User', position: { x: 0, y: -100 } },
+  { id: 'cli', type: 'multi-handle', label: 'CLI', position: { x: 200, y: 0 } },
+  { id: 'tmp', type: 'multi-handle', label: 'Templates', position: { x: 450, y: 0 } },
+  { id: 'fs', type: 'multi-handle', label: 'File System', position: { x: 450, y: 100 } },
+  { id: 'srv', type: 'multi-handle', label: 'Webserver', position: { x:189, y: 150 } }
+]
+
+const genEdges = [
+  { id: 'g1', source: 'u', target: 'cli', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'gen:domain', ...style },
+  { id: 'g2', source: 'cli', target: 'tmp', sourceHandle: 'right-source', targetHandle: 'left', label: 'Load', ...style2 },
+  { id: 'g3', source: 'tmp', target: 'cli', sourceHandle: 'left-source', targetHandle: 'right', label: 'Content', ...style2 },
+  { id: 'g4', source: 'cli', target: 'fs', sourceHandle: 'right-source', targetHandle: 'left', label: 'Write Files', ...style2 },
+  { id: 'g5', source: 'cli', target: 'srv', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Inject Route', ...style2 },
+  { id: 'g6', source: 'cli', target: 'u', sourceHandle: 'top-source', targetHandle: 'right', label: 'Done', ...style }
+]
+
+/* --- Structure Diagram --- */
+const structNodes = [
+  { id: 'cmd', type: 'multi-handle', label: 'bun gen:domain', position: { x: 350, y: 0 } },
+  { id: 'dir', type: 'multi-handle', label: 'src/domain/product/', position: { x: 333, y: 100 } },
+  { id: 'ent', type: 'multi-handle', label: 'entity.ts', position: { x: 100, y: 250 } },
+  { id: 'sch', type: 'multi-handle', label: 'schema.ts', position: { x: 180, y: 320 } },
+  { id: 'rou', type: 'multi-handle', label: 'routes.ts', position: { x: 300, y: 380 } },
+  { id: 'act', type: 'multi-handle', label: 'actions/', position: { x: 500, y: 250 } },
+  { id: 'a1', type: 'multi-handle', label: 'get-by-id', position: { x: 670, y: 380 } },
+  { id: 'a2', type: 'multi-handle', label: 'find-by-params', position: { x: 570, y: 440 } },
+  { id: 'a3', type: 'multi-handle', label: 'post-new', position: { x: 495, y: 500 } },
+  { id: 'sv', type: 'multi-handle', label: 'server.register', position: { x: 279, y: 500 } }
+]
+
+const structEdges = [
+  { id: 's1', source: 'cmd', target: 'dir', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's2', source: 'dir', target: 'ent', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's3', source: 'dir', target: 'sch', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's4', source: 'dir', target: 'rou', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's5', source: 'dir', target: 'act', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 's6', source: 'act', target: 'a1', sourceHandle: 'right-source', targetHandle: 'top', ...style2 },
+  { id: 's7', source: 'act', target: 'a2', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 's8', source: 'act', target: 'a3', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 's9', source: 'rou', target: 'sv', sourceHandle: 'bottom-source', targetHandle: 'top', ...style }
+]
+</script>
 
 # Template System Architecture
 
@@ -13,77 +83,6 @@ The template system is designed with three core principles:
 1. **Zero Dependencies**: No external template libraries (Handlebars, EJS, etc.)
 2. **Developer Experience**: Templates are valid TypeScript files with full IDE support
 3. **Extensibility**: Easy to add new generators (Auth, WebSockets, etc.)
-
-## Architecture
-
-<script setup>
-import { MarkerType } from '@vue-flow/core'
-
-/* --- Architecture Diagram --- */
-const archNodes = [
-  { id: 'a', label: 'User runs bun gen:domain', position: { x: 0, y: 100 } },
-  { id: 'b', label: 'generate-domain.ts', position: { x: 250, y: 100 } },
-  { id: 'c', label: 'Load Templates', position: { x: 500, y: 0 } },
-  { id: 'd', label: 'Replace Placeholders', position: { x: 500, y: 100 } },
-  { id: 'e', label: 'Write to src/domain/', position: { x: 500, y: 200 } },
-  { id: 'f', label: 'Auto-inject Routes', position: { x: 750, y: 100 } },
-  { id: 'g', label: 'Biome Format', position: { x: 1000, y: 100 } }
-]
-
-const archEdges = [
-  { id: 'e1', source: 'a', target: 'b', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2', source: 'b', target: 'c', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3', source: 'c', target: 'd', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4', source: 'd', target: 'e', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5', source: 'e', target: 'f', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e6', source: 'f', target: 'g', markerEnd: MarkerType.ArrowClosed }
-]
-
-/* --- Generation Flow Diagram --- */
-const genNodes = [
-  { id: 'u', type: 'multi-handle', label: 'User', position: { x: 0, y: 0 } },
-  { id: 'cli', type: 'multi-handle', label: 'CLI', position: { x: 200, y: 0 } },
-  { id: 'tmp', type: 'multi-handle', label: 'Templates', position: { x: 400, y: 0 } },
-  { id: 'fs', type: 'multi-handle', label: 'File System', position: { x: 600, y: 0 } },
-  { id: 'srv', type: 'multi-handle', label: 'Webserver', position: { x: 800, y: 0 } }
-]
-
-const genEdges = [
-  { id: 'g1', source: 'u', target: 'cli', sourceHandle: 'right-source', targetHandle: 'left', label: 'gen:domain', markerEnd: MarkerType.ArrowClosed },
-  { id: 'g2', source: 'cli', target: 'tmp', sourceHandle: 'right-source', targetHandle: 'left', label: 'Load', markerEnd: MarkerType.ArrowClosed },
-  { id: 'g3', source: 'tmp', target: 'cli', sourceHandle: 'left-source', targetHandle: 'right', label: 'Content', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'g4', source: 'cli', target: 'cli', label: 'Replace', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'g5', source: 'cli', target: 'fs', sourceHandle: 'right-source', targetHandle: 'left', label: 'Write Files', markerEnd: MarkerType.ArrowClosed },
-  { id: 'g6', source: 'cli', target: 'srv', sourceHandle: 'right-source', targetHandle: 'left', label: 'Inject Route', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'g7', source: 'cli', target: 'u', sourceHandle: 'left-source', targetHandle: 'right', label: 'Done', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
-]
-
-/* --- Structure Diagram --- */
-const structNodes = [
-  { id: 'cmd', label: 'bun gen:domain', position: { x: 300, y: 0 } },
-  { id: 'dir', label: 'src/domain/product/', position: { x: 300, y: 100 } },
-  { id: 'ent', label: 'entity.ts', position: { x: 100, y: 200 } },
-  { id: 'sch', label: 'schema.ts', position: { x: 250, y: 200 } },
-  { id: 'rou', label: 'routes.ts', position: { x: 400, y: 200 } },
-  { id: 'act', label: 'actions/', position: { x: 550, y: 200 } },
-  { id: 'a1', label: 'get-by-id', position: { x: 550, y: 300 } },
-  { id: 'a2', label: 'find-by-params', position: { x: 550, y: 360 } },
-  { id: 'a3', label: 'post-new', position: { x: 550, y: 420 } },
-  { id: 'sv', label: 'server.register', position: { x: 400, y: 300 } }
-]
-
-const structEdges = [
-  { id: 's1', source: 'cmd', target: 'dir', markerEnd: MarkerType.ArrowClosed },
-  { id: 's2', source: 'dir', target: 'ent', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's3', source: 'dir', target: 'sch', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's4', source: 'dir', target: 'rou', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's5', source: 'dir', target: 'act', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's6', source: 'act', target: 'a1', type: 'step', markerEnd: MarkerType.ArrowClosed },
-  { id: 's7', source: 'act', target: 'a2', type: 'step', markerEnd: MarkerType.ArrowClosed },
-  { id: 's8', source: 'act', target: 'a3', type: 'step', markerEnd: MarkerType.ArrowClosed },
-  { id: 's9', source: 'rou', target: 'sv', type: 'step', animated: true, markerEnd: MarkerType.ArrowClosed }
-]
-</script>
 
 ## Architecture
 

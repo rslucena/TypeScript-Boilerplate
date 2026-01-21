@@ -41,12 +41,11 @@ defineProps(['label'])
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Hide handles visually unless hovered or connected (optional, but cleaner) */
 :deep(.vue-flow__handle) {
   width: 8px;
   height: 8px;
   background: var(--vp-c-text-3);
-  opacity: 0; /* Hidden by default for cleaner look */
+  opacity: 0;
   transition: opacity 0.2s;
 }
 

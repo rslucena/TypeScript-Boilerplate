@@ -7,12 +7,11 @@ description: Project architecture and design principles
 
 This project follows a clean, modular architecture inspired by Domain-Driven Design (DDD) principles, focused on performance and developer productivity using TypeScript and Bun.
 
-## Technology Stack
-
 <script setup>
 import { MarkerType } from '@vue-flow/core'
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
 
-// Tech Stack
 const techNodes = [
   { id: 'bun', type: 'multi-handle', label: 'Bun', position: { x: 100, y: 0 } },
   { id: 'fastify', type: 'multi-handle', label: 'Fastify', position: { x: 100, y: 100 } },
@@ -24,15 +23,14 @@ const techNodes = [
 ]
 
 const techEdges = [
-  { id: 'e1', source: 'bun', target: 'fastify', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2', source: 'fastify', target: 'swag', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3', source: 'fastify', target: 'zod', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4', source: 'fastify', target: 'driz', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5', source: 'driz', target: 'pg', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e6', source: 'fastify', target: 'redis', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+  { id: 'e1', source: 'bun', target: 'fastify', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'e2', source: 'fastify', target: 'swag', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'e3', source: 'fastify', target: 'zod', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'e4', source: 'fastify', target: 'driz', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'e5', source: 'driz', target: 'pg', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'e6', source: 'fastify', target: 'redis', sourceHandle: 'right-source', targetHandle: 'left', ...style2 }
 ]
 
-// Layer Overview
 const layerNodes = [
   { id: 'cmd', type: 'multi-handle', label: 'Commands', position: { x: 0, y: 0 } },
   { id: 'dom', type: 'multi-handle', label: 'Domain', position: { x: 200, y: 0 } },
@@ -41,28 +39,27 @@ const layerNodes = [
 ]
 
 const layerEdges = [
-  { id: 'l1', source: 'cmd', target: 'dom', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'l2', source: 'dom', target: 'infra', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'l3', source: 'dom', target: 'fn', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'l4', source: 'cmd', target: 'infra', sourceHandle: 'bottom-source', targetHandle: 'bottom', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+  { id: 'l1', source: 'cmd', target: 'dom', sourceHandle: 'right-source', targetHandle: 'left', ...style2 },
+  { id: 'l2', source: 'dom', target: 'infra', sourceHandle: 'right-source', targetHandle: 'left', ...style2 },
+  { id: 'l3', source: 'dom', target: 'fn', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 },
+  { id: 'l4', source: 'cmd', target: 'infra', sourceHandle: 'bottom-source', targetHandle: 'bottom', ...style2 }
 ]
 
-// Request Flow
 const reqNodes = [
   { id: 'user', type: 'multi-handle', label: 'User', position: { x: 0, y: 0 } },
   { id: 'server', type: 'multi-handle', label: 'Server (Infra)', position: { x: 200, y: 0 } },
   { id: 'route', type: 'multi-handle', label: 'Route (Domain)', position: { x: 400, y: 0 } },
-  { id: 'action', type: 'multi-handle', label: 'Action', position: { x: 600, y: 0 } },
-  { id: 'db', type: 'multi-handle', label: 'Database', position: { x: 800, y: 0 } }
+  { id: 'action', type: 'multi-handle', label: 'Action', position: { x: 430, y: 150 } },
+  { id: 'db', type: 'multi-handle', label: 'Database', position: { x: 426, y: 300 } }
 ]
 
 const reqEdges = [
-  { id: 'r1', source: 'user', target: 'server', sourceHandle: 'right-source', targetHandle: 'left', label: 'HTTP', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'r2', source: 'server', target: 'route', sourceHandle: 'right-source', targetHandle: 'left', label: 'Dispatch', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'r3', source: 'route', target: 'action', sourceHandle: 'right-source', targetHandle: 'left', label: 'Execute', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'r4', source: 'action', target: 'db', sourceHandle: 'right-source', targetHandle: 'left', label: 'Query', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'r5', source: 'db', target: 'action', sourceHandle: 'left-source', targetHandle: 'right', label: 'Result', type: 'smoothstep', style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
-  { id: 'r6', source: 'action', target: 'user', sourceHandle: 'bottom-source', targetHandle: 'bottom', label: 'Response', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+  { id: 'r1', source: 'user', target: 'server', sourceHandle: 'right-source', targetHandle: 'left', label: 'HTTP', ...style2 },
+  { id: 'r2', source: 'server', target: 'route', sourceHandle: 'right-source', targetHandle: 'left', label: 'Dispatch', ...style2 },
+  { id: 'r3', source: 'route', target: 'action', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Execute', ...style2 },
+  { id: 'r4', source: 'action', target: 'db', sourceHandle: 'right-source', targetHandle: 'right', label: 'Query', ...style2 },
+  { id: 'r5', source: 'db', target: 'action', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Result', ...style },
+  { id: 'r6', source: 'action', target: 'user', sourceHandle: 'left-source', targetHandle: 'bottom', label: 'Response', ...style2 }
 ]
 </script>
 

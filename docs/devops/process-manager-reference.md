@@ -29,11 +29,11 @@ const processNodes = [
 
 const processEdges = [
   { id: 'e1', source: 'user', target: 'watch', sourceHandle: 'right-source', targetHandle: 'left', label: 'bun dev', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2', source: 'user', target: 'run', sourceHandle: 'right-source', targetHandle: 'left', label: 'bun start', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3', source: 'watch', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4', source: 'run', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5', source: 'exec', target: 'env', sourceHandle: 'top-source', targetHandle: 'left', label: 'Load Config', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e6', source: 'exec', target: 'pm2', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Init', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'user', target: 'run', sourceHandle: 'right-source', targetHandle: 'left', label: 'bun start', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'watch', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'run', target: 'exec', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'exec', target: 'env', sourceHandle: 'top-source', targetHandle: 'left', label: 'Load Config', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'exec', target: 'pm2', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Init', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
   { id: 'e7', source: 'pm2', target: 'api', sourceHandle: 'right-source', targetHandle: 'left', label: 'Spawn', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
   { id: 'e8', source: 'pm2', target: 'bg', sourceHandle: 'right-source', targetHandle: 'left', label: 'Spawn', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
 ]

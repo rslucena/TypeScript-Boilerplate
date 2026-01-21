@@ -3,8 +3,6 @@ import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { ref } from 'vue'
-
-// Import generic styles
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 import '@vue-flow/controls/dist/style.css'
@@ -26,7 +24,6 @@ const nodeTypes = {
   'multi-handle': MultiHandleNode
 }
 
-// Initialize flow
 const { onInit, onNodeDragStop, onConnect } = useVueFlow()
 
 onInit((vueFlowInstance) => {

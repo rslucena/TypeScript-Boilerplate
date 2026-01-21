@@ -47,45 +47,49 @@ The tool automatically creates a **complete CRUD structure** following the proje
 <script setup>
 import { MarkerType } from '@vue-flow/core'
 
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
 /* --- Structure Diagram --- */
 const structNodes = [
-  { id: 'cmd', label: 'bun gen:domain product', position: { x: 250, y: 0 } },
-  { id: 'dir', label: 'src/domain/product/', position: { x: 250, y: 100 } },
-  { id: 'test', label: 'tests/.../product/', position: { x: 50, y: 100 } },
-  { id: 'ent', label: 'entity.ts', position: { x: 100, y: 200 } },
-  { id: 'sch', label: 'schema.ts', position: { x: 250, y: 200 } },
-  { id: 'rou', label: 'routes.ts', position: { x: 400, y: 200 } },
-  { id: 'act', label: 'actions/', position: { x: 550, y: 200 } },
-  { id: 'list', label: 'actions files...', position: { x: 550, y: 280 } },
-  { id: 'spec', label: 'crud.spec.ts', position: { x: 50, y: 200 } }
+  { id: 'cmd', type: 'multi-handle', label: 'bun gen:domain product', position: { x: 235, y: 0 } },
+  { id: 'dir', type: 'multi-handle', label: 'src/domain/product/', position: { x: 250, y: 100 } },
+  { id: 'test', type: 'multi-handle', label: 'tests/.../product/', position: { x: 50, y: 100 } },
+  { id: 'ent', type: 'multi-handle', label: 'entity.ts', position: { x: 660, y: 200 } },
+  { id: 'sch', type: 'multi-handle', label: 'schema.ts', position: { x: 250, y: 200 } },
+  { id: 'rou', type: 'multi-handle', label: 'routes.ts', position: { x: 400, y: 200 } },
+  { id: 'act', type: 'multi-handle', label: 'actions/', position: { x: 540, y: 200 } },
+  { id: 'list', type: 'multi-handle', label: 'actions files...', position: { x: 518, y: 300 } },
+  { id: 'spec', type: 'multi-handle', label: 'crud.spec.ts', position: { x: 66, y: 200 } }
 ]
 
 const structEdges = [
-  { id: 's1', source: 'cmd', target: 'dir', markerEnd: MarkerType.ArrowClosed },
-  { id: 's2', source: 'cmd', target: 'test', markerEnd: MarkerType.ArrowClosed },
-  { id: 's3', source: 'dir', target: 'ent', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's4', source: 'dir', target: 'sch', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's5', source: 'dir', target: 'rou', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's6', source: 'dir', target: 'act', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 's7', source: 'act', target: 'list', type: 'step', markerEnd: MarkerType.ArrowClosed },
-  { id: 's8', source: 'test', target: 'spec', markerEnd: MarkerType.ArrowClosed }
+  { id: 's1', source: 'cmd', target: 'dir', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's2', source: 'cmd', target: 'test', sourceHandle: 'left-source', targetHandle: 'top', ...style2 },
+  { id: 's3', source: 'dir', target: 'ent', sourceHandle: 'right-source', targetHandle: 'top', ...style },
+  { id: 's4', source: 'dir', target: 'sch', sourceHandle: 'right-source', targetHandle: 'top', ...style },
+  { id: 's5', source: 'dir', target: 'rou', sourceHandle: 'right-source', targetHandle: 'top', ...style },
+  { id: 's6', source: 'dir', target: 'act', sourceHandle: 'right-source', targetHandle: 'top', ...style },
+  { id: 's7', source: 'act', target: 'list', sourceHandle: 'bottom-source', targetHandle: 'top', ...style },
+  { id: 's8', source: 'test', target: 'spec', sourceHandle: 'bottom-source', targetHandle: 'top', ...style2 }
 ]
 
 /* --- Action Flows --- */
-/* Helper to create simple linear flows */
 const createFlow = (idPrefix, steps) => ({
   nodes: steps.map((label, i) => ({ 
     id: `${idPrefix}-${i}`, 
     label, 
-    position: { x: i * 200, y: 0 },
-    ...(label.includes('DB') ? {} : {}),
-    ...(label.includes('Cache') ? {} : {})
+    position: { x: i * 100, y: i * 100 },
+    type: 'multi-handle'
+    
   })),
   edges: steps.slice(0, -1).map((_, i) => ({ 
     id: `${idPrefix}-e${i}`, 
     source: `${idPrefix}-${i}`, 
     target: `${idPrefix}-${i+1}`, 
-    markerEnd: MarkerType.ArrowClosed 
+    sourceHandle: 'bottom-source', targetHandle: 'left',
+    ...style2
   }))
 })
 

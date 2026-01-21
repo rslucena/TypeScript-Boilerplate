@@ -130,18 +130,25 @@ export default { actions, entity: response };
 <script setup>
 import { MarkerType } from '@vue-flow/core'
 
+const styles = { type: 'smoothstep', style: {stroke: '#4CAF50', strokeWidth: 2}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
 const migrationNodes = [
-  { id: '1', type: 'multi-handle', label: 'Developer', position: { x: 0, y: 0 } },
-  { id: '2', type: 'multi-handle', label: 'Source Code', position: { x: 250, y: 0 } },
-  { id: '3', type: 'multi-handle', label: 'Postgres', position: { x: 500, y: 0 } }
+  { id: '1', type: 'multi-handle', label: 'Domain', position: { x: 0, y: 0 } },
+	{ id: '2', type: 'multi-handle', label: 'Entity', position: { x: 300, y: 0 } },
+  { id: '3', type: 'multi-handle', label: 'Schema', position: { x: 600, y: 0 } },
+  { id: '4', type: 'multi-handle', label: 'Migration', position: { x: 0, y: 150 } },
+	{ id: '5', type: 'multi-handle', label: 'Route', position: { x: 300, y: 150 } },
+	{ id: '6', type: 'multi-handle', label: 'Controller', position: { x: 600, y: 150 } },
 ]
 
 const migrationEdges = [
-  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Edit entity.ts', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e1-2b', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Run bun db:migrate', type: 'smoothstep', animated: true, style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2-2', source: '2', target: '2', label: 'Generate SQL', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e1-2c', source: '1', target: '2', sourceHandle: 'right-source', targetHandle: 'left', label: 'Run bun db:migrate:push', type: 'smoothstep', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'right-source', targetHandle: 'left', label: 'Apply SQL Changes', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Generate the Domain', ...styles },
+	{ id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Customize the Entity', ...styles },
+	{ id: 'e3-4', source: '3', target: '4', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Update the Schema Validation', ...styles },
+	{ id: 'e4-5', source: '4', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Generate and Apply Migration', ...styles },
+	{ id: 'e5-6', source: '5', target: '6', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Verify Route Registration', ...styles },
+	{ id: 'e6-7', source: '6', target: '7', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Verify Controller Registration', ...styles },
+
 ]
 </script>
 

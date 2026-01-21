@@ -27,9 +27,10 @@
 	"editor.bracketPairColorization.enabled": true,
 	"editor.fontFamily": "Jetbrains Mono, Menlo, Monaco, 'Courier New', monospace",
 	"editor.codeActionsOnSave": {
-		"source.fixAll": "explicit",
+		"source.fixAll.biome": "explicit",
 		"source.organizeImports.biome": "explicit"
 	},
+	"editor.defaultFormatter": "biomejs.biome",
 	"editor.tokenColorCustomizations": {
 		"textMateRules": []
 	},

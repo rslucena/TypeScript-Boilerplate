@@ -6,25 +6,28 @@ description: Complete data flow demonstration when creating a User domain with a
 <script setup>
 import { MarkerType } from '@vue-flow/core'
 
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 2}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 0.5}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
 const flowNodes = [
-  { id: '1', type: 'multi-handle', label: 'Client', position: { x: 250, y: 0 } },
-  { id: '2', type: 'multi-handle', label: 'Route', position: { x: 250, y: 100 } },
-  { id: '3', type: 'multi-handle', label: 'Action', position: { x: 250, y: 200 } },
-  { id: '4', type: 'multi-handle', label: 'Validation', position: { x: 50, y: 200 } },
-  { id: '5', type: 'multi-handle', label: 'DB', position: { x: 250, y: 350 } },
-  { id: '6', type: 'multi-handle', label: 'Cache', position: { x: 450, y: 200 } }
+  { id: '1', type: 'multi-handle', label: 'Client', position: { x: 0, y: 0 } },
+  { id: '2', type: 'multi-handle', label: 'Route', position: { x: 250, y: 50 } },
+  { id: '3', type: 'multi-handle', label: 'Action', position: { x: 250, y: 250 } },
+  { id: '4', type: 'multi-handle', label: 'Validation', position: { x: 0, y: 150 } },
+  { id: '5', type: 'multi-handle', label: 'DB', position: { x: 250, y: 400 } },
+  { id: '6', type: 'multi-handle', label: 'Cache', position: { x: 500, y: 150 } }
 ]
 
 const flowEdges = [
-  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'POST /api/v1/users', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'postNewEntity()', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'left-source', targetHandle: 'right', label: 'Validate body', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4-3', source: '4', target: '3', sourceHandle: 'right-source', targetHandle: 'left', label: 'Valid data', type: 'smoothstep', style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT user', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created user', animated: true, style: { stroke: '#10b981' }, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3-6', source: '3', target: '6', sourceHandle: 'right-source', targetHandle: 'left', label: 'Invalidate keys', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'User data', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2-1', source: '2', target: '1', sourceHandle: 'top-source', targetHandle: 'bottom', label: '201 Created', type: 'step', markerEnd: MarkerType.ArrowClosed }
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'top-source', targetHandle: 'top', label: 'POST /api/v1/users', ...style2 },
+  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'postNewEntity()', ...style2 },
+  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'left-source', targetHandle: 'right', label: 'Validate body', ...style2 },
+  { id: 'e4-3', source: '4', target: '3', sourceHandle: 'right-source', targetHandle: 'bottom', label: 'Valid data', type: 'smoothstep', ...style },
+  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT user', ...style2},
+  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created user', ...style2 },
+  { id: 'e3-6', source: '3', target: '6', sourceHandle: 'right-source', targetHandle: 'left', label: 'Invalidate keys', type: 'smoothstep', ...style2 },
+  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'right', label: 'User data', ...style },
+  { id: 'e2-1', source: '2', target: '1', sourceHandle: 'top-source', targetHandle: 'bottom', label: '201 Created', type: 'step', ...style }
 ]
 
 const cacheNodes = [

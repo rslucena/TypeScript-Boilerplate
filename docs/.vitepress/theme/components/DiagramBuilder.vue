@@ -42,7 +42,6 @@ const deleteSelected = () => {
   selectedElement.value = null
 }
 
-// Drag & Drop Logic
 const onDragOver = (event) => {
   event.preventDefault()
   if (event.dataTransfer) {
@@ -156,20 +155,8 @@ const showImportModal = () => {
 const handleImport = () => {
   try {
     let code = importCode.value.trim()
-    // Remove script tags and template tags if pasted completely
     code = code.replace(/<script setup>|<\/script>|<template>[\s\S]*?<\/template>|<InteractiveFlow[\s\S]*?\/>/g, '')
-    // Remove imports
     code = code.replace(/import .* from .*/g, '')
-    
-    // Check if it's just raw object/array pasted (loose check)
-    if (code.startsWith('[') || code.startsWith('{')) {
-       // If it looks like JSON/JS Object, try to parse or wrap it
-       // But user mentioned 'edges: [...] nodes: [...]', so likely variables
-    }
-
-    // Execute in a restricted scope
-    // We expect user to paste code that defines 'nodes' and 'edges'
-    // We append a return statement
     const safeEval = new Function('MarkerType', `
       ${code}
       return { 
@@ -181,7 +168,6 @@ const handleImport = () => {
     const result = safeEval(MarkerType)
     
     if (result.nodes && Array.isArray(result.nodes)) {
-      // Restore styles and data
       nodes.value = result.nodes.map(n => ({
         ...n,
         data: { 

@@ -17,6 +17,9 @@ export default defineConfig({
     title: "Boilerplate",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
     themeConfig: {
+        search: {
+            provider: "local"
+        },
         nav: [
             { text: "Home", link: "/" },
             { text: "Guide", link: "/guide/getting-started" },

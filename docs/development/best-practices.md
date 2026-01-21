@@ -3,6 +3,58 @@ title: Best Practices
 description: Recommended patterns and practices for working with the TypeScript Boilerplate
 ---
 
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 1}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
+const cleanNodes = [
+  { id: 'clean', label: '✅ Clean Flow', position: { x: 0, y: 80 }},
+  { id: 'r', type: 'multi-handle', label: 'Route', position: { x: 0, y: 150 }},
+  { id: 'a', type: 'multi-handle', label: 'Action', position: { x: 0, y: 270 }},
+  { id: 'd', type: 'multi-handle', label: 'Database', position: { x: 250, y: 270 }},
+  { id: 's', type: 'multi-handle', label: 'Schema', position: { x: 250, y: 350 }},
+
+]
+const cleanEdges = [
+  { id: 'c1', source: 'r', target: 'a', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Delegates', ...style},
+  { id: 'c2', source: 'a', target: 's', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Validates', ...style},
+  { id: 'c3', source: 'a', target: 'd', sourceHandle: 'right-source', targetHandle: 'left', label: 'Persists', ...style},
+]
+
+const spaghettiNodes = [
+	{ id: 'spag', label: '❌ Spaghetti Flow', position: { x: 0, y: 80 } },
+  { id: 'br', type: 'multi-handle', label: 'Bad Route', position: { x: 0, y: 200 } },
+  { id: 'bd', type: 'multi-handle', label: 'Database', position: { x: 250, y: 100 } },
+  { id: 'bz', type: 'multi-handle', label: 'Ad-hoc Check', position: { x: 350, y: 200 } },
+  { id: 'bb', type: 'multi-handle', label: 'Inline Code', position: { x: 250, y: 300 } }
+]
+
+const spaghettiEdges = [
+	{ id: 's1', source: 'br', target: 'bd', sourceHandle: 'right-source', targetHandle: 'left', label: 'SQL Logic', ...style },
+  { id: 's2', source: 'br', target: 'bz', sourceHandle: 'right-source', targetHandle: 'left', label: 'Validation', ...style },
+  { id: 's3', source: 'br', target: 'bb', sourceHandle: 'right-source', targetHandle: 'left', label: 'Business Logic', ...style }
+]
+
+const cacheNodes = [
+  { id: 'req',type: 'multi-handle', label: 'Request', position: { x: 0, y: 0 } },
+  { id: 'cache',type: 'multi-handle', label: 'Cache Hit?', position: { x: -10, y: 150 } },
+  { id: 'res1',type: 'multi-handle', label: 'Response', position: { x: 300, y: 0 } },
+  { id: 'db',type: 'multi-handle', label: 'Database', position: { x: 150, y: 250 } },
+  { id: 'set',type: 'multi-handle', label: 'Set Cache', position: { x: 400, y: 250 } },
+]
+
+const cacheEdges = [
+  { id: 'ca1', source: 'req', target: 'cache', sourceHandle: 'bottom-source', targetHandle: 'top', label: '1. Check Key', ...style },
+  { id: 'ca2', source: 'cache', target: 'res1', sourceHandle: 'right-source', targetHandle: 'left', label: 'Yes: 2. Return', ...style },
+  { id: 'ca3', source: 'cache', target: 'db', sourceHandle: 'bottom', targetHandle: 'left', label: 'No: 3. Query', ...style2 },
+  { id: 'ca4', source: 'db', target: 'set', sourceHandle: 'right-source', targetHandle: 'left', label: '4. Result', ...style2 },
+  { id: 'ca5', source: 'set', target: 'res1', sourceHandle: 'right-source', targetHandle: 'left', label: '5. Return', ...style2 }
+]
+</script>
+
+
 # Best Practices
 
 This guide outlines recommended patterns and practices when working with this boilerplate.
@@ -284,59 +336,11 @@ api.post("/", async (req, reply) => {
 
 ### Clean Architecture Flow
 
-<script setup>
-import { MarkerType } from '@vue-flow/core'
-
-/* --- Clean Flow Diagram --- */
-const cleanNodes = [
-  // Clean Flow
-  { id: 'clean', label: '✅ Clean Flow', position: { x: 0, y: -50 }, type: 'output', style: { width: '150px', border: 'none', background: 'transparent', fontWeight: 'bold' } },
-  { id: 'r', label: 'Route', position: { x: 0, y: 0 } },
-  { id: 'a', label: 'Action', position: { x: 200, y: 0 } },
-  { id: 's', label: 'Schema', position: { x: 200, y: 100 } },
-  { id: 'd', label: 'Database', position: { x: 400, y: 0 } },
-  
-  // Spaghetti Flow
-  { id: 'spag', label: '❌ Spaghetti Flow', position: { x: 0, y: 150 }, type: 'output', style: { width: '150px', border: 'none', background: 'transparent', fontWeight: 'bold' } },
-  { id: 'br', label: 'Bad Route', position: { x: 0, y: 200 } },
-  { id: 'bd', label: 'Database', position: { x: 250, y: 200 } },
-  { id: 'bz', label: 'Ad-hoc Check', position: { x: 250, y: 270 } },
-  { id: 'bb', label: 'Inline Code', position: { x: 250, y: 340 } }
-]
-
-const cleanEdges = [
-  { id: 'c1', source: 'r', target: 'a', label: 'Delegates', markerEnd: MarkerType.ArrowClosed },
-  { id: 'c2', source: 'a', target: 's', label: 'Validates', markerEnd: MarkerType.ArrowClosed },
-  { id: 'c3', source: 'a', target: 'd', label: 'Persists', markerEnd: MarkerType.ArrowClosed },
-  { id: 's1', source: 'br', target: 'bd', label: 'SQL Logic', markerEnd: MarkerType.ArrowClosed },
-  { id: 's2', source: 'br', target: 'bz', label: 'Validation', markerEnd: MarkerType.ArrowClosed },
-  { id: 's3', source: 'br', target: 'bb', label: 'Business Logic', markerEnd: MarkerType.ArrowClosed }
-]
-
-/* --- Caching Strategy Diagram --- */
-const cacheNodes = [
-  { id: 'req', label: 'Request', position: { x: 0, y: 0 } },
-  { id: 'cache', label: 'Cache Hit?', position: { x: 200, y: 0 } },
-  { id: 'res1', label: 'Response', position: { x: 400, y: -50 } },
-  { id: 'db', label: 'Database', position: { x: 200, y: 150 } },
-  { id: 'set', label: 'Set Cache', position: { x: 400, y: 150 } },
-  { id: 'res2', label: 'Response', position: { x: 600, y: 150 } }
-]
-
-const cacheEdges = [
-  { id: 'ca1', source: 'req', target: 'cache', label: '1. Check Key', markerEnd: MarkerType.ArrowClosed },
-  { id: 'ca2', source: 'cache', target: 'res1', label: 'Yes: 2. Return', sourceHandle: 'top', markerEnd: MarkerType.ArrowClosed },
-  { id: 'ca3', source: 'cache', target: 'db', label: 'No: 3. Query', sourceHandle: 'bottom', markerEnd: MarkerType.ArrowClosed },
-  { id: 'ca4', source: 'db', target: 'set', label: '4. Result', markerEnd: MarkerType.ArrowClosed },
-  { id: 'ca5', source: 'set', target: 'res2', label: '5. Return', markerEnd: MarkerType.ArrowClosed }
-]
-</script>
-
-## Visual Guides
-
-### Clean Architecture Flow
-
 <InteractiveFlow :nodes="cleanNodes" :edges="cleanEdges" />
+
+### Spaghetti Flow
+
+<InteractiveFlow :nodes="spaghettiNodes" :edges="spaghettiEdges" />
 
 ### Caching Strategy Flow
 

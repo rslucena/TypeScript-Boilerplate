@@ -40,20 +40,20 @@ When a request is marked as `restricted` (requiring authentication/plugins), the
 import { MarkerType } from '@vue-flow/core'
 
 const pluginNodes = [
-  { id: 's', type: 'multi-handle', label: 'Server', position: { x: 0, y: 100 } },
-  { id: 'h', type: 'multi-handle', label: 'Auth Handler', position: { x: 250, y: 100 }},
-  { id: 'p', type: 'multi-handle', label: 'Plugin Mgr', position: { x: 250, y: 0 } },
+  { id: 's', type: 'multi-handle', label: 'Server', position: { x: 0, y: 150 } },
+  { id: 'h', type: 'multi-handle', label: 'Auth Handler', position: { x: 250, y: 150 }},
+  { id: 'p', type: 'multi-handle', label: 'Plugin Mgr', position: { x: 260, y: 0 } },
   { id: 'jwt', type: 'multi-handle', label: 'JWT Strategy', position: { x: 500, y: 0 } },
-  { id: 'c', type: 'multi-handle', label: 'Session', position: { x: 500, y: 200 }}
+  { id: 'c', type: 'multi-handle', label: 'Session', position: { x: 500, y: 250 }}
 ]
 
 const pluginEdges = [
   { id: 'p1', source: 's', target: 'h', sourceHandle: 'right-source', targetHandle: 'left', label: 'Authenticate', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'p2', source: 'h', target: 'p', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Get Plugins', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'p2', source: 'h', target: 'p', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Get Plugins', type: 'smoothstep', animated: true,markerEnd: MarkerType.ArrowClosed },
   { id: 'p3', source: 'p', target: 'jwt', sourceHandle: 'right-source', targetHandle: 'left', label: 'Execute', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'p4', source: 'jwt', target: 'h', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Return Data', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'p5', source: 'h', target: 'c', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Set Session', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'p6', source: 'h', target: 's', sourceHandle: 'left-source', targetHandle: 'right', label: 'Proceed/401', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+  { id: 'p4', source: 'jwt', target: 'h', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Return Data', type: 'smoothstep',animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'p5', source: 'h', target: 'c', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Set Session', type: 'smoothstep',animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'p6', source: 'h', target: 's', sourceHandle: 'left-source', targetHandle: 'right', label: 'Proceed/401', type: 'smoothstep',animated: true, markerEnd: MarkerType.ArrowClosed }
 ]
 </script>
 
