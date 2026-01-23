@@ -3,10 +3,10 @@
 This file defines the mandatory guidelines for me, your AI agent. I will consult this file before any significant implementation to ensure consistency with your project.
 
 ## 📚 Main Reference
-Always consult the [wiki/](../wiki/) folder for deep details on:
-- [Architecture](../wiki/Architecture.md)
-- [Best Practices](../wiki/Best-Practices.md)
-- [Testing Guide](../wiki/Testing-Guide.md)
+Always consult the [docs/](../docs/) folder for deep details on:
+- [Architecture](../docs/Architecture.md)
+- [Best Practices](../docs/Best-Practices.md)
+- [Testing Guide](../docs/Testing-Guide.md)
 
 ## 🛠️ Code Guidelines
 
@@ -84,7 +84,7 @@ Always consult the [wiki/](../wiki/) folder for deep details on:
 - **Code Review**: Before submitting, I will run a self-check for N+1 queries, missing database indexes, and `any` usage.
 - **Proactivity**: Before creating something new, check if a similar template or pattern exists in the project.
 - **Documentation**: 
-    - When implementing a new feature, I must validate if the `README.md` or `wiki/` needs updates, improvements, or new files.
+    - When implementing a new feature, I must validate if the `README.md` or `docs/` needs updates, improvements, or new files.
     - Documentation must be **clear, detailed, and dynamic**. 
     - **Graphics**: Use **Mermaid** diagrams to visualize complex data flows, logic, or architectures. This is mandatory for significant changes to make the documentation easier to read.
 - **Security**: Never log sensitive data (passwords, tokens). Always use env vars.
