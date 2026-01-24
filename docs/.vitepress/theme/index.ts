@@ -7,14 +7,15 @@ import 'vitepress-mermaid-preview/dist/index.css';
 import Footer from './Footer.vue'
 import './style.css'
 
-
 import InteractiveFlow from './components/InteractiveFlow.vue'
 import DiagramBuilder from './components/DiagramBuilder.vue'
+import EnvironmentSelector from './components/EnvironmentSelector.vue'
 
 export default {
     extends: DefaultTheme,
     Layout: () => {
         return h(DefaultTheme.Layout, null, {
+            'nav-bar-content-after': () => h(EnvironmentSelector),
             'layout-bottom': () => h(Footer)
         });
     },
