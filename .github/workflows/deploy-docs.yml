@@ -3,6 +3,7 @@ name: Deploy Docs (Preview)
 on:
   push:
     branches:
+      - main
       - staging
       
   workflow_dispatch:
@@ -35,9 +36,11 @@ jobs:
         working-directory: docs
         env:
           VITE_APP_VERSION: ${{ env.VERSION }}
+          VITE_APP_ENV: ${{ github.ref_name }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/.vitepress/dist
+          destination_dir: ${{ github.ref_name == 'staging' && 'staging' || '.' }}
