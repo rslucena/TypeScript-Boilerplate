@@ -429,3 +429,26 @@ console.log(keys);
 const result = schema.safeParseAsync(data);
 if (!result.success) console.log(result.error.format());
 ```
+
+## Frequently Asked Questions (FAQ)
+
+### 1. Can I use Node.js instead of Bun?
+The boilerplate is heavily optimized for **Bun**. While it's possible to run it with Node.js, you would lose the integrated test runner, the ultra-fast package manager, and some native optimizations. We highly recommend sticking with Bun for the intended performance gains.
+
+### 2. How do I change from PostgreSQL to another database?
+The project uses **Drizzle ORM**, which supports various dialects (PostgreSQL, MySQL, SQLite). To switch:
+1. Update `docker-compose.yml` with the new database image.
+2. Change the DB driver in `infrastructure/repositories/repository.ts`.
+3. Update `drizzle.config.ts` to reflect the new dialect.
+4. Regenerate migrations.
+
+### 3. How to add a new plugin/middleware?
+We follow Fastify's plugin architecture. You can:
+- Add a new file in `src/infrastructure/plugins/`.
+- Register it in `src/infrastructure/server/server.ts` or directly in your domain routes.
+
+### 4. Is the Domain Generator customizable?
+Yes! The generator uses templates located in `src/commands/templates/` (if implemented as a separate directory) or directly within the `generate-domain.ts` script. You can modify these templates to include extra fields or different logic by default.
+
+### 5. How to handle multiple environments (test, staging)?
+Use different `.env` files (e.g., `.env.test`, `.env.staging`) and load them by setting the `NODE_ENV` variable. The CI/CD pipeline already handles this for you using GitHub Secrets.
