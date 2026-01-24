@@ -3,6 +3,34 @@ title: Quick Navigation
 description: Quick navigation to the most important files and folders
 ---
 
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const style = { type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed, style: { strokeWidth: 1.5 } }
+
+const repoNodes = [
+  { id: 'src', type: 'multi-handle', label: 'src/', position: { x: 250, y: 0 }, style: { backgroundColor: 'var(--vp-c-brand-soft)', fontWeight: 'bold' } },
+  { id: 'cmd', type: 'multi-handle', label: 'commands/', position: { x: 50, y: 100 } },
+  { id: 'dom', type: 'multi-handle', label: 'domain/', position: { x: 180, y: 100 } },
+  { id: 'fn', type: 'multi-handle', label: 'functions/', position: { x: 320, y: 100 } },
+  { id: 'infra', type: 'multi-handle', label: 'infrastructure/', position: { x: 450, y: 100 }, style: { backgroundColor: 'var(--vp-c-brand-soft)' } },
+  
+  { id: 'cache', type: 'multi-handle', label: 'cache/', position: { x: 350, y: 200 } },
+  { id: 'db', type: 'multi-handle', label: 'repositories/', position: { x: 450, y: 200 } },
+  { id: 'srv', type: 'multi-handle', label: 'server/', position: { x: 550, y: 200 } }
+]
+
+const repoEdges = [
+  { id: 'e-src-cmd', source: 'src', target: 'cmd', ...style },
+  { id: 'e-src-dom', source: 'src', target: 'dom', ...style },
+  { id: 'e-src-fn', source: 'src', target: 'fn', ...style },
+  { id: 'e-src-infra', source: 'src', target: 'infra', ...style },
+  { id: 'e-infra-cache', source: 'infra', target: 'cache', ...style, type: 'smoothstep' },
+  { id: 'e-infra-db', source: 'infra', target: 'db', ...style, type: 'smoothstep' },
+  { id: 'e-infra-srv', source: 'infra', target: 'srv', ...style, type: 'smoothstep' }
+]
+</script>
+
 # 🎯 Quick Navigation
 
 **New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)  
@@ -51,14 +79,20 @@ This project utilizes continuous integration to automate checks and builds:
 | PM2         | Process manager for Node.js applications that simplifies deployment, management, and monitoring of applications in production. |
 | Status Page | Monitors the availability and performance of online services (Uptime Kuma).                                                    |
 
-## File tree (`src/`)
+## Interactive Repository Map
 
-| Folder         | Description                                                                      |
-|----------------|----------------------------------------------------------------------------------|
-| commands       | Contains the process handlers and application entry points.                      |
-| domain         | Contains the application's domain logic (entities, actions, schemas, routes).    |
-| functions      | Utility functions and shared helpers.                                            |
-| infrastructure | Technical implementation details: database, cache, server, logs, messages, i18n. |
+Visualize the project structure and how the different layers interact:
+
+<InteractiveFlow :nodes="repoNodes" :edges="repoEdges" />
+
+### Main Folders (`src/`)
+
+| Folder | Description |
+|:---|:---|
+| **`commands/`** | Application entry points, process handlers (PM2), and build scripts. |
+| **`domain/`** | Business logic layer: Entities, Actions, Schemas, and Routes organized by domain. |
+| **`functions/`** | Shared utilities and helper functions used across the project. |
+| **`infrastructure/`** | Technical implementation: Cache, Database, Server, i18n, etc. |
 
 ### Infrastructure Details
 

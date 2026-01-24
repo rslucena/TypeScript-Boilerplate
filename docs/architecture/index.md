@@ -61,6 +61,19 @@ const reqEdges = [
   { id: 'r5', source: 'db', target: 'action', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Result', ...style },
   { id: 'r6', source: 'action', target: 'user', sourceHandle: 'left-source', targetHandle: 'bottom', label: 'Response', ...style2 }
 ]
+
+const roadmapNodes = [
+  { id: 'rd1', type: 'multi-handle', label: 'Core Architecture', position: { x: 0, y: 0 } },
+  { id: 'rd2', type: 'multi-handle', label: 'Enhanced Plugins', position: { x: 0, y: 150 } },
+  { id: 'rd3', type: 'multi-handle', label: 'Advanced Observability', position: { x: 0, y: 300 } },
+  { id: 'rd4', type: 'multi-handle', label: 'Cloud Native', position: { x: 0, y: 450 } }
+]
+
+const roadmapEdges = [
+  { id: 're1', source: 'rd1', target: 'rd2', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Implemented', ...style },
+  { id: 're2', source: 'rd2', target: 'rd3', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'WIP', ...style2, animated: true },
+  { id: 're3', source: 'rd3', target: 'rd4', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Planned', ...style2 }
+]
 </script>
 
 ## Technology Stack
@@ -101,4 +114,31 @@ When an HTTP request arrives, it follows this path:
 6. **Action** returns the response, which is then serialized by the **Route**.
 
 <InteractiveFlow :nodes="reqNodes" :edges="reqEdges" />
+
+## Future Roadmap
+
+We are constantly evolving the boilerplate to provide the best developer experience. Here is our current roadmap:
+
+<InteractiveFlow :nodes="roadmapNodes" :edges="roadmapEdges" />
+
+### Phase 1: Core Architecture (Completed)
+- [x] Zero-Dep Template Engine
+- [x] Auto-CRUD Scaffolding
+- [x] Redis-powered Smart Caching
+- [x] i18n support
+
+### Phase 2: Enhanced Plugins (In Progress)
+- [ ] Advanced Authentication (OAuth2, OIDC)
+- [ ] Distributed Locking system
+- [ ] Real-time WebSocket plugin
+
+### Phase 3: Advanced Observability (Planned)
+- [ ] OpenTelemetry integration
+- [ ] Structured logging with automatic trace correlation
+- [ ] Performance monitoring dashboard
+
+### Phase 4: Cloud Native (Planned)
+- [ ] Kubernetes operators for domain scaling
+- [ ] Serverless deployment adapters
+- [ ] Edge runtime optimization
 
