@@ -1,6 +1,9 @@
 import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import { vitepressMermaidPreview } from 'vitepress-mermaid-preview';
+import pkg from '../../package.json'
+
+const version = process.env.VITE_APP_VERSION || pkg.version
 
 
 export default defineConfig({
@@ -21,6 +24,7 @@ export default defineConfig({
             provider: "local"
         },
         nav: [
+            { text: `v${version}`, link: 'https://github.com/rslucena/TypeScript-Boilerplate/releases' },
             { text: "Home", link: "/" },
             { text: "Guide", link: "/guide/getting-started" },
             { text: "Reference", link: "/reference/cache-actions-reference" },

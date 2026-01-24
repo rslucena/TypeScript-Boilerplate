@@ -24,9 +24,17 @@ jobs:
         run: bun install
         working-directory: docs
 
+      - name: Get Latest Release version
+        id: get_version
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build VitePress docs
         run: bun run build
         working-directory: docs
+        env:
+          VITE_APP_VERSION: ${{ env.VERSION }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
