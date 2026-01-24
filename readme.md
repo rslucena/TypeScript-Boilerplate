@@ -11,9 +11,20 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 ### This boilerplate is optimized for production and comes with full support for testing and code quality.
 
-[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) [![Quality Gate](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml) [![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency)
+[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) 
+[![Quality Gate](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml) 
+[![Docker Deployment](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docker.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docker.yml)
+[![Deploy Docs](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docs.yml)
+[![Automated Release](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/release.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/release.yml)
 
-[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency)
+[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors) 
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) 
+[![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse)
+
+> [!TIP]
+> **Check out our official documentation for deep dives, architecture diagrams, and more:**  
+> 🌐 **[https://rslucena.github.io/TypeScript-Boilerplate/](https://rslucena.github.io/TypeScript-Boilerplate/)**
 
 ---
 
@@ -224,13 +235,13 @@ bun run tests
 bun run build
 ```
 
-📚 **Learn More:** [CI/CD Pipeline](https://github.com/rslucena/TypeScript-Boilerplate/wiki/CI-CD-Pipeline)
+📚 **Learn More:** [CI/CD Pipeline](https://rslucena.github.io/TypeScript-Boilerplate/devops/ci-cd-pipeline.html)
 
 ---
 
 ## 📚 Documentation
 
-Comprehensive guides available in the [Wiki](https://rslucena.github.io/TypeScript-Boilerplate/):
+Comprehensive guides available in the [Official Documentation](https://rslucena.github.io/TypeScript-Boilerplate/):
 
 | Guide | Description |
 |-------|-------------|

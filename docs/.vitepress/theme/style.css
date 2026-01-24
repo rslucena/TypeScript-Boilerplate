@@ -213,3 +213,23 @@
   margin: 2rem 0;
   font-weight: 500;
 }
+
+:root {
+  --vp-sidebar-item-line-height: normal;
+}
+
+.VPSidebarItem {
+  padding: 2px 0 !important;
+}
+
+.VPSidebarItem.level-0 {
+  margin-top: 12px !important;
+}
+
+.VPSidebarItem.level-1 {
+  padding: 1px 0 1px 16px !important;
+}
+
+.VPSidebarItem .text {
+  font-size: 0.95rem !important;
+}
