@@ -9,25 +9,25 @@ import { MarkerType } from '@vue-flow/core'
 const style = { type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed, style: { strokeWidth: 1.5 } }
 
 const repoNodes = [
-  { id: 'src', type: 'multi-handle', label: 'src/', position: { x: 250, y: 0 }, style: { backgroundColor: 'var(--vp-c-brand-soft)', fontWeight: 'bold' } },
+  { id: 'src', type: 'multi-handle', label: 'src/', position: { x: 300, y: -50 } },
   { id: 'cmd', type: 'multi-handle', label: 'commands/', position: { x: 50, y: 100 } },
-  { id: 'dom', type: 'multi-handle', label: 'domain/', position: { x: 180, y: 100 } },
-  { id: 'fn', type: 'multi-handle', label: 'functions/', position: { x: 320, y: 100 } },
-  { id: 'infra', type: 'multi-handle', label: 'infrastructure/', position: { x: 450, y: 100 }, style: { backgroundColor: 'var(--vp-c-brand-soft)' } },
+  { id: 'dom', type: 'multi-handle', label: 'domain/', position: { x: 170, y: 160 } },
+  { id: 'fn', type: 'multi-handle', label: 'functions/', position: { x: 290, y: 100 } },
+  { id: 'infra', type: 'multi-handle', label: 'infrastructure/', position: { x: 510, y: 100 } },
   
-  { id: 'cache', type: 'multi-handle', label: 'cache/', position: { x: 350, y: 200 } },
-  { id: 'db', type: 'multi-handle', label: 'repositories/', position: { x: 450, y: 200 } },
-  { id: 'srv', type: 'multi-handle', label: 'server/', position: { x: 550, y: 200 } }
+  { id: 'cache', type: 'multi-handle', label: 'cache/', position: { x: 400, y: 200 } },
+  { id: 'db', type: 'multi-handle', label: 'repositories/', position: { x: 517, y: 200 } },
+  { id: 'srv', type: 'multi-handle', label: 'server/', position: { x: 660, y: 200 } }
 ]
 
 const repoEdges = [
-  { id: 'e-src-cmd', source: 'src', target: 'cmd', ...style },
-  { id: 'e-src-dom', source: 'src', target: 'dom', ...style },
-  { id: 'e-src-fn', source: 'src', target: 'fn', ...style },
-  { id: 'e-src-infra', source: 'src', target: 'infra', ...style },
-  { id: 'e-infra-cache', source: 'infra', target: 'cache', ...style, type: 'smoothstep' },
-  { id: 'e-infra-db', source: 'infra', target: 'db', ...style, type: 'smoothstep' },
-  { id: 'e-infra-srv', source: 'infra', target: 'srv', ...style, type: 'smoothstep' }
+  { id: 'e-src-cmd', sourceHandle: 'left-source', targetHandle: 'top', source: 'src', target: 'cmd', ...style },
+  { id: 'e-src-dom', sourceHandle: 'left-source', targetHandle: 'top', source: 'src', target: 'dom', ...style },
+  { id: 'e-src-fn', sourceHandle: 'bottom-source', targetHandle: 'top',source: 'src', target: 'fn', ...style },
+  { id: 'e-src-infra', sourceHandle: 'right-source', targetHandle: 'top', source: 'src', target: 'infra', ...style },
+  { id: 'e-infra-cache', sourceHandle: 'left-source', targetHandle: 'top', source: 'infra', target: 'cache', ...style, type: 'smoothstep' },
+  { id: 'e-infra-db', sourceHandle: 'bottom-source', targetHandle: 'top', source: 'infra', target: 'db', ...style, type: 'smoothstep' },
+  { id: 'e-infra-srv', sourceHandle: 'right-source', targetHandle: 'top', source: 'infra', target: 'srv', ...style, type: 'smoothstep' }
 ]
 </script>
 
@@ -104,7 +104,7 @@ Visualize the project structure and how the different layers interact:
 | messages     | Messaging system supporting both Redis (Pub/Sub) and Node.js Events.       |
 | migrations   | Automated database schema versioning scripts via Drizzle Kit.              |
 | repositories | Data access layer and database connection management.                      |
-| server       | Core Fastify configuration, interface definitions, and request transforms. |
+| server       | [Core Fastify (HTTP)](/servers/http-server) and [Scalable WebSockets](/servers/websockets). |
 | settings     | Environment variables and application-wide configuration.                  |
 
 ## References

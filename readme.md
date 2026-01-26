@@ -254,6 +254,8 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 | [Testing Guide](https://rslucena.github.io/TypeScript-Boilerplate/development/testing-guide.html) | Writing and running tests |
 | [CI/CD Pipeline](https://rslucena.github.io/TypeScript-Boilerplate/devops/ci-cd-pipeline.html) | Automation workflows |
 | [Deployment](https://rslucena.github.io/TypeScript-Boilerplate/devops/deployment.html) | Production deployment |
+| [HTTP Server](https://rslucena.github.io/TypeScript-Boilerplate/servers/http-server.html) | Fastify setup and configuration |
+| [Scalable WebSockets](https://rslucena.github.io/TypeScript-Boilerplate/servers/websockets.html) | Redis Pub/Sub powered real-time |
 
 ---
 
