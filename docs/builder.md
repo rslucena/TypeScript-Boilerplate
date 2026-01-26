@@ -12,6 +12,7 @@ layout: page
   <ClientOnly>
     <DiagramBuilder />
   </ClientOnly>
+
 </div>
 
 <style>
@@ -27,7 +28,7 @@ h1 {
   font-weight: 700;
 }
 
-p {
+.builder-container .p {
   color: var(--vp-c-text-2);
   margin-bottom: 1.5rem;
 }
