@@ -22,6 +22,7 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+      - "5080:5080"
     env_file:
       - .env
     environment:
