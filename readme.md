@@ -11,9 +11,20 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 
 ### This boilerplate is optimized for production and comes with full support for testing and code quality.
 
-[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) [![Quality Gate](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml) [![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency)
+[![CodeQL](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml) 
+[![Quality Gate](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/ci.yml) 
+[![Docker Deployment](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docker.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docker.yml)
+[![Deploy Docs](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/deploy-docs.yml)
+[![Automated Release](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/release.yml/badge.svg)](https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/release.yml)
 
-[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors) [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) [![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/code-frequency)
+[![GitHub contributors](https://img.shields.io/github/contributors/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/graphs/contributors) 
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rslucena/TypeScript-Boilerplate/tree/main?tab=MIT-1-ov-file) 
+[![Commit Activity](https://img.shields.io/github/commit-activity/t/rslucena/TypeScript-Boilerplate)](https://github.com/rslucena/TypeScript-Boilerplate/pulse)
+
+> [!TIP]
+> **Check out our official documentation for deep dives, architecture diagrams, and more:**  
+> 🌐 **[https://rslucena.github.io/TypeScript-Boilerplate/](https://rslucena.github.io/TypeScript-Boilerplate/)**
 
 ---
 
@@ -138,7 +149,7 @@ bun gen:domain product
 
 **Unique Approach:** Uses TypeScript files as templates (not `.hbs` or `.ejs`) for native IDE support and zero dependencies.
 
-📚 **Learn More:** [Template System Architecture](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Template-System-Architecture) | [Domain Generator Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Domain-Scaffolding-(Generator))
+📚 **Learn More:** [Template System Architecture](https://rslucena.github.io/TypeScript-Boilerplate/development/template-system-architecture.html) | [Domain Generator Guide](https://rslucena.github.io/TypeScript-Boilerplate/development/domain-scaffolding.html)
 
 ---
 
@@ -203,7 +214,7 @@ bun test --coverage   # Coverage report
 - `tests/builders/` - Test data factories
 - `tests/mocks/` - Shared mocks
 
-📚 **Learn More:** [Testing Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Testing-Guide)
+📚 **Learn More:** [Testing Guide](https://rslucena.github.io/TypeScript-Boilerplate/development/testing-guide.html)
 
 ---
 
@@ -224,25 +235,25 @@ bun run tests
 bun run build
 ```
 
-📚 **Learn More:** [CI/CD Pipeline](https://github.com/rslucena/TypeScript-Boilerplate/wiki/CI-CD-Pipeline)
+📚 **Learn More:** [CI/CD Pipeline](https://rslucena.github.io/TypeScript-Boilerplate/devops/ci-cd-pipeline.html)
 
 ---
 
 ## 📚 Documentation
 
-Comprehensive guides available in the [Wiki](https://github.com/rslucena/TypeScript-Boilerplate/wiki):
+Comprehensive guides available in the [Official Documentation](https://rslucena.github.io/TypeScript-Boilerplate/):
 
 | Guide | Description |
 |-------|-------------|
-| [Getting Started](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Getting-Started) | Detailed setup and configuration |
-| [Complete Example](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Complete-Example) | Full walkthrough of creating a User domain |
-| [Template System](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Template-System-Architecture) | How the code generator works |
-| [Domain Generator](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Domain-Scaffolding-(Generator)) | Creating CRUD modules |
-| [Architecture](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Architecture) | Project structure deep dive |
-| [Best Practices](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Best-Practices) | Coding standards and patterns |
-| [Testing Guide](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Testing-Guide) | Writing and running tests |
-| [CI/CD Pipeline](https://github.com/rslucena/TypeScript-Boilerplate/wiki/CI-CD-Pipeline) | Automation workflows |
-| [Deployment](https://github.com/rslucena/TypeScript-Boilerplate/wiki/Deployment) | Production deployment |
+| [Getting Started](https://rslucena.github.io/TypeScript-Boilerplate/guide/getting-started.html) | Detailed setup and configuration |
+| [Complete Example](https://rslucena.github.io/TypeScript-Boilerplate/guide/complete-example.html) | Full walkthrough of creating a User domain |
+| [Template System](https://rslucena.github.io/TypeScript-Boilerplate/development/template-system-architecture.html) | How the code generator works |
+| [Domain Generator](https://rslucena.github.io/TypeScript-Boilerplate/development/domain-scaffolding.html) | Creating CRUD modules |
+| [Architecture](https://rslucena.github.io/TypeScript-Boilerplate/architecture/) | Project structure deep dive |
+| [Best Practices](https://rslucena.github.io/TypeScript-Boilerplate/development/best-practices.html) | Coding standards and patterns |
+| [Testing Guide](https://rslucena.github.io/TypeScript-Boilerplate/development/testing-guide.html) | Writing and running tests |
+| [CI/CD Pipeline](https://rslucena.github.io/TypeScript-Boilerplate/devops/ci-cd-pipeline.html) | Automation workflows |
+| [Deployment](https://rslucena.github.io/TypeScript-Boilerplate/devops/deployment.html) | Production deployment |
 
 ---
 
@@ -279,7 +290,7 @@ Comprehensive guides available in the [Wiki](https://github.com/rslucena/TypeScr
 
 ## 📚 Resources
 
-- [Wiki](https://github.com/rslucena/TypeScript-Boilerplate/wiki)
+- [Wiki](https://rslucena.github.io/TypeScript-Boilerplate/)
 - [Bun Documentation](https://bun.sh/docs)
 - [TypeScript Docs](https://www.typescriptlang.org/docs/)
 - [Vite Docs](https://vitejs.dev/guide/)

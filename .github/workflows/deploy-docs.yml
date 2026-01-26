@@ -1,0 +1,46 @@
+name: Deploy Docs (Preview)
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install documentation dependencies
+        run: bun install
+        working-directory: docs
+
+      - name: Get Latest Release version
+        id: get_version
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build VitePress docs
+        run: bun run build
+        working-directory: docs
+        env:
+          VITE_APP_VERSION: ${{ env.VERSION }}
+          VITE_APP_ENV: ${{ github.ref_name }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/.vitepress/dist
+          destination_dir: ${{ github.ref_name == 'staging' && 'staging' || '.' }}
