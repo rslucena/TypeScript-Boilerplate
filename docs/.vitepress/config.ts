@@ -1,14 +1,12 @@
-import { defineConfig } from "vitepress";
+import { defineConfig, type DefaultTheme } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import { vitepressMermaidPreview } from 'vitepress-mermaid-preview';
 import pkg from '../../package.json'
 
 const version = process.env.VITE_APP_VERSION || pkg.version
-const environment = process.env.VITE_APP_ENV || 'main'
-const isStaging = environment === 'staging'
 
 export default defineConfig({
-    base: isStaging ? '/TypeScript-Boilerplate/staging/' : '/TypeScript-Boilerplate/',
+    base: '/TypeScript-Boilerplate/',
     markdown: {
         config(md) {
             md.use(groupIconMdPlugin);
@@ -21,6 +19,7 @@ export default defineConfig({
     title: "Boilerplate",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
     themeConfig: {
+        version,
         search: {
             provider: "local"
         },
@@ -76,5 +75,5 @@ export default defineConfig({
         ],
 
         socialLinks: [{ icon: "github", link: "https://github.com/rslucena/TypeScript-Boilerplate" }],
-    },
+    } as DefaultTheme.Config & { version?: string },
 });

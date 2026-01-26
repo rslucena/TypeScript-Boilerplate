@@ -12,14 +12,8 @@ const currentEnv = computed(() => {
 
 const switchEnv = () => {
   if (typeof window === 'undefined') return
-  const isStaging = currentEnv.value === 'Staging'
   const repoBase = '/TypeScript-Boilerplate/'
-  
-  if (isStaging) {
-    window.location.href = repoBase
-  } else {
-    window.location.href = `${repoBase}staging/`
-  }
+  window.location.href = repoBase
 }
 
 const goToReleases = () => {

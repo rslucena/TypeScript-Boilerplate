@@ -25,10 +25,14 @@ jobs:
         run: bun install
         working-directory: docs
 
-      - name: Get Latest Release version
-        id: get_version
+      - name: Set version
+        id: set_version
         run: |
-          VERSION=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "")
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            VERSION=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "1.0.0")
+          else
+            VERSION=$(echo ${{ github.sha }} | cut -c1-7)
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build VitePress docs
@@ -44,3 +48,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/.vitepress/dist
           destination_dir: ${{ github.ref_name == 'staging' && 'staging' || '.' }}
+          keep_files: true
