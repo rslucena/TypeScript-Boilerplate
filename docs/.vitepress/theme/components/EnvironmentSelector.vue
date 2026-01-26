@@ -6,15 +6,7 @@ const { site, theme } = useData()
 
 const version = computed(() => theme.value.version || '1.0.0')
 
-const currentEnv = computed(() => {
-  return typeof window !== 'undefined' && window.location.pathname.includes('/staging/') ? 'Staging' : 'Main'
-})
-
-const switchEnv = () => {
-  if (typeof window === 'undefined') return
-  const repoBase = '/TypeScript-Boilerplate/'
-  window.location.href = repoBase
-}
+const currentEnv = 'Main'
 
 const goToReleases = () => {
   if (typeof window !== 'undefined') {
@@ -28,11 +20,10 @@ const goToReleases = () => {
     <div class="version-tag" @click="goToReleases">
       v{{ version }}
     </div>
-    <div class="env-selector" @click="switchEnv" :title="`Switch to ${currentEnv === 'Main' ? 'Staging' : 'Main'}`">
-      <div class="env-badge" :class="currentEnv.toLowerCase()">
+    <div class="env-selector" title="Production Environment">
+      <div class="env-badge main">
         <span class="dot"></span>
         <span class="env-text">{{ currentEnv }}</span>
-        <span class="chevron">▼</span>
       </div>
     </div>
   </div>
@@ -97,22 +88,9 @@ const goToReleases = () => {
   background-color: #10b981;
 }
 
-.staging .dot {
-  background-color: #f59e0b;
-}
-
 .env-text {
   line-height: 1;
   color: var(--vp-c-text-1);
-}
-
-.chevron {
-  font-size: 7px;
-  opacity: 0.5;
-}
-
-.env-badge:hover .chevron {
-  opacity: 1;
 }
 
 @media (max-width: 959px) {
