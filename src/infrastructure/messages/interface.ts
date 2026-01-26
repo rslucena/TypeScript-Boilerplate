@@ -1,7 +1,8 @@
 interface actions {
 	ping: () => Promise<string>;
 	sub(topic: string, callback: (snapshot: unknown, topic?: string) => Promise<void>): Promise<void>;
-	pub(topic: string, value: CallableFunction): Promise<undefined | number>;
+	unsub(topic: string, callback?: (snapshot: unknown, topic?: string) => Promise<void>): Promise<void>;
+	pub(topic: string, value: unknown): Promise<undefined | number>;
 }
 
 interface eventemitter {
