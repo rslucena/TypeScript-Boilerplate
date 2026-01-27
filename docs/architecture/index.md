@@ -97,7 +97,7 @@ The heart of the application. Each subfolder (e.g., `user`) represents a bounded
 ### 3. Infrastructure (`src/infrastructure/`)
 Contains implementation details of technical services:
 - **Server**: [Fastify (HTTP)](/servers/http-server) and [WebSockets (Scalable)](/servers/websockets) configurations.
-- **Cache**: Redis integration for high-performance data storage.
+- **Cache**: Redis integration for high-performance data storage with **Graceful Degradation** for high availability.
 - **Repository**: Database connection and base repository patterns.
 - **Messages**: Communication layer (distributed via Redis or internal via Node events).
 - **Plugins**: Agent system for modular extensions (e.g., Authentication).
@@ -127,10 +127,11 @@ We are constantly evolving the boilerplate to provide the best developer experie
 - [x] Redis-powered Smart Caching
 - [x] i18n support
 
-### Phase 2: Enhanced Plugins (Completed / In Progress)
+### Phase 2: Enhanced Plugins ( In Progress)
+- [x] Redis Graceful Degradation
+- [x] Real-time WebSocket plugin (Scalable via Redis)
 - [ ] Advanced Authentication (OAuth2, OIDC)
 - [ ] Distributed Locking system
-- [x] Real-time WebSocket plugin (Scalable via Redis)
 
 ### Phase 3: Advanced Observability (Planned)
 - [ ] OpenTelemetry integration
@@ -141,4 +142,3 @@ We are constantly evolving the boilerplate to provide the best developer experie
 - [ ] Kubernetes operators for domain scaling
 - [ ] Serverless deployment adapters
 - [ ] Edge runtime optimization
-

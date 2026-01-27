@@ -48,7 +48,7 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 - 🎯 **Production-Ready**: Full CI/CD pipeline, Docker support, and PM2 process management
 - ⚡ **CLI Generator**: Scaffold complete CRUD domains in seconds with `bun gen:domain`
 - 🔒 **Type-Safe Everything**: End-to-end type safety with Drizzle ORM + Zod validation
-- 💾 **Smart Caching**: Redis integration with automatic cache invalidation
+- 💾 **Smart Caching**: Redis integration with automatic cache invalidation and **Graceful Degradation** for high availability
 - 📚 **Auto API Docs**: Swagger UI automatically generated from Zod schemas
 - 🌍 **i18n Ready**: Multi-language error messages and responses out of the box
 - 🧪 **100% Tested**: Comprehensive unit tests with Bun's blazing-fast test runner
