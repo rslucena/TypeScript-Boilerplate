@@ -15,6 +15,9 @@ export const createRedisClientMock = () => {
 		ping: mock(() => Promise.resolve("PONG")),
 		duplicate: mock(() => redisMock),
 		connect: mock(() => Promise.resolve()),
+		publish: mock((..._args: unknown[]) => Promise.resolve(1)),
+		subscribe: mock((..._args: unknown[]) => Promise.resolve()),
+		unsubscribe: mock((..._args: unknown[]) => Promise.resolve()),
 	};
 	return redisMock;
 };
