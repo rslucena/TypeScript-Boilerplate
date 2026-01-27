@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main
-      - staging
-      
-  workflow_dispatch:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-docs.yml'
 
 jobs:
   build-deploy:
@@ -47,5 +47,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/.vitepress/dist
-          destination_dir: ${{ github.ref_name == 'staging' && 'staging' || '.' }}
+          destination_dir: .
           keep_files: true
