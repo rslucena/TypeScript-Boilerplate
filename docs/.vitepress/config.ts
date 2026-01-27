@@ -38,6 +38,13 @@ export default defineConfig({
                 ],
             },
             {
+                text: "🌐 Servers",
+                items: [
+                    { text: "HTTP Server (Fastify)", link: "/servers/http-server" },
+                    { text: "Scalable WebSockets", link: "/servers/websockets" },
+                ]
+            },
+            {
                 text: "🛠️ Development",
                 items: [
                     { text: "Domain Scaffolding", link: "/development/domain-scaffolding" },

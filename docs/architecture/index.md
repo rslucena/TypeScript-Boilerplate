@@ -71,7 +71,7 @@ const roadmapNodes = [
 
 const roadmapEdges = [
   { id: 're1', source: 'rd1', target: 'rd2', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Implemented', ...style },
-  { id: 're2', source: 'rd2', target: 'rd3', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'WIP', ...style2, animated: true },
+  { id: 're2', source: 'rd2', target: 'rd3', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Implemented/WIP', ...style2, animated: true },
   { id: 're3', source: 'rd3', target: 'rd4', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Planned', ...style2 }
 ]
 </script>
@@ -96,7 +96,7 @@ The heart of the application. Each subfolder (e.g., `user`) represents a bounded
 
 ### 3. Infrastructure (`src/infrastructure/`)
 Contains implementation details of technical services:
-- **Server**: Fastify configuration and boilerplate.
+- **Server**: [Fastify (HTTP)](/servers/http-server) and [WebSockets (Scalable)](/servers/websockets) configurations.
 - **Cache**: Redis integration for high-performance data storage.
 - **Repository**: Database connection and base repository patterns.
 - **Messages**: Communication layer (distributed via Redis or internal via Node events).
@@ -127,10 +127,10 @@ We are constantly evolving the boilerplate to provide the best developer experie
 - [x] Redis-powered Smart Caching
 - [x] i18n support
 
-### Phase 2: Enhanced Plugins (In Progress)
+### Phase 2: Enhanced Plugins (Completed / In Progress)
 - [ ] Advanced Authentication (OAuth2, OIDC)
 - [ ] Distributed Locking system
-- [ ] Real-time WebSocket plugin
+- [x] Real-time WebSocket plugin (Scalable via Redis)
 
 ### Phase 3: Advanced Observability (Planned)
 - [ ] OpenTelemetry integration

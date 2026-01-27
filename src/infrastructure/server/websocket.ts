@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import Logs from "@infrastructure/logs/handler";
+import { messages } from "@infrastructure/messages/actions";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import authentication from "./authentication";
 import { container } from "./interface";
 import { safeParse } from "./transforms";
 
-type messages = { action: string; session: string; context: string };
+type payload = { action: string; session: string; context: string };
 type client = { link: WebSocket; authenticated: boolean };
 
 const topics: Map<string, Set<string>> = new Map();
@@ -18,6 +19,7 @@ export default function websocket(Params: WebSocketServer["options"]) {
 	ws.on("close", () => logger.error("websocket closed"));
 	ws.on("error", () => logger.error("websocket error"));
 	ws.on("listening", () => logger.info(`websocket listening ${JSON.stringify(ws.address())}`));
+	ws.on("headers", (headers) => logger.info(`websocket headers received: ${headers}`));
 	ws.on("connection", (link, request) => connection(link, request));
 	return ws;
 }
@@ -48,7 +50,7 @@ async function message(id: string, data: RawData) {
 	const decoded = safeParse(data.toString());
 	if (!decoded || !client) return disconnect(id);
 
-	const { action, context, session } = decoded as messages;
+	const { action, context, session } = decoded as payload;
 	if (!action || !context || !session) disconnect(id);
 	if (session !== id) disconnect(id);
 
@@ -59,14 +61,14 @@ async function message(id: string, data: RawData) {
 			return client.link.send(authenticated);
 
 		case "subscribe": {
-			const subscribed = subscribe(id, action, client.authenticated);
+			const subscribed = await subscribe(id, context, client.authenticated);
 			if (subscribed) return client.link.send(msubscribe);
 			client.link.send(insession);
 			return disconnect(id);
 		}
 
 		case "unsubscribe": {
-			const deleted = unsubscribe(id, action, client.authenticated);
+			const deleted = await unsubscribe(id, context, client.authenticated);
 			if (deleted) return client.link.send(munsubscribe);
 			client.link.send(insession);
 			return disconnect(id);
@@ -77,10 +79,13 @@ async function message(id: string, data: RawData) {
 	}
 }
 
-function disconnect(id: string) {
-	for (const [router, clients] of topics.entries()) {
-		if (clients.has(id)) clients.delete(id);
-		if (clients.size === 0) topics.delete(router);
+async function disconnect(id: string) {
+	for (const [topic, connected] of topics.entries()) {
+		if (connected.has(id)) connected.delete(id);
+		if (connected.size === 0) {
+			await messages.unsub(topic);
+			topics.delete(topic);
+		}
 	}
 	const client = clients.get(id);
 	if (!client) return;
@@ -94,17 +99,38 @@ async function credentials(content: string) {
 	return await new authentication().session(receiver);
 }
 
-function subscribe(id: string, action: string, authenticated: boolean) {
+async function subscribe(id: string, topic: string, authenticated: boolean) {
 	if (!authenticated) return undefined;
-	if (!topics.has(action)) topics.set(action, new Set<string>());
-	return topics.get(action)?.add(id);
+	if (!topics.has(topic)) {
+		await messages.sub(topic, broadcast);
+		topics.set(topic, new Set<string>());
+	}
+	return topics.get(topic)?.add(id);
 }
 
-function unsubscribe(id: string, action: string, authenticated: boolean) {
+async function unsubscribe(id: string, topic: string, authenticated: boolean) {
 	if (!authenticated) return undefined;
-	const subscribers = topics.get(action);
+	const subscribers = topics.get(topic);
 	if (!subscribers) return true;
-	return subscribers.size > 2 ? subscribers.delete(id) : topics.delete(action);
+
+	const deleted = subscribers.delete(id);
+	if (subscribers.size === 0) {
+		await messages.unsub(topic);
+		topics.delete(topic);
+	}
+	return deleted;
+}
+
+async function broadcast(snapshot: unknown, topic?: string) {
+	if (!topic || !topics.has(topic)) return;
+	const message = JSON.stringify({ action: "message", topic, snapshot });
+	const subscribers = topics.get(topic);
+	if (subscribers) {
+		for (const id of subscribers) {
+			const client = clients.get(id);
+			if (client && client.link.readyState === 1) client.link.send(message);
+		}
+	}
 }
 
 const mstart = JSON.stringify({ action: "connect", message: "connection established" });
