@@ -1,11 +1,6 @@
 name: Deploy Docs (Preview)
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -15,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
