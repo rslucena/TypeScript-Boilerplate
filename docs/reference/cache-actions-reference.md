@@ -11,6 +11,7 @@ This document presents the available actions for interacting with the cache syst
 export interface actions {
   text: functions
   json: functions
+  status: () => boolean
   ping: () => Promise<string>
 }
 ```
@@ -35,6 +36,28 @@ cache.ping()
   .then((result) => console.log('Ping result:', result))
   .catch((error) => console.error('Error:', error));
 ```
+
+### Checks the cache connection status. `status`
+Returns a boolean indicating if the Redis client is currently connected and open.
+
+**Returns**: `boolean`
+
+```typescript
+import cache from '@infrastructure/cache/actions';
+
+if (cache.status()) {
+  console.log('Redis is connected');
+}
+```
+
+### High Availability & Resilience
+This cache system implements **Graceful Degradation**. All methods (`get`, `set`, `del`) are designed to be non-blocking. If Redis is unavailable:
+- **`get`**: Returns `null` (forcing a fallback to the database).
+- **`set`/`del`**: Resolve silently (returning `null` or `0`) without throwing errors.
+- **`ping`**: Returns `"PONG"` even if disconnected.
+
+> [!NOTE]
+> This ensures the API remains functional even during Redis outages, although it might increase Database load.
 
 ### Stores data in the cache. `set`
 The set function is essential in cache systems as it enables storing data with specified keys for efficient retrieval. By utilizing set, applications can optimize data access by caching frequently accessed or expensive-to-calculate data, enhancing overall system performance.

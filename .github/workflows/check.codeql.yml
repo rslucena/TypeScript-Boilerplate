@@ -3,10 +3,20 @@ name: "CodeQL"
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   schedule:
     - cron: '0 0 * * 1,3,5'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
@@ -25,18 +35,18 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4.2.2
 
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v3.28.10
       with:
         languages: ${{ matrix.language }}
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+      uses: github/codeql-action/autobuild@v3.28.10
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v3.28.10
       with:
         category: "/language:${{matrix.language}}"

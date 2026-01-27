@@ -3,8 +3,21 @@ name: Quality Gate
 on:
   push:
     branches: [ "main", "staging" ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   pull_request:
     branches: [ "main", "staging" ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   pre_job:
@@ -13,7 +26,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5
+        uses: fkirc/skip-duplicate-actions@v5.3.0
         with:
           concurrent_skipping: 'always'
           skip_after_successful_duplicate: 'true'
@@ -23,14 +36,14 @@ jobs:
     if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4.2.2
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v2.0.1
         with:
           bun-version: latest
       
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
@@ -47,14 +60,14 @@ jobs:
     if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4.2.2
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
       
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
@@ -71,14 +84,14 @@ jobs:
     needs: [pre_job, lint, test]
     if: needs.pre_job.outputs.should_skip != 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4.2.2
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
       
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}

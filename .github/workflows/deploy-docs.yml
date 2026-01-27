@@ -6,7 +6,18 @@ on:
       - main
     paths:
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build-deploy:
@@ -14,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v2.0.1
         with:
           bun-version: latest
 
@@ -28,10 +39,11 @@ jobs:
       - name: Set version
         id: set_version
         run: |
-          if [ "${{ github.ref_name }}" == "main" ]; then
-            VERSION=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' || echo "1.0.0")
+          if [ "${{ github.event_name }}" == "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
           else
-            VERSION=$(echo ${{ github.sha }} | cut -c1-7)
+            LATEST_RELEASE=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+            VERSION=${LATEST_RELEASE:-"1.0.0"}
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -43,7 +55,7 @@ jobs:
           VITE_APP_ENV: ${{ github.ref_name }}
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/.vitepress/dist
