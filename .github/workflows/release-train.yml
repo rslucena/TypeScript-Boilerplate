@@ -5,6 +5,10 @@ on:
     - cron: "0 0 * * 1" 
   workflow_dispatch: 
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
@@ -14,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
