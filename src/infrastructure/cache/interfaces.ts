@@ -15,5 +15,6 @@ export interface setmode {
 export interface actions {
 	text: functions;
 	json: functions;
+	status: () => boolean;
 	ping: () => Promise<string>;
 }

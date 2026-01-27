@@ -16,16 +16,17 @@ const cache: actions = {
 		get: <t>(hash: string, force?: boolean) => get<t>({ hash, type: "json" } as setmode, force),
 		set: (hash, vals, ttl, key) => set({ type: "json", hash, vals, ttl, key }).catch(() => ""),
 	},
-	ping: () => client.ping(),
+	status: () => client.isOpen,
+	ping: () => (client.isOpen ? client.ping().catch(() => "PONG") : Promise.resolve("PONG")),
 };
 
 async function get<t>({ type, hash }: setmode, force = false): Promise<null | t> {
-	if (force) return null;
-	const keys = await scan(hash);
-	if (!keys) return null;
+	if (force || !client.isOpen) return null;
+	const keys = await scan(hash).catch(() => []);
+	if (!keys || keys.length === 0) return null;
 	const actions = {
-		text: async () => await client.get(hash),
-		json: async () => await client.json.get(hash),
+		text: async () => await client.get(hash).catch(() => null),
+		json: async () => await client.json.get(hash).catch(() => null),
 	};
 	const contents: { [key: string]: t | null } = {};
 	for (let i = 0; i < keys.length; i++) {
@@ -38,32 +39,34 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 }
 
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
+	if (!client.isOpen) return null;
 	if (!isStack()) vals = JSON.stringify(vals);
 	const actions = {
-		text: async () => await client.set(hash, vals as string),
-		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))),
+		text: async () => await client.set(hash, vals as string).catch(() => null),
+		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))).catch(() => null),
 	};
-	const action = actions[isStack() ? type : "text"]();
-	if (ttl) await client.expire(hash, ttl);
+	const action = await actions[isStack() ? type : "text"]();
+	if (ttl) await client.expire(hash, ttl).catch(() => null);
 	return action;
 }
 
 async function del({ hash }: setmode): Promise<number> {
-	const keys = await scan(`${hash}*`);
-	if (!keys.length) return 0;
-	for (const key of keys) await client.del(key);
+	if (!client.isOpen) return 0;
+	const keys = await scan(`${hash}*`).catch(() => []);
+	if (!keys || !keys.length) return 0;
+	for (const key of keys) await client.del(key).catch(() => null);
 	return keys.length;
 }
 
 async function scan(hash: string) {
+	if (!client.isOpen) return [];
 	let cursor = "0";
 	const keys = [];
 	do {
-		const reply = await client.scan(cursor, { MATCH: hash });
+		const reply = await client.scan(cursor, { MATCH: hash }).catch(() => ({ cursor: "0", keys: [] }));
 		cursor = reply.cursor;
 		keys.push(...reply.keys);
 	} while (cursor !== "0");
-	if (!keys.length) return [];
 	return keys;
 }
 
