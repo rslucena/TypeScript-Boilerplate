@@ -3,7 +3,8 @@ import client from "@infrastructure/cache/connection";
 
 const publisher = client;
 const subscriber = client.duplicate();
-await subscriber.connect();
+
+subscriber.connect().catch(() => {});
 
 class eventsEmitter {
 	private emitter = new EventEmitter();

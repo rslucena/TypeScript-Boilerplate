@@ -67,3 +67,14 @@ This document records the architectural decisions made for the project, providin
 - **Consequences**:
     - ✅ **Pros**: Better client-side error handling, clearer API documentation, follows REST best practices.
     - ⚠️ **Cons**: Slightly more verbose action logic to handle specific conflict scenarios.
+
+## ADR-006: Redis Graceful Degradation
+- **Status**: Accepted
+- **Decision**: Implement non-blocking error handling and status checks for Redis operations.
+- **Context**: Redis is used for high-speed caching and real-time features (Pub/Sub). However, making it a mandatory dependency for every request or for basic real-time functionality creates a Single Point of Failure (SPOF). We needed a way to ensure the system remains available and functional (Availability over Consistency/Performance) during Redis outages.
+- **Decision**: 
+    - **Cache**: Implement non-blocking error handling and status checks.
+    - **Messaging/WebSocket**: Automatically fallback to an internal `EventEmitter` if Redis is offline, maintaining real-time functionality within the same instance.
+- **Consequences**:
+    - ✅ **Pros**: High Availability (API and WebSockets remain functional), non-blocking app boot, automatic recovery when connection is restored.
+    - ⚠️ **Cons**: Temporary increase in Database load; loss of cross-instance WebSocket communication during Redis downtime.
