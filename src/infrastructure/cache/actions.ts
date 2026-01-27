@@ -42,8 +42,8 @@ async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | nu
 	if (!client.isOpen) return null;
 	if (!isStack()) vals = JSON.stringify(vals);
 	const actions = {
-		text: async () => await client.set(hash, vals as string).catch(() => null),
-		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))).catch(() => null),
+		text: async () => await client.set(hash, vals as string).catch(() => ""),
+		json: async () => await client.json.set(hash, key ?? "$", JSON.parse(JSON.stringify(vals))).catch(() => ""),
 	};
 	const action = await actions[isStack() ? type : "text"]();
 	if (ttl) await client.expire(hash, ttl).catch(() => null);
