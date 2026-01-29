@@ -1,4 +1,4 @@
-import jwt from "@infrastructure/authentication/strategies/jwt";
+import jwt from "@infrastructure/authentication/jwt";
 import type { container } from "@infrastructure/server/interface";
 
 type agents = "authentication";
