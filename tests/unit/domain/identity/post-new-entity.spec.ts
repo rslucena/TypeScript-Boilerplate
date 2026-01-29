@@ -42,10 +42,10 @@ mock.module("@infrastructure/repositories/references", () => ({
 
 const validId = "123e4567-e89b-12d3-a456-426614174000";
 
-import "@domain/user/schema";
+import "@domain/identity/schema";
 import { beforeEach, describe, expect, it } from "bun:test";
 
-describe("User Domain Actions : postNewEntity", () => {
+describe("Identity Domain Actions : postNewEntity", () => {
 	let postNewEntity: CallableFunction;
 
 	beforeEach(async () => {
@@ -58,25 +58,25 @@ describe("User Domain Actions : postNewEntity", () => {
 		repositoryMock.onConflictDoNothing.mockReturnThis();
 		repositoryMock.returning.mockClear();
 		repositoryMock.execute.mockClear();
-		postNewEntity = (await import("@domain/user/actions/post-new-entity")).default;
+		postNewEntity = (await import("@domain/identity/actions/post-new-entity")).default;
 	});
 
-	it("should create new user and return it", async () => {
-		const userData = { name: "John", lastName: "Doe", email: "john@example.com", password: "password123" };
-		containerMock.body.mockReturnValue(userData);
+	it("should create new identity and return it", async () => {
+		const identityData = { name: "John", lastName: "Doe", email: "john@example.com" };
+		containerMock.body.mockReturnValue(identityData);
 		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
-		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...userData }]);
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["user/find:some-key"] });
+		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...identityData }]);
+		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["identity/find:some-key"] });
 
 		const result = await postNewEntity(containerMock);
-		expect(result).toEqual([{ id: validId, ...userData }]);
+		expect(result).toEqual([{ id: validId, ...identityData }]);
 		expect(repositoryMock.insert).toHaveBeenCalled();
 		expect(redisClientMock.del).toHaveBeenCalled();
 	});
 
 	it("should throw 409 if conflict (duplicate email)", async () => {
-		const userData = { name: "John", lastName: "Doe", email: "john@example.com", password: "password123" };
-		containerMock.body.mockReturnValue(userData);
+		const identityData = { name: "John", lastName: "Doe", email: "john@example.com" };
+		containerMock.body.mockReturnValue(identityData);
 		repositoryMock.returning.mockResolvedValueOnce([]);
 		containerMock.conflict.mockReturnValue(new Error("Conflict"));
 

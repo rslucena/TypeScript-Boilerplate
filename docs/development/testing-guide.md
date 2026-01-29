@@ -55,8 +55,8 @@ tests/
 In Bun, `mock.module` applied in one test file can affect other test files in the same process. To ensure **unit tests** are isolated and always use the **real implementation**, we use a query parameter in the import path:
 
 ```typescript
-// tests/unit/infra/authentication/strategies/jwt.spec.ts
-import * as jwt from "@infrastructure/authentication/strategies/jwt?v=unit";
+// tests/unit/infra/authentication/jwt.spec.ts
+import * as jwt from "@infrastructure/authentication/jwt?v=unit";
 ```
 
 The suffix `?v=unit` (or any query) creates a separate module cache entry, bypassing any global mocks applied to the base path.

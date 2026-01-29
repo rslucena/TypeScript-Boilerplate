@@ -24,14 +24,14 @@ mock.module("@infrastructure/repositories/references", () => {
 });
 
 import { describe, expect, it } from "bun:test";
-import user from "@domain/user/entity";
+import identity from "@domain/identity/entity";
 
-describe("User Entity", () => {
+describe("Identity Entity", () => {
 	it("should be defined", () => {
-		expect(user).toBeDefined();
+		expect(identity).toBeDefined();
 	});
 
 	it("should have field 'name'", () => {
-		expect(user.name).toBeDefined();
+		expect(identity.name).toBeDefined();
 	});
 });

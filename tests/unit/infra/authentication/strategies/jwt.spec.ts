@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import * as jwtDefault from "@infrastructure/authentication/strategies/jwt?v=unit";
+import * as jwtDefault from "@infrastructure/authentication/jwt";
 import type { guise } from "@infrastructure/server/interface";
-import { container } from "@infrastructure/server/interface?v=unit";
+import { container } from "@infrastructure/server/interface";
 
 const jwt = jwtDefault.default || jwtDefault;
 

@@ -2,20 +2,20 @@ import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository, { withPagination } from "@infrastructure/repositories/repository";
 import type { container } from "@infrastructure/server/interface";
-import { and, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
-import user from "../entity";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import identity from "../entity";
 import { default as schema } from "../schema";
 
 export default async function getFindByParams(request: container) {
 	request.status(200);
 
 	const validRequest = await schema.actions.read.safeParseAsync(request.query());
-	if (!validRequest.success) throw request.badRequest(request.language(), tag("user", "find{params}"));
+	if (!validRequest.success) throw request.badRequest(request.language(), tag("identity", "find{params}"));
 
 	const { data } = validRequest;
-	const reference = tag("user", "find{params}", data);
+	const reference = tag("identity", "find{params}", data);
 
-	const cached = await cache.json.get<{ [key: string]: user[] }>(reference);
+	const cached = await cache.json.get<{ [key: string]: identity[] }>(reference);
 	if (cached?.[reference]) return cached[reference];
 
 	if (data.name) data.name = `%${data.name}%`;
@@ -25,30 +25,28 @@ export default async function getFindByParams(request: container) {
 	if (data.deletedAt) data.deletedAt = `${data.deletedAt}%`;
 	if (data.updatedAt) data.updatedAt = `${data.updatedAt}%`;
 
-	const { password, ...outhers } = getTableColumns(user);
-
 	const prepare = repository
-		.select({ ...outhers })
-		.from(user)
+		.select()
+		.from(identity)
 		.where(
 			and(
-				data.name ? ilike(user.name, sql.placeholder("name")) : undefined,
-				data.lastName ? ilike(user.lastName, sql.placeholder("lastName")) : undefined,
-				data.email ? ilike(user.email, sql.placeholder("email")) : undefined,
-				data.createdAt ? ilike(user.email, sql.placeholder("createdAt")) : undefined,
-				data.updatedAt ? ilike(user.email, sql.placeholder("updatedAt")) : undefined,
-				data.deletedAt ? ilike(user.email, sql.placeholder("deletedAt")) : undefined,
-				data.activated !== undefined ? eq(user.activated, sql.placeholder("activated")) : undefined,
+				data.name ? ilike(identity.name, sql.placeholder("name")) : undefined,
+				data.lastName ? ilike(identity.lastName, sql.placeholder("lastName")) : undefined,
+				data.email ? ilike(identity.email, sql.placeholder("email")) : undefined,
+				data.createdAt ? ilike(identity.createdAt, sql.placeholder("createdAt")) : undefined,
+				data.updatedAt ? ilike(identity.updatedAt, sql.placeholder("updatedAt")) : undefined,
+				data.deletedAt ? ilike(identity.deletedAt, sql.placeholder("deletedAt")) : undefined,
+				data.activated !== undefined ? eq(identity.activated, sql.placeholder("activated")) : undefined,
 			),
 		)
-		.orderBy(desc(user.id))
+		.orderBy(desc(identity.id))
 		.$dynamic();
 
 	withPagination(prepare, data["req.page"][0], data["req.page"][1]);
 
 	const content = await prepare.execute(validRequest.data);
 
-	if (!content.length) throw request.notFound(request.language(), tag("user", "find{params}"));
+	if (!content.length) throw request.notFound(request.language(), tag("identity", "find{params}"));
 
 	await cache.json.set(reference, content, 60 * 10);
 

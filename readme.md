@@ -246,7 +246,7 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 | Guide | Description |
 |-------|-------------|
 | [Getting Started](https://rslucena.github.io/TypeScript-Boilerplate/guide/getting-started.html) | Detailed setup and configuration |
-| [Complete Example](https://rslucena.github.io/TypeScript-Boilerplate/guide/complete-example.html) | Full walkthrough of creating a User domain |
+| [Complete Example](https://rslucena.github.io/TypeScript-Boilerplate/guide/complete-example.html) | Full walkthrough of creating a product domain |
 | [Template System](https://rslucena.github.io/TypeScript-Boilerplate/development/template-system-architecture.html) | How the code generator works |
 | [Domain Generator](https://rslucena.github.io/TypeScript-Boilerplate/development/domain-scaffolding.html) | Creating CRUD modules |
 | [Architecture](https://rslucena.github.io/TypeScript-Boilerplate/architecture/) | Project structure deep dive |
