@@ -4,9 +4,9 @@ This file defines the mandatory guidelines for me, your AI agent. I will consult
 
 ## 📚 Main Reference
 Always consult the [docs/](../docs/) folder for deep details on:
-- [Architecture](../docs/Architecture.md)
-- [Best Practices](../docs/Best-Practices.md)
-- [Testing Guide](../docs/Testing-Guide.md)
+- [Architecture](../docs/architecture)
+- [Best Practices](../docs/development/best-practices.md)
+- [Testing Guide](../docs/development/testing-guide.md)
 
 ## 🛠️ Code Guidelines
 
@@ -55,19 +55,9 @@ Always consult the [docs/](../docs/) folder for deep details on:
 ---
 
 ## 🤖 Agent Behavior
-- **Agenic Memory**: 
-    - **Task Logging**: For every significant implementation, I must create a task log in `.agent/tasks/YYYY-MM/DD_{TIMESTAMP}.md`.
-    - **Self-Correction**: Check for similar past tasks in `.agent/tasks/` before starting to avoid duplicating efforts or repeating mistakes.
+- **Agenic Memory**:
     - **Never Commit**: `IMPLEMENTATION_PROPOSAL.md` is for planning only and must **NEVER** be committed to the repository. It should remain local.
-    - **Reflection**: Periodically update `.agent/reflections/` with broad architectural insights or recurring patterns discovered.
-- **Log Template**: Each task log must include:
-    - **Description**: What the task is.
-    - **User Request**: Textual quote.
-    - **Context**: Project state before changes.
-    - **Decisions**: Why approach X was chosen over Y.
-    - **Implemented Changes**: Step-by-step summary.
-    - **Lessons Learned**: Insights for future agents/sessions.
-- **Implementation Proposal**: For any non-trivial task, I must create an `IMPLEMENTATION_PROPOSAL.md` file in the root containing:
+- **Implementation Proposal**: For any task, I must create an `IMPLEMENTATION_PROPOSAL.md` file in the root containing:
     - **Branch Information**: Branch Name (`feat/name`) and PR Name (`type(scope): description`).
     - **Context**: Brief explanation of the problem and improved solution.
     - **Proposed Changes**:
@@ -83,8 +73,8 @@ Always consult the [docs/](../docs/) folder for deep details on:
         - **Convention**: Use Conventional Commits.
 - **Code Review**: Before submitting, I will run a self-check for N+1 queries, missing database indexes, and `any` usage.
 - **Proactivity**: Before creating something new, check if a similar template or pattern exists in the project.
-- **Documentation**: 
+- **Documentation**:
     - When implementing a new feature, I must validate if the `README.md` or `docs/` needs updates, improvements, or new files.
-    - Documentation must be **clear, detailed, and dynamic**. 
+    - Documentation must be **clear, detailed, and dynamic**.
     - **Graphics**: Use **Mermaid** diagrams to visualize complex data flows, logic, or architectures. This is mandatory for significant changes to make the documentation easier to read.
 - **Security**: Never log sensitive data (passwords, tokens). Always use env vars.

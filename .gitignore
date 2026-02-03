@@ -85,10 +85,6 @@ api/_assets*
 **/migrations/*.sql
 **/migrations/meta/*
 
-# Agents
-/.agent/tasks/
-/.agent/reflections/
-
 # Docs
 docs/.vitepress/dist
 docs/.vitepress/cache
