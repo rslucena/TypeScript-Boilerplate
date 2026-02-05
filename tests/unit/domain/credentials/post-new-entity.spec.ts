@@ -64,6 +64,7 @@ describe("Credentials Domain Actions : postNewEntity", () => {
 		const onConflictMock = mock().mockReturnValue({ returning: returningMock });
 		const valuesMock = mock().mockReturnValue({ onConflictDoNothing: onConflictMock });
 		repositoryMock.insert.mockReturnValue({ values: valuesMock });
+
 		const prepareMock = { execute: mock().mockResolvedValueOnce([credentialData]) };
 		repositoryMock.select.mockReturnValue({
 			from: mock().mockReturnValue({
