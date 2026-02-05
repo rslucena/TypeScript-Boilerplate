@@ -10,7 +10,7 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
-mock.module("@infrastructure/cache/connection", () => ({
+mock.module("@infrastructure/cache/actions", () => ({
 	__esModule: true,
 	default: redisClientMock,
 }));
@@ -71,7 +71,7 @@ describe("Identity Domain Actions : postNewEntity", () => {
 		const result = await postNewEntity(containerMock);
 		expect(result).toEqual([{ id: validId, ...identityData }]);
 		expect(repositoryMock.insert).toHaveBeenCalled();
-		expect(redisClientMock.del).toHaveBeenCalled();
+		expect(redisClientMock.json.del).toHaveBeenCalled();
 	});
 
 	it("should throw 409 if conflict (duplicate email)", async () => {

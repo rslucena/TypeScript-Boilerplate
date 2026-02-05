@@ -15,8 +15,8 @@ export default async function getById(request: container) {
 	const { id } = validRequest.data;
 	const reference = tag("identity", "find{id}", { id });
 
-	const cached = await cache.json.get<{ [key: string]: identity[] }>(reference);
-	if (cached?.[reference]) return cached[reference];
+	const cached = await cache.json.get<identity[]>(reference);
+	if (cached) return cached;
 
 	const prepare = repository
 		.select()

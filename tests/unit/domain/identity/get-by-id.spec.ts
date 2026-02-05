@@ -10,7 +10,7 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
-mock.module("@infrastructure/cache/connection", () => ({
+mock.module("@infrastructure/cache/actions", () => ({
 	__esModule: true,
 	default: redisClientMock,
 }));

@@ -54,10 +54,10 @@ export default async function identityRoutes(api: FastifyInstance) {
 				tags: ["identity"],
 				summary: "Create new identity",
 				body: schema.actions.create,
-				headers: schema.actions.headers,
+				headers: schema.actions.headers.omit({ authorization: true }),
 				response: { 201: schema.entity, ...request.reply.schemas },
 			},
 		},
-		request.restricted(postNewEntity),
+		request.noRestricted(postNewEntity),
 	);
 }
