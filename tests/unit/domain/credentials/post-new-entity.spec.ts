@@ -20,18 +20,32 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 }));
 
+// Mock both entity and schema to break circular dependency
+mock.module("@domain/credentials/entity", () => ({
+	__esModule: true,
+	default: {
+		id: { setName: mock(() => ({})) },
+		identityId: { setName: mock(() => ({})) },
+		password: { setName: mock(() => ({})) },
+		activated: { setName: mock(() => ({})) },
+		createdAt: { setName: mock(() => ({})) },
+		updatedAt: { setName: mock(() => ({})) },
+		deletedAt: { setName: mock(() => ({})) },
+	},
+}));
+
 mock.module("@domain/credentials/schema", () => ({
 	__esModule: true,
 	default: {
 		actions: {
 			create: {
-				safeParseAsync: mock((data: any) => Promise.resolve({ success: true, data })),
+				safeParseAsync: mock((data: unknown) => Promise.resolve({ success: true, data })),
 			},
 			id: {
-				safeParseAsync: mock((data: any) => Promise.resolve({ success: true, data })),
+				safeParseAsync: mock((data: unknown) => Promise.resolve({ success: true, data })),
 			},
 			read: {
-				safeParseAsync: mock((data: any) => Promise.resolve({ success: true, data })),
+				safeParseAsync: mock((data: unknown) => Promise.resolve({ success: true, data })),
 			},
 		},
 	},
@@ -53,6 +67,7 @@ describe("Credentials Domain Actions : postNewEntity", () => {
 		redisClientMock.json.del.mockClear();
 		repositoryMock.insert.mockClear();
 		repositoryMock.select.mockClear();
+
 		postNewEntity = (await import("@domain/credentials/actions/post-new-entity")).default;
 	});
 
@@ -65,6 +80,7 @@ describe("Credentials Domain Actions : postNewEntity", () => {
 		const valuesMock = mock().mockReturnValue({ onConflictDoNothing: onConflictMock });
 		repositoryMock.insert.mockReturnValue({ values: valuesMock });
 
+		// Mock repository for internal getById call
 		const prepareMock = { execute: mock().mockResolvedValueOnce([credentialData]) };
 		repositoryMock.select.mockReturnValue({
 			from: mock().mockReturnValue({
@@ -101,7 +117,9 @@ describe("Credentials Domain Actions : postNewEntity", () => {
 
 	it("should throw 400 if validation fails", async () => {
 		const { default: schema } = await import("@domain/credentials/schema");
-		(schema.actions.create.safeParseAsync as any).mockResolvedValueOnce({ success: false });
+		(
+			schema.actions.create.safeParseAsync as unknown as { mockResolvedValueOnce: CallableFunction }
+		).mockResolvedValueOnce({ success: false });
 
 		containerMock.body.mockReturnValue({ password: "short" });
 		containerMock.badRequest.mockReturnValue(new Error("Bad Request"));

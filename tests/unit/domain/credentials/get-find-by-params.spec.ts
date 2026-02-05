@@ -21,12 +21,26 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	withPagination: mock(() => ({})),
 }));
 
+// Mock both entity and schema to break circular dependency
+mock.module("@domain/credentials/entity", () => ({
+	__esModule: true,
+	default: {
+		id: { setName: mock(() => ({})) },
+		identityId: { setName: mock(() => ({})) },
+		password: { setName: mock(() => ({})) },
+		activated: { setName: mock(() => ({})) },
+		createdAt: { setName: mock(() => ({})) },
+		updatedAt: { setName: mock(() => ({})) },
+		deletedAt: { setName: mock(() => ({})) },
+	},
+}));
+
 mock.module("@domain/credentials/schema", () => ({
 	__esModule: true,
 	default: {
 		actions: {
 			read: {
-				safeParseAsync: mock((data: any) => Promise.resolve({ success: true, data })),
+				safeParseAsync: mock((data: unknown) => Promise.resolve({ success: true, data })),
 			},
 		},
 	},
