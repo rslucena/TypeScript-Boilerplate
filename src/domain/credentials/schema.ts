@@ -1,12 +1,17 @@
 import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { array, uuid } from "zod";
+import { array, uuid, z } from "zod";
+import { providers, types } from "./constants";
 import credentials from "./entity";
 
 const create = createInsertSchema(credentials, {
-	identityId: uuid(),
-	password: (schema) => schema.min(8).max(100),
+	type: () => z.enum(types),
+	provider: () => z.enum(providers),
+	subject: (schema) => schema.min(1).max(255),
+	login: (schema) => schema.trim().optional(),
+	secret: (schema) => schema.trim().optional(),
+	revokedReason: (schema) => schema.trim().min(3).max(255).optional(),
 });
 
 const select = createSelectSchema(credentials, {
@@ -18,9 +23,27 @@ const actions = {
 	headers,
 	id: select.pick({ id: true }).required(),
 	read: select.omit({ id: true }).extend(withPagination.shape),
-	create: create.omit({ id: true }),
-	update: create.omit({ id: true }).partial(),
-	delete: create.pick({ id: true }),
+	create: create
+		.omit({ id: true })
+		.extend({ type: z.enum(types), provider: z.enum(providers) })
+		.superRefine((data, ctx) => {
+			if (data.type === types.PASSWORD && !data.secret) {
+				ctx.addIssue({
+					code: "custom",
+					message: "Secret is required for PASSWORD type",
+					path: ["secret"],
+				});
+			}
+			if (data.type === types.OIDC && !data.subject) {
+				ctx.addIssue({
+					code: "custom",
+					message: "Subject is required for OIDC type",
+					path: ["subject"],
+				});
+			}
+		}),
+	update: create.pick({ login: true, secret: true }),
+	delete: create.pick({ revokedReason: true }).required(),
 };
 
 export default { actions, entity: array(select) };

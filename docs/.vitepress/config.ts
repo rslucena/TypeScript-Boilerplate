@@ -58,6 +58,7 @@ export default defineConfig({
                 items: [
                     { text: "Overview", link: "/architecture/" },
                     { text: "Architecture Decisions", link: "/architecture/architecture-decisions" },
+                    { text: "Identity vs Credentials", link: "/architecture/identity-vs-credentials" },
                     { text: "Plugin System", link: "/architecture/plugin-system" },
                 ],
             },

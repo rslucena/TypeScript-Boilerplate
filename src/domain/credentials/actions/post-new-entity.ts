@@ -1,4 +1,5 @@
 import cache from "@infrastructure/cache/actions";
+import { credential } from "@infrastructure/pipes/credential";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
 import { container } from "@infrastructure/server/interface";
@@ -9,14 +10,23 @@ import getById from "./get-by-id";
 export default async function postNewEntity(request: container) {
 	request.status(201);
 
-	const validRequest = await schema.actions.create.safeParseAsync(request.body());
-	if (!validRequest.success) throw request.badRequest(request.language(), "post/credentials/{params}");
+	const valid = await schema.actions.create.safeParseAsync(request.body());
+	if (!valid.success) throw request.badRequest(request.language(), tag("credentials", "create/schema"));
+
+	const roles = credential({
+		type: valid.data.type,
+		provider: valid.data.provider,
+		subject: valid.data.subject,
+		secret: valid.data.secret,
+	});
+
+	if (!roles) throw request.badRequest(request.language(), tag("credentials", "create/validation"));
 
 	const content = await repository
 		.insert(credentials)
 		.values({
-			...validRequest.data,
-			password: hash(validRequest.data.password),
+			...valid.data,
+			...(valid.data.secret && { secret: hash(valid.data.secret) }),
 		})
 		.onConflictDoNothing()
 		.returning();
