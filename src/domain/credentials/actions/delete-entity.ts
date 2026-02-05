@@ -1,22 +1,33 @@
-import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
-import type { container } from "@infrastructure/server/interface";
+import { container } from "@infrastructure/server/interface";
 import { eq } from "drizzle-orm";
 import credentials from "../entity";
 import schema from "../schema";
+import getById from "./get-by-id";
 
 export default async function deleteEntity(request: container) {
-	request.status(204);
+	request.status(200);
 
 	const validRequest = await schema.actions.id.safeParseAsync(request.params());
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("credentials", "delete{id}"));
 
-	const content = await repository.delete(credentials).where(eq(credentials.id, validRequest.data.id)).returning();
+	const validBody = await schema.actions.delete.safeParseAsync(request.body());
+	if (!validBody.success) throw request.badRequest(request.language(), tag("credentials", "delete{id}"));
+
+	const { revokedReason } = validBody.data;
+
+	const content = await repository
+		.update(credentials)
+		.set({
+			revokedAt: new Date(),
+			revokedReason: revokedReason ? revokedReason : "manual_revoke",
+			activated: false,
+		})
+		.where(eq(credentials.id, validRequest.data.id))
+		.returning();
 
 	if (!content.length) throw request.notFound(request.language(), tag("credentials", "delete"));
 
-	await cache.json.del(tag("credentials", "find*"));
-
-	return {};
+	return getById(new container({ params: { id: content[0].id } }));
 }

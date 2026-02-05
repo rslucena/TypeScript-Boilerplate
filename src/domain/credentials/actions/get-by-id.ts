@@ -1,4 +1,3 @@
-import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
 import type { container } from "@infrastructure/server/interface";
@@ -13,10 +12,6 @@ export default async function getById(request: container) {
 	if (!validRequest.success) throw request.badRequest(request.language(), tag("credentials", "find{id}"));
 
 	const { id } = validRequest.data;
-	const reference = tag("credentials", "find{id}", { id });
-
-	const cached = await cache.json.get<(typeof credentials)[]>(reference);
-	if (cached) return cached;
 
 	const prepare = repository
 		.select()
@@ -29,8 +24,6 @@ export default async function getById(request: container) {
 	const content = await prepare.execute({ id });
 
 	if (!content.length) throw request.notFound(request.language(), tag("credentials", "find{id}"));
-
-	await cache.json.set(reference, content, 60 * 10);
 
 	return content;
 }

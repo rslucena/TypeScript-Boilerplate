@@ -60,6 +60,15 @@ Different authentication methods can be added without modifying the `Identity` e
 ### 3. Modular Testing
 Separating these domains allows for cleaner unit tests. We can test identity profile updates independently of password hashing logic and vice versa.
 
+## Validation Rules
+
+To maintain high security and data integrity, the **Credentials** domain enforces strict validation rules via standardized pipes:
+
+- **Type Compatibility**: Each credential `type` is restricted to specific `providers` (e.g., `PASSWORD` is only allowed for the `LOCAL` provider).
+- **Mandatory Secrets**: Credentials of type `PASSWORD`, `API_KEY`, or `SERVICE` **must** include a `secret`.
+- **Subject Requirement**: OIDC-based credentials (`GOOGLE`, `GITHUB`) **must** include a `subject` (typically the provider's unique user ID).
+- **Mutually Exclusive Fields**: If a `subject` is required, it must be provided; if not required, it must be omitted to avoid data pollution.
+
 ## How it works
 
 When a user logs in, the system verifies the **Credentials** first. Once validated, it retrieves the associated **Identity** to populate the session/token.
