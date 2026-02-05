@@ -1,18 +1,19 @@
 import identity from "@domain/identity/entity";
-import { identifier, pgIndex } from "@infrastructure/repositories/references";
-import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { identifier } from "@infrastructure/repositories/references";
+import { index, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 
 const columns = {
-	userId: uuid("userId")
+	identityId: uuid("identityId")
 		.references(() => identity.id)
 		.notNull()
 		.unique(),
 	password: varchar("password", { length: 100 }).notNull(),
 };
 
-const credentials = pgTable("credentials", { ...columns, ...identifier }, (table) =>
-	pgIndex("credentials", table, ["userId"]),
-);
+const credentials = pgTable("credentials", { ...columns, ...identifier }, (table) => [
+	index("credentials_identityId_idx").on(table.identityId),
+	index("credentials_activated_idx").on(table.activated),
+]);
 
 type credentials = typeof credentials.$inferSelect;
 
