@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import jwt from "@infrastructure/authentication/jwt";
+import * as jwt from "@infrastructure/authentication/jwt";
 import authentication from "@infrastructure/server/authentication";
 import { container } from "@infrastructure/server/interface";
 
