@@ -15,8 +15,8 @@ export default async function getFindByParams(request: container) {
 	const { data } = validRequest;
 	const reference = tag("identity", "find{params}", data);
 
-	const cached = await cache.json.get<{ [key: string]: identity[] }>(reference);
-	if (cached?.[reference]) return cached[reference];
+	const cached = await cache.json.get<identity[]>(reference);
+	if (cached) return cached;
 
 	if (data.name) data.name = `%${data.name}%`;
 	if (data.lastName) data.lastName = `%${data.lastName}%`;

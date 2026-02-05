@@ -1,4 +1,4 @@
-import { safeParse } from "@infrastructure/server/transforms";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 import { env } from "@infrastructure/settings/environment";
 import client from "./connection";
 import type { actions, setmode } from "./interfaces";

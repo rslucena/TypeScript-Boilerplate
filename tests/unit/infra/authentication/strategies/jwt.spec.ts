@@ -1,9 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import * as jwtDefault from "@infrastructure/authentication/jwt";
+import * as jwt from "@infrastructure/authentication/jwt";
 import type { guise } from "@infrastructure/server/interface";
 import { container } from "@infrastructure/server/interface";
-
-const jwt = jwtDefault.default || jwtDefault;
 
 describe("JWT Strategy", () => {
 	const mockSession: guise["session"] = { id: "123", name: "Test User" };

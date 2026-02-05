@@ -107,6 +107,10 @@ bun gen:domain product
 ### Step 4️⃣ - Run & Test
 
 ```bash
+
+# 🔐 Generate security keys (RSA)
+bun gen:keys
+
 # Start development server
 bun dev --workers=primary-webserver
 
@@ -256,6 +260,7 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 | [Deployment](https://rslucena.github.io/TypeScript-Boilerplate/devops/deployment.html) | Production deployment |
 | [HTTP Server](https://rslucena.github.io/TypeScript-Boilerplate/servers/http-server.html) | Fastify setup and configuration |
 | [Scalable WebSockets](https://rslucena.github.io/TypeScript-Boilerplate/servers/websockets.html) | Redis Pub/Sub powered real-time |
+| [Identity vs Credentials](./docs/architecture/identity-vs-credentials.md) | Domain separation architectural pattern |
 
 ---
 

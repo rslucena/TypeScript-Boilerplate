@@ -1,73 +1,81 @@
-import crypto from "node:crypto";
-import type { container, guise, JWT } from "@infrastructure/server/interface";
-import { safeParse } from "@infrastructure/server/transforms";
+import { readFileSync } from "node:fs";
+import { base64url, rsa, rsaVerify } from "@infrastructure/pipes/crypto";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
+import type { container, guise } from "@infrastructure/server/interface";
 import { env } from "@infrastructure/settings/environment";
 
+export interface TokenPayload {
+	exp?: number;
+	iat?: number;
+	nbf?: number;
+	sub?: string;
+	aud?: string;
+	iss?: string;
+	jti?: string;
+	scope?: string;
+	client_id?: string;
+	email?: string;
+	id?: string;
+	[key: string]: unknown;
+}
+
+const privateKey = readFileSync(`${env.APP_FOLDER_KEY}/private.pem`, "utf8");
+const publicKey = readFileSync(`${env.APP_FOLDER_KEY}/public.pem`, "utf8");
+const metadata = JSON.parse(readFileSync(`${env.APP_FOLDER_KEY}/metadata.json`, "utf8"));
+const kid = metadata.kid as string;
+
 function create(content: guise["session"], exp?: number) {
-	const header = {
-		alg: "HS256",
-		typ: "JWT",
+	const header = { alg: "RS256", typ: "JWT", kid };
+
+	const payload = {
+		...content,
 		exp: Math.floor(Date.now() / 1000) + (exp ?? 60 * 60),
 	};
-	const encodedHeader = Buffer.from(JSON.stringify(header))
-		.toString("base64")
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=/g, "");
-	const encodedPayload = Buffer.from(JSON.stringify(content))
-		.toString("base64")
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=/g, "");
-	const signature = crypto
-		.createHmac("sha256", env.AUTH_SALT)
-		.update(`${encodedHeader}.${encodedPayload}`)
-		.digest("base64")
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=/g, "");
-	return `${encodedHeader}.${encodedPayload}.${signature}`;
+
+	const encodedHeader = base64url(JSON.stringify(header));
+	const encodedPayload = base64url(JSON.stringify(payload));
+	const data = `${encodedHeader}.${encodedPayload}`;
+
+	const signature = rsa(data, privateKey);
+	return `${data}.${base64url(signature)}`;
+}
+
+function parse(token: string) {
+	const parts = token.split(".");
+	if (parts.length !== 3) throw new Error("Invalid token format");
+
+	const [header, payload, signature] = parts;
+	const data = `${header}.${payload}`;
+
+	const buffer = Buffer.from(signature, "base64url");
+
+	const isValid = rsaVerify(data, buffer, publicKey);
+	if (!isValid) throw new Error("Invalid signature");
+
+	const body = safeParse<{ [key: string]: unknown }>(Buffer.from(payload, "base64url").toString());
+	if (!body) throw new Error("Invalid payload");
+
+	return body;
 }
 
 async function session<T = guise["session"]>(request: container): Promise<T> {
 	const { authorization } = request.headers();
-
 	if (!authorization) throw new Error("Unauthorized");
 
 	const jwt = authorization.replace("Bearer", "").replace(" ", "");
+	try {
+		const body = parse(jwt);
+		const Now = Math.floor(Date.now() / 1000);
+		if (typeof body.exp === "number" && Now > body.exp) throw new Error("Unauthorized");
+		return body as T;
+	} catch {
+		throw new Error("Unauthorized");
+	}
+}
 
-	const parts = jwt.split(".");
-	if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) throw new Error("Unauthorized");
-
-	const encodedHeader = parts[0];
-	const encodedPayload = parts[1];
-	const signature = parts[2];
-
-	const header = safeParse<JWT>(Buffer.from(encodedHeader, "base64").toString());
-	if (!header) throw new Error("Unauthorized");
-	if (header.typ !== "JWT" || header.alg !== "HS256") throw new Error("Unauthorized");
-
-	const body = safeParse<{ [key: string]: unknown }>(Buffer.from(encodedPayload, "base64").toString());
-	if (!body) throw new Error("Unauthorized");
-
-	const expectedSignature = crypto
-		.createHmac("sha256", env.AUTH_SALT)
-		.update(`${encodedHeader}.${encodedPayload}`)
-		.digest("base64")
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=/g, "");
-
-	if (signature !== expectedSignature) throw new Error("Unauthorized");
-
-	const Now = Math.floor(Date.now() / 1000);
-
-	if (Now > header.exp) throw new Error("Unauthorized");
-
+function decode<T>(token: string): T {
+	const body = parse(token);
 	return body as T;
 }
 
-export default {
-	create,
-	session,
-};
+export { create, session, decode };

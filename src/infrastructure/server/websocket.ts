@@ -2,10 +2,10 @@ import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import Logs from "@infrastructure/logs/handler";
 import { messages } from "@infrastructure/messages/actions";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import authentication from "./authentication";
 import { container } from "./interface";
-import { safeParse } from "./transforms";
 
 type payload = { action: string; session: string; context: string };
 type client = { link: WebSocket; authenticated: boolean };

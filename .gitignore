@@ -88,3 +88,7 @@ api/_assets*
 # Docs
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+# Keys
+keys
+*.pem
