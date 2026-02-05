@@ -26,6 +26,7 @@
 	},
 	"scripts": {
 		"gen:domain": "bun src/commands/generate-domain.ts",
+		"gen:keys": "bun src/commands/generate-keys.ts",
 		"lint:check": "bunx biome ci .",
 		"tests": "bun test --coverage",
 		"pb:health": "bun outdated",
@@ -35,7 +36,7 @@
 		"build": "bun src/commands/exec-builder.ts",
 		"start": "bun dist/commands/exec-process.js",
 		"dev": "bun --watch src/commands/exec-process.ts",
-		"prebuild": "bunx biome format --write .",
+		"prebuild": "bunx biome format --write . && bun gen:keys",
 		"postinstall": "lefthook install"
 	},
 	"devDependencies": {
