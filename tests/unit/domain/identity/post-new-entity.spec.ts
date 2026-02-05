@@ -35,9 +35,9 @@ mock.module("@infrastructure/repositories/references", () => ({
 	__esModule: true,
 	tag: referencesMock.tag,
 	hash: referencesMock.hash,
-	identifier: { id: mock().mockReturnValue("some-string") },
-	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.uuid() },
+	identifier: referencesMock.identifier,
+	pgIndex: referencesMock.pgIndex,
+	zodIdentifier: referencesMock.zodIdentifier,
 }));
 
 const validId = "123e4567-e89b-12d3-a456-426614174000";

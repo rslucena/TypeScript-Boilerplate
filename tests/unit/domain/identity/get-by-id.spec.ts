@@ -3,7 +3,6 @@ import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
-import { z } from "zod";
 
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
@@ -27,12 +26,13 @@ mock.module("@infrastructure/server/request", () => ({
 }));
 
 mock.module("@infrastructure/repositories/references", () => ({
+	__esModule: true,
 	tag: referencesMock.tag,
 	hash: referencesMock.hash,
 	withPagination: referencesMock.withPagination,
-	identifier: { id: mock().mockReturnValue("some-string") },
-	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string() },
+	identifier: referencesMock.identifier,
+	pgIndex: referencesMock.pgIndex,
+	zodIdentifier: referencesMock.zodIdentifier,
 }));
 
 import "@domain/identity/schema";

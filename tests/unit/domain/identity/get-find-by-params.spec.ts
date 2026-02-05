@@ -27,12 +27,13 @@ mock.module("@infrastructure/server/request", () => ({
 }));
 
 mock.module("@infrastructure/repositories/references", () => ({
+	__esModule: true,
 	tag: referencesMock.tag,
 	hash: referencesMock.hash,
 	withPagination: referencesMock.withPagination,
-	identifier: { id: mock().mockReturnValue("some-string") },
-	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string() },
+	identifier: referencesMock.identifier,
+	pgIndex: referencesMock.pgIndex,
+	zodIdentifier: referencesMock.zodIdentifier,
 }));
 
 import "@domain/identity/schema";
