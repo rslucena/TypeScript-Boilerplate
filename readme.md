@@ -108,7 +108,7 @@ bun gen:domain product
 
 ```bash
 
-# 🔐 Generate security keys (RSA)
+# 🔐 Generate security keys and self-signed certificate (RSA + SSL)
 bun gen:keys
 
 # Start development server

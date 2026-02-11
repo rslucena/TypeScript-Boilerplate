@@ -40,7 +40,8 @@ export default defineConfig({
             {
                 text: "🌐 Servers",
                 items: [
-                    { text: "HTTP Server (Fastify)", link: "/servers/http-server" },
+                    { text: "HTTP/2", link: "/servers/http2" },
+                    { text: "HTTP Server", link: "/servers/http-server" },
                     { text: "Scalable WebSockets", link: "/servers/websockets" },
                 ]
             },
