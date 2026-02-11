@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createJWKS, generateRSAKeyPair, pemToJWK } from "@infrastructure/pipes/crypto";
 import { env } from "@infrastructure/settings/environment";
@@ -8,6 +9,12 @@ const { publicKey, privateKey } = generateRSAKeyPair();
 
 writeFileSync(`${env.APP_FOLDER_KEY}/private.pem`, privateKey);
 writeFileSync(`${env.APP_FOLDER_KEY}/public.pem`, publicKey);
+
+console.log("⏳ Generating certificate...");
+execSync(
+	`openssl req -x509 -new -nodes -key ${env.APP_FOLDER_KEY}/private.pem -sha256 -days 365 -out ${env.APP_FOLDER_KEY}/cert.pem -subj "/C=BR/ST=SP/L=SaoPaulo/O=Development/CN=localhost"`,
+	{ stdio: "inherit" },
+);
 
 const jwk = pemToJWK(publicKey);
 const jwks = createJWKS([jwk]);
