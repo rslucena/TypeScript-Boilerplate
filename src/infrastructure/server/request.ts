@@ -1,14 +1,14 @@
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import authentication from "./authentication";
 import { type AnyType, container, type guise, replyErrorSchema } from "./interface";
-import { safeParse } from "./transforms";
 
 export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, done: HookHandlerDoneFunction) {
 	if (req.url.startsWith("/documentation")) {
 		done();
 		return;
 	}
-	const transform = (vl: AnyType): AnyType => {
+	const transform = (vl: string | unknown): unknown => {
 		if (vl === "null") return null;
 		if (vl === "true") return true;
 		if (vl === "false") return false;
@@ -18,7 +18,7 @@ export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, d
 		return vl;
 	};
 
-	const convert = (params: { [key: string]: AnyType } | undefined) => {
+	const convert = (params: Record<string, unknown> | undefined) => {
 		if (!params) return {};
 		for (const key in params) {
 			const vl = params[key];
@@ -27,9 +27,9 @@ export function convertRequestTypes(req: FastifyRequest, _reply: FastifyReply, d
 		}
 		return params;
 	};
-	req.body = convert(req.body as { [key: string]: AnyType });
-	req.params = convert(req.params as { [key: string]: AnyType });
-	req.query = convert(req.query as { [key: string]: AnyType });
+	req.body = convert(req.body as Record<string, unknown>);
+	req.params = convert(req.params as Record<string, unknown>);
+	req.query = convert(req.query as Record<string, unknown>);
 	done();
 }
 

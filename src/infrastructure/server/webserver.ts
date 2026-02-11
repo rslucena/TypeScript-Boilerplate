@@ -1,9 +1,11 @@
+import { readFileSync } from "node:fs";
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Logs from "@infrastructure/logs/handler";
 import cors from "@infrastructure/settings/cors";
+import { env } from "@infrastructure/settings/environment";
 import helmet from "@infrastructure/settings/helmet";
 import { SettingOptions, SettingOptionsUI } from "@infrastructure/settings/swagger";
 import fastify from "fastify";
@@ -15,7 +17,18 @@ import { convertRequestTypes } from "./request";
 const logger = Logs.handler("webserver");
 
 async function webserver(): Promise<server> {
+	const http2 = env.APP_HTTP2
+		? {
+				http2: true,
+				https: {
+					key: readFileSync(env.APP_KEY),
+					cert: readFileSync(env.APP_CERT),
+				},
+			}
+		: {};
+
 	const instance = fastify({
+		...http2,
 		logger: Logs.settings("webserver"),
 		pluginTimeout: 20000,
 		requestTimeout: 20000,
@@ -33,7 +46,7 @@ async function webserver(): Promise<server> {
 	instance.register(fastifySwaggerUi, SettingOptionsUI);
 	instance.register(fastifyCors, cors);
 	instance.register(fastifyHelmet, helmet);
-	instance.setNotFoundHandler((_request, reply) => reply.code(510).send());
+	instance.setNotFoundHandler((_request, reply) => reply.code(404).send());
 	instance.setErrorHandler((error: unknown, request, reply) => {
 		const er = new err().badRequest(request.headers["accept-language"]);
 		er.message = "An unknown error occurred";

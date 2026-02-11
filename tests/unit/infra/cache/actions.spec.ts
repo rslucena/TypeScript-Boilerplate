@@ -1,7 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
-import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
+import { redisClientMock } from "@tests/mocks/redis.client.mock";
 
-const redisClientMock = createRedisClientMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 
 describe("Cache Infrastructure", () => {
@@ -12,7 +11,6 @@ describe("Cache Infrastructure", () => {
 		cache = module.default;
 	});
 	afterEach(() => {
-		mock.restore();
 		redisClientMock.get.mockClear();
 		redisClientMock.get.mockResolvedValue(null);
 		redisClientMock.set.mockClear();

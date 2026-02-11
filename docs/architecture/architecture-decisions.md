@@ -78,3 +78,19 @@ This document records the architectural decisions made for the project, providin
 - **Consequences**:
     - ✅ **Pros**: High Availability (API and WebSockets remain functional), non-blocking app boot, automatic recovery when connection is restored.
     - ⚠️ **Cons**: Temporary increase in Database load; loss of cross-instance WebSocket communication during Redis downtime.
+
+## ADR-007: Identity vs Credentials Separation
+- **Status**: Accepted
+- **Decision**: Decouple "who the user is" (Identity) from "how they authenticate" (Credentials).
+- **Context**: Combining profile data and security secrets in a single table limits scalability and increases the attack surface for social/public features.
+- **Consequences**:
+    - ✅ **Pros**: Enhanced security (strict access to credentials), multi-method auth support (Password, OAuth, Passkeys), cleaner domain logic.
+    - ⚠️ **Cons**: Requires a 1:1 join for some authentication flows.
+
+## ADR-008: Shared Infrastructure Pipes
+- **Status**: Accepted
+- **Decision**: Introduce a `pipes` module in `src/infrastructure` for pure, stateless utility functions.
+- **Context**: Logic like cryptographic hashing, UUID generation, and safe JSON parsing were scattered across `transforms` or duplicated in domains.
+- **Consequences**:
+    - ✅ **Pros**: Reusable, standalone, and strictly typed utilities; simplified testing of infrastructure logic.
+    - ⚠️ **Cons**: None identified.

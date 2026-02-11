@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import path from "node:path";
-import { safeParse } from "@infrastructure/server/transforms";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 
 const paths = path.resolve("./src/infrastructure/languages");
 

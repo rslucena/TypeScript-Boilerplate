@@ -2,5 +2,6 @@
 preload = ["./tests/setup.ts"]
 coverage = true
 coveragePathIgnorePatterns = [
-  "tests/mocks/**"  
+  "**/*/entity.ts",
+  "**/tests/**"  
 ]

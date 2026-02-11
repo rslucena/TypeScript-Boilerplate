@@ -1,6 +1,8 @@
 FROM docker.io/oven/bun:latest AS base
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 FROM base AS install
 RUN mkdir -p /temp/dev
 COPY package.json bun.lock /temp/dev/

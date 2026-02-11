@@ -30,6 +30,10 @@ const columnBuilder = () => {
 			return col;
 		}),
 		default: mock(() => col),
+		setName: mock((name: string) => {
+			col.name = name;
+			return col;
+		}),
 		defaultConfig: {},
 		indexConfig: {},
 	};

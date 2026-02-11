@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { safeParse } from "@infrastructure/server/transforms";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 
 describe("Transforms", () => {
 	describe("safeParse", () => {

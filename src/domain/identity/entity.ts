@@ -5,11 +5,12 @@ const columns = {
 	name: varchar("name", { length: 50 }).notNull(),
 	lastName: varchar("lastName", { length: 100 }),
 	email: varchar("email", { length: 400 }).unique().notNull(),
-	password: varchar("password", { length: 100 }).notNull(),
 };
 
-const user = pgTable("user", { ...columns, ...identifier }, (table) => pgIndex("user", table, ["name", "email"]));
+const identity = pgTable("identity", { ...columns, ...identifier }, (table) =>
+	pgIndex("identity", table, ["name", "email"]),
+);
 
-type user = typeof user.$inferSelect;
+type identity = typeof identity.$inferSelect;
 
-export default user;
+export default identity;

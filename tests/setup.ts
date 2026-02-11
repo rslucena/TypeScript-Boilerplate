@@ -19,3 +19,4 @@ process.env.APP_NAME = "Test App";
 process.env.APP_DESCRIPTION = "Test Description";
 process.env.APP_VERSION = "0.0.1";
 process.env.PROCESS_CORS_ORIGIN = "*";
+process.env.PROCESS_DOMAIN = "http://localhost:3000";

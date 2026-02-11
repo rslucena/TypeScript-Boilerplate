@@ -59,20 +59,23 @@ The server includes a global error handler that catches exceptions and normalize
 
 ## Usage in Routes
 
-Routes are defined in the `domain` layer and registered in the application entry point.
+Routes are defined in the `domain/{entity}` layer and registered in the application entry point.
 
 ```typescript
-// src/domain/user/routes.ts
+// src/domain/{entity}/routes.ts
 export default (app: server) => {
-    app.post(
-        "/",
-        {
-            schema: {
-                body: CreateUserSchema,
-                response: { 201: UserResponseSchema }
-            }
-        },
-        createUserAction
-    );
+	api.get(
+		"/:id",
+		{
+			schema: {
+				tags: ["{entity}"],
+				summary: "Find {entity} by id",
+				params: schema.actions.id,
+				headers: schema.actions.headers,
+				response: { 200: schema.entity, ...request.reply.schemas },
+			},
+		},
+		request.restricted(getById),
+	);
 };
 ```

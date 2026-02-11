@@ -1,6 +1,6 @@
 ---
 title: Complete Example
-description: Complete data flow demonstration when creating a User domain with all architectural layers
+description: Complete data flow demonstration when creating a new domain with all architectural layers
 ---
 
 <script setup>
@@ -19,14 +19,14 @@ const flowNodes = [
 ]
 
 const flowEdges = [
-  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'top-source', targetHandle: 'top', label: 'POST /api/v1/users', ...style2 },
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'top-source', targetHandle: 'top', label: 'POST /api/v1/identities', ...style2 },
   { id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'postNewEntity()', ...style2 },
   { id: 'e3-4', source: '3', target: '4', sourceHandle: 'left-source', targetHandle: 'right', label: 'Validate body', ...style2 },
   { id: 'e4-3', source: '4', target: '3', sourceHandle: 'right-source', targetHandle: 'bottom', label: 'Valid data', type: 'smoothstep', ...style },
-  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT user', ...style2},
-  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created user', ...style2 },
+  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT identity', ...style2},
+  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created identity', ...style2 },
   { id: 'e3-6', source: '3', target: '6', sourceHandle: 'right-source', targetHandle: 'left', label: 'Invalidate keys', type: 'smoothstep', ...style2 },
-  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'right', label: 'User data', ...style },
+  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'right', label: 'Identity data', ...style },
   { id: 'e2-1', source: '2', target: '1', sourceHandle: 'top-source', targetHandle: 'bottom', label: '201 Created', type: 'step', ...style }
 ]
 
@@ -51,11 +51,11 @@ const cacheEdges = [
 
 # Complete Example
 
-This example demonstrates the complete data flow when creating a User domain, showing how all architectural layers work together. We'll walk through each file and explain how they interact.
+This example demonstrates the complete data flow when creating a new domain, showing how all the architectural layers work together. We will analyze each file and explain how they interact.
 
 ## Overview
 
-We'll create a complete User management system with:
+We'll create a complete domain with:
 - Database table definition
 - Validation schemas
 - REST API endpoints (CRUD)
@@ -67,19 +67,19 @@ We'll create a complete User management system with:
 ::: code-group
 
 ```bash [bun]
-bun gen:domain user
+bun gen:domain product
 ```
 
 ```bash [npm]
-npm run gen:domain user
+npm run gen:domain product
 ```
 
 ```bash [yarn]
-yarn gen:domain user
+yarn gen:domain product
 ```
 
 ```bash [pnpm]
-pnpm gen:domain user
+pnpm gen:domain product
 ```
 
 :::
@@ -88,30 +88,30 @@ This creates the complete structure. Let's examine each generated file.
 
 ## Step 2: Understanding the Generated Files
 
-### 2.1 Entity Definition (`src/domain/user/entity.ts`)
+### 2.1 Entity Definition (`src/domain/product/entity.ts`)
 
 The entity defines the database table structure using Drizzle ORM:
 
 ```typescript
 import { identifier, pgIndex } from "@infrastructure/repositories/references";
-import { pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable, varchar, number } from "drizzle-orm/pg-core";
 
 const columns = {
   name: varchar("name", { length: 50 }).notNull(),
-  lastName: varchar("lastName", { length: 100 }),
-  email: varchar("email", { length: 400 }).unique().notNull(),
-  password: varchar("password", { length: 100 }).notNull(),
+  price: number("price", { length: 100 }),
+  description: varchar("description", { length: 400 }).unique().notNull(),
+  
 };
 
-const user = pgTable(
-  "user", 
+const product = pgTable(
+  "product", 
   { ...columns, ...identifier }, 
-  (table) => pgIndex("user", table, ["name", "email"])
+  (table) => pgIndex("product", table, ["name", "email"])
 );
 
-type user = typeof user.$inferSelect;
+type product = typeof product.$inferSelect;
 
-export default user;
+export default product;
 ```
 
 **Key Points:**
@@ -120,7 +120,7 @@ export default user;
 - `pgIndex`: Creates database index for performance
 - Type inference: TypeScript type automatically derived from schema
 
-### 2.2 Validation Schemas (`src/domain/user/schema.ts`)
+### 2.2 Validation Schemas (`src/domain/product/schema.ts`)
 
 Zod schemas for runtime validation:
 
@@ -129,16 +129,16 @@ import { withPagination, zodIdentifier } from "@infrastructure/repositories/refe
 import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { array, object } from "zod/v4";
-import user from "./entity";
+import product from "./entity";
 
 // Generate base schemas from Drizzle entity
-const create = createInsertSchema(user, {
+const create = createInsertSchema(product, {
   name: (schema) => schema.min(1).max(50),
-  email: (schema) => schema.email(),
-  password: (schema) => schema.min(8),
+  price: (schema) => schema.min(1),
+  description: (schema) => schema.min(1).max(400),
 });
 
-const select = createSelectSchema(user, {
+const select = createSelectSchema(product, {
   ...zodIdentifier,
 }).partial();
 
@@ -152,7 +152,7 @@ const actions = {
   }),
   create: create.omit({ id: true }),
   update: create.omit({ id: true }).partial(),
-  delete: create.pick({ id: true }),
+  delete: select.pick({ id: true }),
 };
 
 export default { actions, entity: array(select) };
@@ -164,7 +164,7 @@ export default { actions, entity: array(select) };
 - Action schemas: Separate schemas for each operation
 - Type-safe: Full TypeScript inference
 
-### 2.3 Routes Definition (`src/domain/user/routes.ts`)
+### 2.3 Routes Definition (`src/domain/product/routes.ts`)
 
 Fastify routes with OpenAPI documentation:
 
@@ -178,15 +178,15 @@ import postNewEntity from "./actions/post-new-entity";
 import putUpdateEntity from "./actions/put-update-entity";
 import schema from "./schema";
 
-export default async function userRoutes(api: FastifyInstance) {
-  api.get("/ping", { schema: { tags: ["User"] } }, (_, reply) => reply.code(200).send());
+export default async function productRoutes(api: FastifyInstance) {
+  api.get("/ping", { schema: { tags: ["Product"] } }, (_, reply) => reply.code(200).send());
 
   api.get(
     "/:id",
     {
       schema: {
-        tags: ["User"],
-        summary: "Find user by id",
+        tags: ["Product"],
+        summary: "Find product by id",
         params: schema.actions.id,
         headers: schema.actions.headers,
         response: { 200: schema.entity, ...request.reply.schemas },
@@ -199,8 +199,8 @@ export default async function userRoutes(api: FastifyInstance) {
     "/",
     {
       schema: {
-        tags: ["User"],
-        summary: "Create new user",
+        tags: ["Product"],
+        summary: "Create new product",
         body: schema.actions.create,
         headers: schema.actions.headers,
         response: { 201: schema.entity, ...request.reply.schemas },
@@ -219,16 +219,16 @@ export default async function userRoutes(api: FastifyInstance) {
 - `request.restricted()`: Applies authentication middleware
 - `response`: Defines response schema for documentation
 
-### 2.4 Business Logic (`src/domain/user/actions/post-new-entity.ts`)
+### 2.4 Business Logic (`src/domain/product/actions/post-new-entity.ts`)
 
-Create user action with validation and caching:
+Create product action with validation and caching:
 
 ```typescript
 import cache from "@infrastructure/cache/actions";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
 import { container } from "@infrastructure/server/request";
-import user from "../entity";
+import identity from "../entity";
 import { default as schema } from "../schema";
 import getById from "./get-by-id";
 
@@ -238,28 +238,27 @@ export default async function postNewEntity(request: container) {
   // 1. Validate request body
   const validRequest = await schema.actions.create.safeParseAsync(request.body());
   if (!validRequest.success) {
-    throw request.badRequest(request.language(), "post/user/{params}");
+    throw request.badRequest(request.language(), "post/product/{params}");
   }
 
-  // 2. Hash password before storing
   const content = await repository
     .insert(user)
     .values({
       ...validRequest.data,
-      password: hash(validRequest.data.password),
+      
     })
     .onConflictDoNothing()
     .returning();
 
   // 3. Check if insert succeeded
   if (!content.length) {
-    throw request.unprocessableEntity(request.language(), `post/user/${validRequest.data.email}`);
+    throw request.unprocessableEntity(request.language(), `post/product/${validRequest.data.email}`);
   }
 
-  // 4. Invalidate cache (all user list queries)
-  await cache.json.del(tag("user", "find*"));
+  // 4. Invalidate cache (all product list queries)
+  await cache.json.del(tag("product", "find*"));
 
-  // 5. Return created user (fetched to ensure cache consistency)
+  // 5. Return created product (fetched to ensure cache consistency)
   return getById(new container({ params: { id: content[0].id } }));
 }
 ```
@@ -272,11 +271,11 @@ export default async function postNewEntity(request: container) {
 
 Let's trace a complete request:
 
-### Creating a User
+### Creating a Product
 
 **Request:**
 ```bash
-curl -X POST http://localhost:3000/api/v1/users \
+curl -X POST http://localhost:3000/api/v1/products \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer token" \
   -d '{
@@ -295,8 +294,8 @@ curl -X POST http://localhost:3000/api/v1/users \
 4. **Action execution** → Calls `postNewEntity()`
 5. **Password hashing** → `hash()` encrypts password
 6. **Database insert** → Drizzle ORM inserts record
-7. **Cache invalidation** → Clears cached user lists
-8. **Response** → Returns created user (201 status)
+7. **Cache invalidation** → Clears cached product lists
+8. **Response** → Returns created product (201 status)
 
 **Response:**
 ```json
@@ -311,11 +310,11 @@ curl -X POST http://localhost:3000/api/v1/users \
 }
 ```
 
-### Retrieving a User
+### Retrieving a Product
 
 **Request:**
 ```bash
-curl http://localhost:3000/api/v1/users/123e4567-e89b-12d3-a456-426614174000 \
+curl http://localhost:3000/api/v1/products/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer token"
 ```
 
@@ -331,11 +330,11 @@ export default async function getById(request: container) {
   // Validate ID parameter
   const validRequest = await schema.actions.id.safeParseAsync(request.params());
   if (!validRequest.success) {
-    throw request.badRequest(request.language(), tag("user", "find{id}"));
+    throw request.badRequest(request.language(), tag("product", "find{id}"));
   }
 
   const { id } = validRequest.data;
-  const reference = tag("user", "find{id}", { id });
+  const reference = tag("product", "find{id}", { id });
 
   // Check cache first
   const cached = await cache.json.get<{ [key: string]: typeof user[] }>(reference);
@@ -353,7 +352,7 @@ export default async function getById(request: container) {
   const content = await prepare.execute({ id });
 
   if (!content.length) {
-    throw request.notFound(request.language(), tag("user", "find{id}"));
+    throw request.notFound(request.language(), tag("product", "find{id}"));
   }
 
   // Cache for 10 minutes
@@ -371,13 +370,13 @@ Edit `entity.ts`:
 ```typescript
 const columns = {
   name: varchar("name", { length: 50 }).notNull(),
-  lastName: varchar("lastName", { length: 100 }),
-  email: varchar("email", { length: 400 }).unique().notNull(),
-  password: varchar("password", { length: 100 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  description: varchar("description", { length: 400 }),
+  
   // Add new fields
-  phoneNumber: varchar("phoneNumber", { length: 20 }),
-  role: varchar("role", { length: 20 }).default("user"),
-  isVerified: boolean("isVerified").default(false),
+  stock: integer("stock").notNull(),
+  category: varchar("category", { length: 20 }).notNull(),
+  perishable: boolean("perishable").notNull(),
 };
 ```
 
@@ -387,11 +386,11 @@ Edit `schema.ts`:
 ```typescript
 const create = createInsertSchema(user, {
   name: (schema) => schema.min(1).max(50),
-  email: (schema) => schema.email(),
-  password: (schema) => schema.min(8).regex(/^(?=.*[A-Z])(?=.*[0-9])/),
+  price: (schema) => schema.min(0),
+  description: (schema) => schema.max(400),
   // Add custom validation
-  phoneNumber: (schema) => schema.regex(/^\+?[1-9]\d{1,14}$/),
-  role: (schema) => schema.enum(["user", "admin", "moderator"]),
+  stock: (schema) => schema.min(0),
+  category: (schema) => schema.enum(["Fruits", "Vegetables", "Meats", "Hygiene"]),
 });
 ```
 
@@ -440,23 +439,25 @@ pnpm db:migrate:push
 Write tests for your actions:
 
 ```typescript
-// tests/unit/domain/user/user-create.spec.ts
+// tests/unit/domain/product/product-create.spec.ts
 import { describe, it, expect, beforeEach } from "bun:test";
-import { createUserBuilder } from "@tests/builders/user.builder";
-import postNewEntity from "@domain/user/actions/post-new-entity";
+import { createProductBuilder } from "@tests/builders/product.builder";
+import postNewEntity from "@domain/product/actions/post-new-entity";
 
-describe("User Creation", () => {
-  it("should create user with hashed password", async () => {
-    const userData = createUserBuilder({ password: "PlainPassword123" });
-    const result = await postNewEntity(mockRequest(userData));
-    
-    expect(result[0].password).not.toBe("PlainPassword123");
-    expect(result[0].email).toBe(userData.email);
+describe("Product Creation", () => {
+  it("should create product with hashed password", async () => {
+    const data = { name: "Product", price: 10, description: "Description", stock: 10, category: "Fruits", perishable: true }
+    const productData = createProductBuilder(data);
+    const result = await postNewEntity(mockRequest(productData));
+    expect(result[0].name).toBe("Product");
+    expect(result[0].category).toBe("Fruits");
+    expect(result[0].perishable).toBe(true);
   });
 
   it("should reject invalid email", async () => {
-    const userData = createUserBuilder({ email: "invalid-email" });
-    await expect(postNewEntity(mockRequest(userData))).rejects.toThrow();
+    const data = { name: "Product", price: 10, description: "Description", stock: 10, category: "Fruits", perishable: true }
+    const productData = createProductBuilder(data);
+    await expect(postNewEntity(mockRequest(productData))).rejects.toThrow();
   });
 });
 ```
