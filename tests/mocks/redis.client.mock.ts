@@ -8,6 +8,7 @@ export const createRedisClientMock = () => {
 		del: mock((..._args: unknown[]) => Promise.resolve(1)),
 		scan: mock((..._args: unknown[]) => Promise.resolve({ cursor: "0", keys: [] as unknown[] })),
 		expire: mock((..._args: unknown[]) => Promise.resolve(true)),
+		incr: mock((..._args: unknown[]) => Promise.resolve(1)),
 		json: {
 			get: mock((..._args: unknown[]) => Promise.resolve(null as unknown)),
 			set: mock((..._args: unknown[]) => Promise.resolve("OK")),
@@ -23,4 +24,11 @@ export const createRedisClientMock = () => {
 	return redisMock;
 };
 
-export const redisClientMock = createRedisClientMock();
+// @ts-expect-error
+const globalMock = globalThis as unknown as { redisMockSingleton: ReturnType<typeof createRedisClientMock> };
+
+if (!globalMock.redisMockSingleton) {
+	globalMock.redisMockSingleton = createRedisClientMock();
+}
+
+export const redisClientMock = globalMock.redisMockSingleton;

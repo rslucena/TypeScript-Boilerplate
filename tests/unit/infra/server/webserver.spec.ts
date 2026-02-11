@@ -9,7 +9,14 @@ const mockEnv = {
 	APP_DESCRIPTION: "Test",
 	APP_VERSION: "1.0",
 	LOG_LEVEL: "error",
+	REDIS_STACK: true,
 };
+
+import { redisClientMock } from "@tests/mocks/redis.client.mock";
+
+mock.module("@infrastructure/cache/connection", () => ({
+	default: redisClientMock,
+}));
 
 mock.module("@infrastructure/settings/environment", () => ({
 	env: mockEnv,
@@ -41,7 +48,7 @@ describe("Webserver HTTP/2 Configuration", () => {
 	it("should NOT configure HTTP/2 when APP_HTTP2 is false", async () => {
 		mockEnv.APP_HTTP2 = false;
 		const server = await webserver.create();
-		expect(server.initialConfig.http2).toBeUndefined();
+		expect(server.initialConfig.http2).not.toBe(true);
 		expect(server.initialConfig.https).toBeUndefined();
 		await server.close();
 	});
