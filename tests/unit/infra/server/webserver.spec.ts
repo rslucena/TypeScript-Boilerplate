@@ -1,7 +1,19 @@
-import { describe, expect, it, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { readFileSync } from "node:fs";
-import webserver from "@infrastructure/server/webserver";
-import { env } from "@infrastructure/settings/environment";
+
+const mockEnv = {
+	APP_HTTP2: false,
+	APP_KEY: "./keys/private.pem",
+	APP_CERT: "./keys/cert.pem",
+	APP_NAME: "Test",
+	APP_DESCRIPTION: "Test",
+	APP_VERSION: "1.0",
+	LOG_LEVEL: "error",
+};
+
+mock.module("@infrastructure/settings/environment", () => ({
+	env: mockEnv,
+}));
 
 mock.module("node:fs", () => ({
 	readFileSync: mock((path: string) => {
@@ -11,11 +23,15 @@ mock.module("node:fs", () => ({
 	}),
 }));
 
+import webserver from "@infrastructure/server/webserver";
+
 describe("Webserver HTTP/2 Configuration", () => {
+	beforeEach(() => {
+		mockEnv.APP_HTTP2 = false;
+	});
+
 	it("should configure HTTP/2 and HTTPS when APP_HTTP2 is true", async () => {
-		env.APP_HTTP2 = true;
-		env.APP_KEY = "./keys/private.pem";
-		env.APP_CERT = "./keys/cert.pem";
+		mockEnv.APP_HTTP2 = true;
 		const server = await webserver.create();
 		expect(server.initialConfig.http2).toBe(true);
 		expect(server.initialConfig.https).toBeDefined();
@@ -23,9 +39,9 @@ describe("Webserver HTTP/2 Configuration", () => {
 	});
 
 	it("should NOT configure HTTP/2 when APP_HTTP2 is false", async () => {
-		env.APP_HTTP2 = false;
+		mockEnv.APP_HTTP2 = false;
 		const server = await webserver.create();
-		expect(server.initialConfig.http2).toBe(false);
+		expect(server.initialConfig.http2).toBeUndefined();
 		expect(server.initialConfig.https).toBeUndefined();
 		await server.close();
 	});
