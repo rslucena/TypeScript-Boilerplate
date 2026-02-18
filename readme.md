@@ -234,7 +234,7 @@ Automated quality gates and deployments with GitHub Actions:
 
 ```bash
 # Run checks locally
-bun run lint:check
+bun run lint
 bun run tests
 bun run build
 ```

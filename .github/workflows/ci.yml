@@ -53,7 +53,7 @@ jobs:
       - name: Install Dependencies
         run: bun install
       - name: Run Linter
-        run: bun run lint:check
+        run: bun run lint
 
   test:
     needs: pre_job
