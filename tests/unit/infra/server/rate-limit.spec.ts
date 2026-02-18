@@ -6,12 +6,6 @@ mock.module("@infrastructure/cache/connection", () => ({
 	default: redisClientMock,
 }));
 
-import client from "@infrastructure/cache/connection";
-
-const mockRedis = client as unknown as ReturnType<
-	typeof import("@tests/mocks/redis.client.mock").createRedisClientMock
->;
-
 describe("Rate Limit Middleware", () => {
 	let mockRequest: FastifyRequest;
 	let mockReply: FastifyReply;
