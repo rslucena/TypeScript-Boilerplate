@@ -17,7 +17,10 @@ mock.module("@infrastructure/cache/actions", () => ({
 
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
-	default: repositoryMock,
+	default: {
+		...repositoryMock,
+		execute: repositoryMock.execute,
+	},
 	withPagination: mock((qb) => qb),
 }));
 

@@ -2,8 +2,10 @@ import plugins from "@infrastructure/settings/plugins";
 import type { container } from "./interface";
 
 export default class authentication {
+	constructor(private readonly _plugins = plugins) {}
+
 	async session(receiver: container) {
-		const active = Object.entries(plugins.authentication)
+		const active = Object.entries(this._plugins.authentication)
 			.map(([name, plugin]) => ({ name, ...plugin }))
 			.filter((item) => item.active);
 

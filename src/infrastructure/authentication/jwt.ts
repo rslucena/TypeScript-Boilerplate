@@ -19,12 +19,20 @@ export interface TokenPayload {
 	[key: string]: unknown;
 }
 
-const privateKey = readFileSync(`${env.APP_FOLDER_KEY}/private.pem`, "utf8");
-const publicKey = readFileSync(`${env.APP_FOLDER_KEY}/public.pem`, "utf8");
-const metadata = JSON.parse(readFileSync(`${env.APP_FOLDER_KEY}/metadata.json`, "utf8"));
-const kid = metadata.kid as string;
+let keys: { privateKey: string; publicKey: string; kid: string } | null = null;
+
+function getKeys() {
+	if (keys) return keys;
+	const privateKey = readFileSync(`${env.APP_FOLDER_KEY}/private.pem`, "utf8");
+	const publicKey = readFileSync(`${env.APP_FOLDER_KEY}/public.pem`, "utf8");
+	const metadata = JSON.parse(readFileSync(`${env.APP_FOLDER_KEY}/metadata.json`, "utf8"));
+	const kid = metadata.kid as string;
+	keys = { privateKey, publicKey, kid };
+	return keys;
+}
 
 function create(content: guise["session"], exp?: number) {
+	const { kid, privateKey } = getKeys();
 	const header = { alg: "RS256", typ: "JWT", kid };
 
 	const payload = {
@@ -49,6 +57,7 @@ function parse(token: string) {
 
 	const buffer = Buffer.from(signature, "base64url");
 
+	const { publicKey } = getKeys();
 	const isValid = rsaVerify(data, buffer, publicKey);
 	if (!isValid) throw new Error("Invalid signature");
 
@@ -78,4 +87,4 @@ function decode<T>(token: string): T {
 	return body as T;
 }
 
-export { create, session, decode };
+export { create, decode, session };
