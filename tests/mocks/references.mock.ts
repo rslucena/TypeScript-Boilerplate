@@ -1,4 +1,6 @@
 import { mock } from "bun:test";
+import { columnBuilder } from "@tests/builders/column.builders";
+import { z } from "zod";
 
 export const createReferencesMock = () => ({
 	tag: mock((domain, method, conditions) => {
@@ -10,9 +12,25 @@ export const createReferencesMock = () => ({
 	}),
 	hash: mock((val) => `hashed-${val}`),
 	pgIndex: mock(() => []),
-	identifier: { id: mock().mockReturnValue("some-id") },
-	zodIdentifier: { id: { _type: "string" } },
-	withPagination: mock(),
+	identifier: {
+		id: columnBuilder(),
+		activated: columnBuilder(),
+		createdAt: columnBuilder(),
+		updatedAt: columnBuilder(),
+		deletedAt: columnBuilder(),
+	},
+	zodIdentifier: {
+		id: z.uuid(),
+		activated: z.boolean(),
+		createdAt: z.date(),
+		updatedAt: z.date().nullable(),
+		deletedAt: z.date().nullable(),
+	},
+	withPagination: {
+		shape: {
+			"req.page": z.array(z.number()),
+		},
+	},
 });
 
 export const referencesMock = createReferencesMock();

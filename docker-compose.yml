@@ -25,6 +25,8 @@ services:
       - "5080:5080"
     env_file:
       - .env
+    volumes:
+      - ./keys:/usr/src/app/keys
     environment:
       REDIS_SERVER: redis
       POSTGRES_SERVER: postgres

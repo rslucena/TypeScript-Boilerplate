@@ -10,7 +10,6 @@ export async function rateLimit(request: FastifyRequest, reply: FastifyReply) {
 	const key = tag("rate-limit", "check", { ip });
 
 	const current = await client.incr(key);
-
 	if (current === 1) await client.expire(key, window);
 
 	reply.header("X-RateLimit-Limit", limit);

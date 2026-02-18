@@ -40,7 +40,8 @@ export default defineConfig({
             {
                 text: "🌐 Servers",
                 items: [
-                    { text: "HTTP Server (Fastify)", link: "/servers/http-server" },
+                    { text: "HTTP/2", link: "/servers/http2" },
+                    { text: "HTTP Server", link: "/servers/http-server" },
                     { text: "Scalable WebSockets", link: "/servers/websockets" },
                 ]
             },
@@ -58,6 +59,7 @@ export default defineConfig({
                 items: [
                     { text: "Overview", link: "/architecture/" },
                     { text: "Architecture Decisions", link: "/architecture/architecture-decisions" },
+                    { text: "Identity vs Credentials", link: "/architecture/identity-vs-credentials" },
                     { text: "Plugin System", link: "/architecture/plugin-system" },
                 ],
             },

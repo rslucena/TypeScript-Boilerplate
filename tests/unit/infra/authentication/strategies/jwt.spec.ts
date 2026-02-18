@@ -1,9 +1,20 @@
-import { describe, expect, it } from "bun:test";
-import * as jwtDefault from "@infrastructure/authentication/strategies/jwt?v=unit";
-import type { guise } from "@infrastructure/server/interface";
-import { container } from "@infrastructure/server/interface?v=unit";
+import { describe, expect, it, mock } from "bun:test";
+import { generateRSAKeyPair } from "@infrastructure/pipes/crypto";
 
-const jwt = jwtDefault.default || jwtDefault;
+const { privateKey, publicKey } = generateRSAKeyPair();
+
+mock.module("node:fs", () => ({
+	readFileSync: mock((path: string) => {
+		if (path.includes("private.pem")) return privateKey;
+		if (path.includes("public.pem")) return publicKey;
+		if (path.includes("metadata.json")) return JSON.stringify({ kid: "test-kid" });
+		return "";
+	}),
+}));
+
+import * as jwt from "@infrastructure/authentication/jwt";
+import type { guise } from "@infrastructure/server/interface";
+import { container } from "@infrastructure/server/interface";
 
 describe("JWT Strategy", () => {
 	const mockSession: guise["session"] = { id: "123", name: "Test User" };

@@ -247,6 +247,16 @@ describe("Request Infrastructure", () => {
 			const callback = mock();
 			const route = requestModule.restricted(callback);
 
+			mock.module("@infrastructure/server/authentication", () => {
+				return {
+					default: class {
+						async session() {
+							return false;
+						}
+					},
+				};
+			});
+
 			const req = {
 				routeOptions: { config: { url: "/test", method: "POST" } },
 				headers: {},

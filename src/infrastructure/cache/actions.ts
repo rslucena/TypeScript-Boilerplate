@@ -1,6 +1,6 @@
-import { safeParse } from "@infrastructure/server/transforms";
+import client from "@infrastructure/cache/connection";
+import { safeParse } from "@infrastructure/pipes/safe-parse";
 import { env } from "@infrastructure/settings/environment";
-import client from "./connection";
 import type { actions, setmode } from "./interfaces";
 
 const isStack = () => env.REDIS_STACK;
