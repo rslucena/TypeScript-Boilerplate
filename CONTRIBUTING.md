@@ -42,7 +42,7 @@ bun install
 Before committing, ensure everything is linted and tested:
 
 ```bash
-bun run biome
+bun run lint
 bun test
 ```
 

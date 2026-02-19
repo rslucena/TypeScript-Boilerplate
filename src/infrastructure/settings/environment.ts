@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const schema = z.object({
 	NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+	PROCESS_DOMAIN: z.url(),
 	PROCESS_PORT: z.coerce.number(),
 	APP_NAME: z.string(),
 	APP_DESCRIPTION: z.string(),
@@ -25,6 +26,10 @@ const schema = z.object({
 	SHOW_LOG: z.string().transform((val) => val === "true"),
 	LOG_LEVEL: z.string(),
 	PROCESS_CORS_ORIGIN: z.string(),
+	APP_FOLDER_KEY: z.string(),
+	APP_HTTP2: z.string().transform((val) => val === "true"),
+	APP_CERT: z.string().refine((val) => val.endsWith(".crt") || val.endsWith(".pem")),
+	APP_KEY: z.string().refine((val) => val.endsWith(".key") || val.endsWith(".pem")),
 });
 
 const result = schema.safeParse(process.env);

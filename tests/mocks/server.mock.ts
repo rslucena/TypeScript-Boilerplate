@@ -10,6 +10,7 @@ export const createContainerMock = () => ({
 	notFound: mock((_: string, msg: string) => new Error(msg)),
 	unprocessableEntity: mock((_: string, msg: string) => new Error(msg)),
 	conflict: mock((_: string, msg: string) => new Error(msg)),
+	unauthorized: mock((_: string, msg: string) => new Error(msg)),
 	headers: mock(),
 	language: mock().mockReturnValue("en"),
 });

@@ -107,6 +107,10 @@ bun gen:domain product
 ### Step 4️⃣ - Run & Test
 
 ```bash
+
+# 🔐 Generate security keys and self-signed certificate (RSA + SSL)
+bun gen:keys
+
 # Start development server
 bun dev --workers=primary-webserver
 
@@ -230,7 +234,7 @@ Automated quality gates and deployments with GitHub Actions:
 
 ```bash
 # Run checks locally
-bun run lint:check
+bun run lint
 bun run tests
 bun run build
 ```
@@ -246,7 +250,7 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 | Guide | Description |
 |-------|-------------|
 | [Getting Started](https://rslucena.github.io/TypeScript-Boilerplate/guide/getting-started.html) | Detailed setup and configuration |
-| [Complete Example](https://rslucena.github.io/TypeScript-Boilerplate/guide/complete-example.html) | Full walkthrough of creating a User domain |
+| [Complete Example](https://rslucena.github.io/TypeScript-Boilerplate/guide/complete-example.html) | Full walkthrough of creating a product domain |
 | [Template System](https://rslucena.github.io/TypeScript-Boilerplate/development/template-system-architecture.html) | How the code generator works |
 | [Domain Generator](https://rslucena.github.io/TypeScript-Boilerplate/development/domain-scaffolding.html) | Creating CRUD modules |
 | [Architecture](https://rslucena.github.io/TypeScript-Boilerplate/architecture/) | Project structure deep dive |
@@ -256,6 +260,7 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 | [Deployment](https://rslucena.github.io/TypeScript-Boilerplate/devops/deployment.html) | Production deployment |
 | [HTTP Server](https://rslucena.github.io/TypeScript-Boilerplate/servers/http-server.html) | Fastify setup and configuration |
 | [Scalable WebSockets](https://rslucena.github.io/TypeScript-Boilerplate/servers/websockets.html) | Redis Pub/Sub powered real-time |
+| [Identity vs Credentials](./docs/architecture/identity-vs-credentials.md) | Domain separation architectural pattern |
 
 ---
 

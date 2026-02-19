@@ -25,6 +25,12 @@ const headers = z.object({
 	"accept-language": z.string().default("en"),
 });
 
+const health = z.object({
+	status: z.string(),
+	version: z.string(),
+	date: z.string(),
+});
+
 type server = FastifyInstance<
 	Server<typeof IncomingMessage, typeof ServerResponse>,
 	IncomingMessage,
@@ -153,4 +159,4 @@ export class container<t = unknown> extends err {
 	}
 }
 
-export { type JWT, errorSchema, type guise, headers, replyErrorSchema, type server, type AnyType };
+export { type JWT, errorSchema, type guise, headers, health, replyErrorSchema, type server, type AnyType };
