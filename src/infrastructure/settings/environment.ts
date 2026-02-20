@@ -36,7 +36,7 @@ const result = schema.safeParse(process.env);
 
 if (!result.success) {
 	const isTest = process.env.NODE_ENV === "test";
-	const isBuild = process.argv.some((arg) => arg.includes("exec-builder.ts"));
+	const isBuild = process.argv.some((arg) => arg.includes("exec-builder.ts") || arg.includes("generate-keys.ts"));
 
 	if (!isTest && !isBuild) {
 		const { fieldErrors } = result.error.flatten();
