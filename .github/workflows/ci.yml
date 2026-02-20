@@ -30,6 +30,7 @@ jobs:
         with:
           concurrent_skipping: 'always'
           skip_after_successful_duplicate: 'true'
+          do_not_skip: '["push", "workflow_dispatch", "schedule"]'
 
   lint:
     needs: pre_job
@@ -51,7 +52,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
       - name: Run Linter
         run: bun run lint
 
@@ -75,7 +76,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
       - name: Run Tests
         run: bun run tests
 
@@ -99,6 +100,6 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
       - name: Build Project
         run: bun run build

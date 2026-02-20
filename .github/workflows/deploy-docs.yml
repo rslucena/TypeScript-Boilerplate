@@ -28,7 +28,7 @@ jobs:
           bun-version: latest
 
       - name: Install documentation dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
         working-directory: docs
 
       - name: Set version
