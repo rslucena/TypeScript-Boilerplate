@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import { exchangeToken, getAuthorizationUrl, getNormalizedUser } from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
@@ -17,6 +17,10 @@ beforeAll(() => {
 		github.clientSecret = "mock-client-secret";
 		github.redirectUri = "http://localhost/callback";
 	}
+});
+
+afterEach(() => {
+	mock.restoreAllMocks();
 });
 
 describe("Infrastructure - SSO Connect", () => {
@@ -64,8 +68,6 @@ describe("Infrastructure - SSO Connect", () => {
 
 		expect(result.access_token).toBe("mock_access_token");
 		expect(result.id_token).toBe("mock_id_token");
-
-		mockFetch.mockRestore();
 	});
 
 	it("Should normalize GitHub user correctly", async () => {
@@ -93,7 +95,5 @@ describe("Infrastructure - SSO Connect", () => {
 		expect(result.subject).toBe("12345");
 		expect(result.name).toBe("Mock User");
 		expect(result.email).toBe("mockuser@example.com");
-
-		mockFetch.mockRestore();
 	});
 });

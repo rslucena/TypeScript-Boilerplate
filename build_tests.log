@@ -1,15 +1,51 @@
 bun test v1.3.9 (cf6cdbbb)
 
 tests/domain/sso/routes.test.ts:
-(pass) Domain - SSO Routes > Should redirect on /authorize with valid provider [146.99ms]
-(pass) Domain - SSO Routes > Should fail on /authorize with invalid provider [20.00ms]
-(pass) Domain - SSO Routes > Should process /callback and return normalized user on success [19.00ms]
-(pass) Domain - SSO Routes > Should fail on /callback if missing code [20.00ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should redirect on /authorize with valid provider [143.99ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should fail on /authorize with invalid provider [20.00ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should process /callback and return normalized user on success [19.00ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should fail on /callback if missing code [17.00ms]
 
 tests/integration/api/identity.test.ts:
-(pass) Identity API Routes > GET /health > should return 200 [15.00ms]
+(pass) Identity API Routes > GET /health > should return 200 [14.00ms]
 (pass) Identity API Routes > GET /api/v1/identities/:id > should return 401 if unauthorized [8.00ms]
-(pass) Identity API Routes > GET /api/v1/identities/:id > should return identity if authorized [11.00ms]
+(pass) Identity API Routes > GET /api/v1/identities/:id > should return identity if authorized [10.00ms]
 (pass) Identity API Routes > POST /api/v1/identities > should return 200/201 and create identity [10.00ms]
 (pass) Identity API Routes > POST /api/v1/identities > should return 400 if validation fails [11.00ms]
 
@@ -23,33 +59,33 @@ tests/unit/builders/column.builders.spec.ts:
 tests/infrastructure/sso/oidc.test.ts:
 (pass) Infrastructure - SSO Connect > Should generate authorization URL correctly for Google
 (pass) Infrastructure - SSO Connect > Should generate authorization URL correctly for GitHub without nonce
-54 | 		);
-55 | 		spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
-56 | 
-57 | 		const result = await exchangeToken(providers.GOOGLE, "mock_auth_code");
-58 | 
-59 | 		expect(result.access_token).toBe("mock_access_token");
+60 | 		);
+61 | 		spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+62 | 
+63 | 		const result = await exchangeToken(providers.GOOGLE, "mock_auth_code");
+64 | 
+65 | 		expect(result.access_token).toBe("mock_access_token");
                                    ^
 error: expect(received).toBe(expected)
 
 Expected: "mock_access_token"
 Received: "mock-access"
 
-      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:59:31)
-(fail) Infrastructure - SSO Connect > Should exchange token successfully using mock fetch
-84 | 
-85 | 		const result = await getNormalizedUser(providers.GITHUB, { access_token: "mock_git_token" });
-86 | 
-87 | 		expect(result.subject).toBe("12345");
-88 | 		expect(result.name).toBe("Mock User");
-89 | 		expect(result.email).toBe("mockuser@example.com");
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:65:31)
+(fail) Infrastructure - SSO Connect > Should exchange token successfully using mock fetch [1.00ms]
+90 | 
+91 | 		const result = await getNormalizedUser(providers.GITHUB, { access_token: "mock_git_token" });
+92 | 
+93 | 		expect(result.subject).toBe("12345");
+94 | 		expect(result.name).toBe("Mock User");
+95 | 		expect(result.email).toBe("mockuser@example.com");
                             ^
 error: expect(received).toBe(expected)
 
 Expected: "mockuser@example.com"
 Received: "mock@google.com"
 
-      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:89:24)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:95:24)
 (fail) Infrastructure - SSO Connect > Should normalize GitHub user correctly
 
 tests/unit/infra/pipes/safe-parse.spec.ts:
@@ -63,16 +99,16 @@ tests/unit/infra/pipes/credential.spec.ts:
 (pass) Infrastructure: Pipes -> Credential > should return false for PASSWORD with GOOGLE provider
 (pass) Infrastructure: Pipes -> Credential > should return true for valid OIDC credential
 (pass) Infrastructure: Pipes -> Credential > should return false for OIDC without subject
-(pass) Infrastructure: Pipes -> Credential > should return false for OIDC with subject but invalid provider (LOCAL) [1.00ms]
+(pass) Infrastructure: Pipes -> Credential > should return false for OIDC with subject but invalid provider (LOCAL)
 (pass) Infrastructure: Pipes -> Credential > should return false for PASSWORD with subject (strictly forbidden if not required)
 
 tests/unit/infra/server/webserver.spec.ts:
-(pass) Webserver HTTP/2 Configuration > should configure HTTP/2 and HTTPS when APP_HTTP2 is true [11.00ms]
-(pass) Webserver HTTP/2 Configuration > should NOT configure HTTP/2 when APP_HTTP2 is false [10.00ms]
+(pass) Webserver HTTP/2 Configuration > should configure HTTP/2 and HTTPS when APP_HTTP2 is true [10.00ms]
+(pass) Webserver HTTP/2 Configuration > should NOT configure HTTP/2 when APP_HTTP2 is false [9.00ms]
 
 tests/unit/infra/server/request.spec.ts:
 (pass) Request Infrastructure > err class > should return unauthorized error
-(pass) Request Infrastructure > err class > should return notFound error [1.00ms]
+(pass) Request Infrastructure > err class > should return notFound error
 (pass) Request Infrastructure > err class > should return badRequest error
 (pass) Request Infrastructure > err class > should return unprocessableEntity error
 (pass) Request Infrastructure > err class > should return conflict error
@@ -81,7 +117,7 @@ tests/unit/infra/server/request.spec.ts:
 (pass) Request Infrastructure > container class > should update and return status
 (pass) Request Infrastructure > container class > should update and return body
 (pass) Request Infrastructure > container class > should update and return headers
-(pass) Request Infrastructure > container class > should update and return query
+(pass) Request Infrastructure > container class > should update and return query [1.00ms]
 (pass) Request Infrastructure > container class > should update and return params
 (pass) Request Infrastructure > container class > should return session context if passed to session()
 (pass) Request Infrastructure > container class > should return default language if not provided
@@ -89,58 +125,58 @@ tests/unit/infra/server/request.spec.ts:
 (pass) Request Infrastructure > convertRequestTypes > should skip documentation routes
 (pass) Request Infrastructure > convertRequestTypes > should convert types correctly
 (pass) Request Infrastructure > convertRequestTypes > should handle missing body/query/params
-(pass) Request Infrastructure > execute wrapper > should execute noRestricted callback successfully [1.00ms]
+(pass) Request Infrastructure > execute wrapper > should execute noRestricted callback successfully
 (pass) Request Infrastructure > execute wrapper > should handle errors in callback and return 200 if error has no statusCode
 (pass) Request Infrastructure > execute wrapper > should handle errors in callback with statusCode
-(pass) Request Infrastructure > execute wrapper > should handle restricted routes and unauthorized access
+(pass) Request Infrastructure > execute wrapper > should handle restricted routes and unauthorized access [1.00ms]
 
 tests/unit/infra/server/rate-limit.spec.ts:
 (pass) Rate Limit Middleware > should allow request under limit
 TEST: Mock incr value set to 101
-(pass) Rate Limit Middleware > should block request over limit [1.00ms]
+(pass) Rate Limit Middleware > should block request over limit
 (pass) Rate Limit Middleware > should throw on redis error
 
 tests/unit/infra/server/authentication.spec.ts:
 (pass) Authentication Handler > should return false if no plugins succeed
 
 tests/unit/infra/repositories/repository.spec.ts:
-(pass) Repository Utilities > withPagination > should apply limit and offset correctly
-(pass) Repository Utilities > manager logger > should use the defined logger and write messages [3.00ms]
+(pass) Repository Utilities > withPagination > should apply limit and offset correctly [1.00ms]
+(pass) Repository Utilities > manager logger > should use the defined logger and write messages [2.00ms]
 
 tests/unit/infra/repositories/references.spec.ts:
 (pass) Repository References > hash > should hash a string [49.00ms]
-(pass) Repository References > hash > should compare correctly [133.00ms]
-(pass) Repository References > hash > should hash an object [90.00ms]
+(pass) Repository References > hash > should compare correctly [132.00ms]
+(pass) Repository References > hash > should hash an object [88.00ms]
 (pass) Repository References > tag > should generate a simple tag
 (pass) Repository References > tag > should generate a tag with conditions
-(pass) Repository References > pgIndex > should generate index configurations
-(pass) Repository References > identifier > should have correct fields [1.00ms]
+(pass) Repository References > pgIndex > should generate index configurations [1.00ms]
+(pass) Repository References > identifier > should have correct fields
 
 tests/unit/infra/languages/translate.spec.ts:
 (pass) Languages Infrastructure > Languages object > should have en, es, and pt-br languages
-(pass) Languages Infrastructure > Languages object > should have keys in en dictionary [1.00ms]
+(pass) Languages Infrastructure > Languages object > should have keys in en dictionary
 (pass) Languages Infrastructure > translate function > should translate an existing key to english by default
 (pass) Languages Infrastructure > translate function > should translate an existing key to pt-br
 (pass) Languages Infrastructure > translate function > should fallback to english if language is unknown
 (pass) Languages Infrastructure > translate function > should return the key if it does not exist in the dictionary
-(pass) Languages Infrastructure > translate function > should return the key from english dictionary if dictionary for requested language exists but key does not, and key exists in english
+(pass) Languages Infrastructure > translate function > should return the key from english dictionary if dictionary for requested language exists but key does not, and key exists in english [1.00ms]
 
 tests/unit/infra/messages/actions.spec.ts:
 (pass) Messaging Infrastructure > Resilience (Graceful Degradation) > should fallback to internal events when Redis is offline (pub)
-(pass) Messaging Infrastructure > Resilience (Graceful Degradation) > should fallback to internal events when Redis is offline (sub)
-(pass) Messaging Infrastructure > Resilience (Graceful Degradation) > should return PONG even if Redis is offline (ping) [1.00ms]
+(pass) Messaging Infrastructure > Resilience (Graceful Degradation) > should fallback to internal events when Redis is offline (sub) [1.00ms]
+(pass) Messaging Infrastructure > Resilience (Graceful Degradation) > should return PONG even if Redis is offline (ping)
 (pass) Messaging Infrastructure > Distributed (Redis Online) > should use Redis when online (pub)
 (pass) Messaging Infrastructure > Distributed (Redis Online) > should use Redis when online (sub)
 
 tests/unit/infra/cache/actions.spec.ts:
 (pass) Cache Infrastructure > Text Actions > should set value correctly
 (pass) Cache Infrastructure > Text Actions > should handle set error correctly
-(pass) Cache Infrastructure > Text Actions > should set value with TTL [1.00ms]
+(pass) Cache Infrastructure > Text Actions > should set value with TTL
 (pass) Cache Infrastructure > Text Actions > should get value correctly
-(pass) Cache Infrastructure > Text Actions > should delete value correctly
+(pass) Cache Infrastructure > Text Actions > should delete value correctly [1.00ms]
 (pass) Cache Infrastructure > JSON Actions > should set json value correctly
 (pass) Cache Infrastructure > JSON Actions > should handle json set error correctly
-(pass) Cache Infrastructure > JSON Actions > should get json value correctly [1.00ms]
+(pass) Cache Infrastructure > JSON Actions > should get json value correctly
 (pass) Cache Infrastructure > JSON Actions > should delete json value correctly
 (pass) Cache Infrastructure > should ping correctly
 
@@ -151,10 +187,10 @@ tests/unit/domain/identity/entity.spec.ts:
 (pass) Identity Entity > should have field 'lastName'
 
 tests/unit/domain/identity/get-find-by-params.spec.ts:
-(pass) Identity Domain Actions : getFindByParams > should return cached identities if available [1.00ms]
+(pass) Identity Domain Actions : getFindByParams > should return cached identities if available
 (pass) Identity Domain Actions : getFindByParams > should return identities from repository if not cached [1.00ms]
 (pass) Identity Domain Actions : getFindByParams > should throw error if no identities found
-(pass) Identity Domain Actions : getFindByParams > should throw error if validation fails
+(pass) Identity Domain Actions : getFindByParams > should throw error if validation fails [1.00ms]
 
 tests/unit/domain/identity/get-by-id.spec.ts:
 (pass) Identity Domain Actions : getById > should return cached identity if available
@@ -162,22 +198,26 @@ tests/unit/domain/identity/get-by-id.spec.ts:
 (pass) Identity Domain Actions : getById > should throw error if identity not found
 
 tests/unit/domain/identity/post-new-entity.spec.ts:
-(pass) Identity Domain Actions : postNewEntity > should create new identity and return it
+(pass) Identity Domain Actions : postNewEntity > should create new identity and return it [1.00ms]
 (pass) Identity Domain Actions : postNewEntity > should throw 409 if conflict (duplicate email)
-(pass) Identity Domain Actions : postNewEntity > should throw 400 if validation fails [1.00ms]
+(pass) Identity Domain Actions : postNewEntity > should throw 400 if validation fails
 
 tests/unit/infra/authentication/strategies/jwt.spec.ts:
 (pass) JWT Strategy > create > should create a valid JWT string [1.00ms]
-(pass) JWT Strategy > create > should create a JWT with specific expiration
+(pass) JWT Strategy > create > should create a JWT with specific expiration [1.00ms]
 (pass) JWT Strategy > session > should return the decoded session for a valid token [1.00ms]
 (pass) JWT Strategy > session > should throw 'Unauthorized' if authorization header is missing
-(pass) JWT Strategy > session > should throw 'Unauthorized' for malformed token [1.00ms]
-(pass) JWT Strategy > session > should throw 'Unauthorized' for invalid signature
+(pass) JWT Strategy > session > should throw 'Unauthorized' for malformed token
+(pass) JWT Strategy > session > should throw 'Unauthorized' for invalid signature [1.00ms]
 (pass) JWT Strategy > session > should throw 'Unauthorized' if token is expired [1.00ms]
 (pass) JWT Strategy > session > should throw 'Unauthorized' if header is invalid JSON
 
-2 tests failed:
-(fail) Infrastructure - SSO Connect > Should exchange token successfully using mock fetch
+6 tests failed:
+(fail) Domain - SSO Routes > Should redirect on /authorize with valid provider [143.99ms]
+(fail) Domain - SSO Routes > Should fail on /authorize with invalid provider [20.00ms]
+(fail) Domain - SSO Routes > Should process /callback and return normalized user on success [19.00ms]
+(fail) Domain - SSO Routes > Should fail on /callback if missing code [17.00ms]
+(fail) Infrastructure - SSO Connect > Should exchange token successfully using mock fetch [1.00ms]
 (fail) Infrastructure - SSO Connect > Should normalize GitHub user correctly
 ---------------------------------------------------|---------|---------|-------------------
 File                                               | % Funcs | % Lines | Uncovered Line #s
@@ -220,7 +260,7 @@ All files                                          |   80.43 |   91.92 |
  src/infrastructure/sso/providers.ts               |  100.00 |  100.00 | 
 ---------------------------------------------------|---------|---------|-------------------
 
- 107 pass
- 2 fail
+ 103 pass
+ 6 fail
  201 expect() calls
-Ran 109 tests across 20 files. [1095.00ms]
+Ran 109 tests across 20 files. [1001.00ms]

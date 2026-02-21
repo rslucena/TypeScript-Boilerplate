@@ -1,0 +1,109 @@
+bun test v1.3.9 (cf6cdbbb)
+
+tests/domain/sso/routes.test.ts:
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should redirect on /authorize with valid provider [154.99ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should fail on /authorize with invalid provider [27.00ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should process /callback and return normalized user on success [17.00ms]
+17 | 		google.redirectUri = "http://localhost/callback";
+18 | 	}
+19 | });
+20 | 
+21 | afterEach(() => {
+22 | 	mock.restoreAllMocks();
+           ^
+TypeError: mock.restoreAllMocks is not a function. (In 'mock.restoreAllMocks()', 'mock.restoreAllMocks' is undefined)
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/domain/sso/routes.test.ts:22:7)
+(fail) Domain - SSO Routes > Should fail on /callback if missing code [17.00ms]
+
+tests/infrastructure/sso/oidc.test.ts:
+(pass) Infrastructure - SSO Connect > Should generate authorization URL correctly for Google
+(pass) Infrastructure - SSO Connect > Should generate authorization URL correctly for GitHub without nonce
+60 | 		);
+61 | 		spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+62 | 
+63 | 		const result = await exchangeToken(providers.GOOGLE, "mock_auth_code");
+64 | 
+65 | 		expect(result.access_token).toBe("mock_access_token");
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: "mock_access_token"
+Received: "mock-access"
+
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:65:31)
+(fail) Infrastructure - SSO Connect > Should exchange token successfully using mock fetch
+90 | 
+91 | 		const result = await getNormalizedUser(providers.GITHUB, { access_token: "mock_git_token" });
+92 | 
+93 | 		expect(result.subject).toBe("12345");
+94 | 		expect(result.name).toBe("Mock User");
+95 | 		expect(result.email).toBe("mockuser@example.com");
+                            ^
+error: expect(received).toBe(expected)
+
+Expected: "mockuser@example.com"
+Received: "mock@google.com"
+
+      at <anonymous> (/home/lucena/Área de trabalho/Codes/TypeScript-Boilerplate/backend/tests/infrastructure/sso/oidc.test.ts:95:24)
+(fail) Infrastructure - SSO Connect > Should normalize GitHub user correctly
+-----------------------------------------------|---------|---------|-------------------
+File                                           | % Funcs | % Lines | Uncovered Line #s
+-----------------------------------------------|---------|---------|-------------------
+All files                                      |   67.19 |   81.03 |
+ src/domain/credentials/constants.ts           |  100.00 |  100.00 | 
+ src/domain/sso/actions/get-authorize.ts       |  100.00 |  100.00 | 
+ src/domain/sso/actions/get-callback.ts        |  100.00 |  100.00 | 
+ src/domain/sso/routes.ts                      |  100.00 |  100.00 | 
+ src/domain/sso/schema.ts                      |  100.00 |  100.00 | 
+ src/infrastructure/authentication/jwt.ts      |    0.00 |   12.28 | 24-30,34-47,51-66,70-80,85-86
+ src/infrastructure/cache/connection.ts        |    0.00 |  100.00 | 
+ src/infrastructure/languages/translate.ts     |  100.00 |  100.00 | 
+ src/infrastructure/logs/handler.ts            |   42.86 |  100.00 | 
+ src/infrastructure/pipes/crypto.ts            |   37.50 |   22.92 | 10-22,26-36,40-49,55-57
+ src/infrastructure/pipes/safe-parse.ts        |  100.00 |   83.33 | 
+ src/infrastructure/repositories/references.ts |   33.33 |   80.56 | 36-39,43-45
+ src/infrastructure/server/authentication.ts   |    0.00 |   13.04 | 5-24
+ src/infrastructure/server/interface.ts        |   46.67 |   73.68 | 66-71,74-79,90-95,98-103,132-133,136-137,152-153
+ src/infrastructure/server/rate-limit.ts       |  100.00 |  100.00 | 
+ src/infrastructure/server/request.ts          |   87.50 |   89.39 | 8-9,54-55,63-65
+ src/infrastructure/server/webserver.ts        |   23.08 |   84.15 | 55-56,63-65,78-85
+ src/infrastructure/settings/cors.ts           |   50.00 |   87.50 | 12-13
+ src/infrastructure/settings/environment.ts    |   75.00 |   80.77 | 44-45,47-51,53-55
+ src/infrastructure/settings/helmet.ts         |  100.00 |  100.00 | 
+ src/infrastructure/settings/plugins.ts        |  100.00 |  100.00 | 
+ src/infrastructure/settings/swagger.ts        |  100.00 |  100.00 | 
+ src/infrastructure/sso/oidc.ts                |   16.67 |   17.14 | 10,27-52,63-70,80-110,114-146,150-166
+ src/infrastructure/sso/providers.ts           |  100.00 |  100.00 | 
+-----------------------------------------------|---------|---------|-------------------
+
+ 2 pass
+ 6 fail
+ 26 expect() calls
+Ran 8 tests across 2 files. [526.00ms]
