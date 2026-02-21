@@ -30,6 +30,12 @@ const schema = z.object({
 	APP_HTTP2: z.string().transform((val) => val === "true"),
 	APP_CERT: z.string().refine((val) => val.endsWith(".crt") || val.endsWith(".pem")),
 	APP_KEY: z.string().refine((val) => val.endsWith(".key") || val.endsWith(".pem")),
+	SSO_GOOGLE_CLIENT_ID: z.string().optional(),
+	SSO_GOOGLE_CLIENT_SECRET: z.string().optional(),
+	SSO_GOOGLE_REDIRECT_URI: z.string().url().optional(),
+	SSO_GITHUB_CLIENT_ID: z.string().optional(),
+	SSO_GITHUB_CLIENT_SECRET: z.string().optional(),
+	SSO_GITHUB_REDIRECT_URI: z.string().url().optional(),
 });
 
 const result = schema.safeParse(process.env);
