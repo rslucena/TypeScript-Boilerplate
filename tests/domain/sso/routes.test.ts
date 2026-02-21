@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, mock } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 
 mock.module("@infrastructure/cache/connection", () => ({ default: createRedisClientMock() }));
@@ -6,17 +6,8 @@ mock.module("@infrastructure/cache/connection", () => ({ default: createRedisCli
 import { providers } from "@domain/credentials/constants";
 import ssoRoutes from "@domain/sso/routes";
 import webserver from "@infrastructure/server/webserver";
-import { getAuthorizationUrl } from "@infrastructure/sso/oidc";
+import * as oidc from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
-
-const mockExchangeToken = mock();
-const mockGetNormalizedUser = mock();
-
-mock.module("@infrastructure/sso/oidc", () => ({
-	exchangeToken: mockExchangeToken,
-	getNormalizedUser: mockGetNormalizedUser,
-	getAuthorizationUrl,
-}));
 
 beforeAll(() => {
 	const google = oidcProviders[providers.GOOGLE];
@@ -25,6 +16,10 @@ beforeAll(() => {
 		google.clientSecret = "mock-client-secret";
 		google.redirectUri = "http://localhost/callback";
 	}
+});
+
+afterEach(() => {
+	mock.restoreAllMocks();
 });
 
 describe("Domain - SSO Routes", () => {
@@ -42,7 +37,6 @@ describe("Domain - SSO Routes", () => {
 			headers: { "accept-language": "en" },
 		});
 
-		if (response.statusCode === 400) console.log("AUTHORIZE ERROR:", response.json());
 		expect(response.statusCode).toBe(302);
 		expect(response.headers.location).toInclude("accounts.google.com");
 	});
@@ -65,13 +59,13 @@ describe("Domain - SSO Routes", () => {
 	});
 
 	it("Should process /callback and return normalized user on success", async () => {
-		mockExchangeToken.mockResolvedValue({
+		spyOn(oidc, "exchangeToken").mockResolvedValue({
 			access_token: "mock-access",
 			id_token: "mock-id-token",
 			token_type: "Bearer",
 		});
 
-		mockGetNormalizedUser.mockResolvedValue({
+		spyOn(oidc, "getNormalizedUser").mockResolvedValue({
 			subject: "12345",
 			email: "mock@google.com",
 			name: "Mock User",
@@ -91,7 +85,6 @@ describe("Domain - SSO Routes", () => {
 			headers: { "accept-language": "en" },
 		});
 
-		if (response.statusCode === 400) console.log("CALLBACK ERROR:", response.json());
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
 		expect(body.subject).toBe("12345");
