@@ -9,6 +9,9 @@ import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
+let exchangeSpy: any;
+let userSpy: any;
+
 beforeAll(() => {
 	const google = oidcProviders[providers.GOOGLE];
 	if (google) {
@@ -19,7 +22,8 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-	mock.restoreAllMocks();
+	if (exchangeSpy) exchangeSpy.mockRestore();
+	if (userSpy) userSpy.mockRestore();
 });
 
 describe("Domain - SSO Routes", () => {
@@ -59,13 +63,13 @@ describe("Domain - SSO Routes", () => {
 	});
 
 	it("Should process /callback and return normalized user on success", async () => {
-		spyOn(oidc, "exchangeToken").mockResolvedValue({
+		exchangeSpy = spyOn(oidc, "exchangeToken").mockResolvedValue({
 			access_token: "mock-access",
 			id_token: "mock-id-token",
 			token_type: "Bearer",
 		});
 
-		spyOn(oidc, "getNormalizedUser").mockResolvedValue({
+		userSpy = spyOn(oidc, "getNormalizedUser").mockResolvedValue({
 			subject: "12345",
 			email: "mock@google.com",
 			name: "Mock User",
