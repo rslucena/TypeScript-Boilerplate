@@ -4,13 +4,19 @@ import { exchangeToken, getAuthorizationUrl, getNormalizedUser } from "@infrastr
 import { oidcProviders } from "@infrastructure/sso/providers";
 
 beforeAll(() => {
-	oidcProviders[providers.GOOGLE]!.clientId = "mock-client-id";
-	oidcProviders[providers.GOOGLE]!.clientSecret = "mock-client-secret";
-	oidcProviders[providers.GOOGLE]!.redirectUri = "http://localhost/callback";
+	const google = oidcProviders[providers.GOOGLE];
+	if (google) {
+		google.clientId = "mock-client-id";
+		google.clientSecret = "mock-client-secret";
+		google.redirectUri = "http://localhost/callback";
+	}
 
-	oidcProviders[providers.GITHUB]!.clientId = "mock-client-id";
-	oidcProviders[providers.GITHUB]!.clientSecret = "mock-client-secret";
-	oidcProviders[providers.GITHUB]!.redirectUri = "http://localhost/callback";
+	const github = oidcProviders[providers.GITHUB];
+	if (github) {
+		github.clientId = "mock-client-id";
+		github.clientSecret = "mock-client-secret";
+		github.redirectUri = "http://localhost/callback";
+	}
 });
 
 describe("Infrastructure - SSO Connect", () => {
