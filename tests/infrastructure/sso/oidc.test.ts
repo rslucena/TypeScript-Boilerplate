@@ -1,16 +1,28 @@
-import { beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import { exchangeToken, getAuthorizationUrl, getNormalizedUser } from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
-beforeAll(() => {
-	oidcProviders[providers.GOOGLE]!.clientId = "mock-client-id";
-	oidcProviders[providers.GOOGLE]!.clientSecret = "mock-client-secret";
-	oidcProviders[providers.GOOGLE]!.redirectUri = "http://localhost/callback";
+let fetchSpy: any;
 
-	oidcProviders[providers.GITHUB]!.clientId = "mock-client-id";
-	oidcProviders[providers.GITHUB]!.clientSecret = "mock-client-secret";
-	oidcProviders[providers.GITHUB]!.redirectUri = "http://localhost/callback";
+beforeAll(() => {
+	const google = oidcProviders[providers.GOOGLE];
+	if (google) {
+		google.clientId = "mock-client-id";
+		google.clientSecret = "mock-client-secret";
+		google.redirectUri = "http://localhost/callback";
+	}
+
+	const github = oidcProviders[providers.GITHUB];
+	if (github) {
+		github.clientId = "mock-client-id";
+		github.clientSecret = "mock-client-secret";
+		github.redirectUri = "http://localhost/callback";
+	}
+});
+
+afterEach(() => {
+	if (fetchSpy) fetchSpy.mockRestore();
 });
 
 describe("Infrastructure - SSO Connect", () => {
@@ -52,14 +64,12 @@ describe("Infrastructure - SSO Connect", () => {
 				{ status: 200 },
 			),
 		);
-		spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
 
 		const result = await exchangeToken(providers.GOOGLE, "mock_auth_code");
 
 		expect(result.access_token).toBe("mock_access_token");
 		expect(result.id_token).toBe("mock_id_token");
-
-		mockFetch.mockRestore();
 	});
 
 	it("Should normalize GitHub user correctly", async () => {
@@ -80,14 +90,12 @@ describe("Infrastructure - SSO Connect", () => {
 					status: 200,
 				}),
 			);
-		spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
 
 		const result = await getNormalizedUser(providers.GITHUB, { access_token: "mock_git_token" });
 
 		expect(result.subject).toBe("12345");
 		expect(result.name).toBe("Mock User");
 		expect(result.email).toBe("mockuser@example.com");
-
-		mockFetch.mockRestore();
 	});
 });
