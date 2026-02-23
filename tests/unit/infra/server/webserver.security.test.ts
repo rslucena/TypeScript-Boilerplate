@@ -1,11 +1,15 @@
-import { describe, expect, it } from "bun:test";
-import webserver from "../src/infrastructure/server/webserver";
+import { describe, expect, it, mock } from "bun:test";
+import webserver from "@infrastructure/server/webserver";
+import { redisClientMock } from "@tests/mocks/redis.client.mock";
+
+mock.module("@infrastructure/cache/connection", () => ({
+	default: redisClientMock,
+}));
 
 describe("Webserver Security: Error Handling", () => {
 	it("should NOT leak internal error messages in the response", async () => {
 		const server = await webserver.create();
 
-		// Create a route that throws a sensitive error
 		server.get("/vulnerable-error", async () => {
 			throw new Error("INTERNAL_DATABASE_FAILURE: secret_db_password_123");
 		});
@@ -17,10 +21,9 @@ describe("Webserver Security: Error Handling", () => {
 
 		const payload = JSON.parse(response.payload);
 
-		// The vulnerability is that the message contains the sensitive string
-		// We expect the message to be generic after the fix
+		expect(response.statusCode).toBe(500);
 		expect(payload.message).not.toContain("secret_db_password_123");
-		expect(payload.message).toBe("An unknown error occurred");
+		expect(payload.message).toBe("An internal server error occurred. Please try again later.");
 	});
 
 	it("should handle 'Unsupported Media Type' safely", async () => {
@@ -37,7 +40,6 @@ describe("Webserver Security: Error Handling", () => {
 
 		const payload = JSON.parse(response.payload);
 
-		// It should be truncated/generic enough
 		expect(payload.message).toBe("Unsupported Media Type");
 		expect(payload.message).not.toContain("additional sensitive info");
 	});
