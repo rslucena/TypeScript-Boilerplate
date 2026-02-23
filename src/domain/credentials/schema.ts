@@ -44,6 +44,7 @@ const actions = {
 		}),
 	update: create.pick({ login: true, secret: true }),
 	delete: create.pick({ revokedReason: true }).required(),
+	find: z.object({ provider: z.enum(providers), subject: z.string() }),
 };
 
 export default { actions, entity: array(select) };
