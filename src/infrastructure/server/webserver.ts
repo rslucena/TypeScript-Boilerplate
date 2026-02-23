@@ -50,12 +50,13 @@ async function webserver(): Promise<server> {
 	instance.setErrorHandler((error: unknown, request, reply) => {
 		const er = new err().badRequest(request.headers["accept-language"]);
 		er.message = "An unknown error occurred";
+		logger.error(error);
+
 		if (error instanceof Error) {
 			if (error.message.startsWith("Unsupported Media Type")) {
 				request.headers["content-type"] = "application/json";
-				error.message = error.message.split(";")[0];
+				er.message = error.message.split(";")[0];
 			}
-			er.message = error.message;
 		}
 		return reply.headers(request.headers).code(er.statusCode).send(er);
 	});
