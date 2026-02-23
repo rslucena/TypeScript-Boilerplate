@@ -1,4 +1,5 @@
-import { mock, describe, it, expect, beforeEach } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
+import type { container } from "@infrastructure/server/interface";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
@@ -90,22 +91,38 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 
 	it("should update identity and return it", async () => {
 		const updateData = { name: "Jane", lastName: "Doe" };
-		const updatedIdentity = { id: validId, ...updateData, email: "jane@example.com", activated: true, createdAt: new Date(), updatedAt: new Date() };
+		const updatedIdentity = {
+			id: validId,
+			...updateData,
+			email: "jane@example.com",
+			activated: true,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
 
-		// Setup request
 		const request = new (class {
-			params() { return { id: validId }; }
-			body() { return updateData; }
-			status() { return containerMock.status(); }
-			badRequest(l: string, t: string) { return containerMock.badRequest(l, t); }
-			notFound(l: string, t: string) { return containerMock.notFound(l, t); }
-			language() { return "en"; }
-		})() as any;
+			params() {
+				return { id: validId };
+			}
+			body() {
+				return updateData;
+			}
+			status() {
+				return containerMock.status();
+			}
+			badRequest(l: string, t: string) {
+				return containerMock.badRequest(l, t);
+			}
+			notFound(l: string, t: string) {
+				return containerMock.notFound(l, t);
+			}
+			language() {
+				return "en";
+			}
+		})() as unknown as container;
 
-		// Mock update returning success (indicates row was updated)
 		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
 
-		// Mock getById execution (returns the full entity)
 		repositoryMock.execute.mockResolvedValueOnce([updatedIdentity]);
 
 		const result = await putUpdateEntity(request);
@@ -118,17 +135,28 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 	});
 
 	it("should throw 404 if identity not found", async () => {
-		// Setup request
 		const request = new (class {
-			params() { return { id: validId }; }
-			body() { return { name: "Jane" }; }
-			status() { return containerMock.status(); }
-			badRequest(l: string, t: string) { return containerMock.badRequest(l, t); }
-			notFound(l: string, t: string) { return new Error("Not Found"); }
-			language() { return "en"; }
-		})() as any;
+			params() {
+				return { id: validId };
+			}
+			body() {
+				return { name: "Jane" };
+			}
+			status() {
+				return containerMock.status();
+			}
+			badRequest(l: string, t: string) {
+				return containerMock.badRequest(l, t);
+			}
+			notFound(_l: string, _t: string) {
+				return new Error("Not Found");
+			}
+			language() {
+				return "en";
+			}
+		})() as unknown as container;
 
-		repositoryMock.returning.mockResolvedValueOnce([]); // No rows updated
+		repositoryMock.returning.mockResolvedValueOnce([]);
 
 		expect(putUpdateEntity(request)).rejects.toThrow("Not Found");
 		expect(redisClientMock.json.del).not.toHaveBeenCalled();
@@ -136,12 +164,22 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 
 	it("should throw 400 if params validation fails", async () => {
 		const request = new (class {
-			params() { return { id: "invalid-uuid" }; }
-			body() { return { name: "Jane" }; }
-			status() { return containerMock.status(); }
-			badRequest(l: string, t: string) { return new Error("Bad Request"); }
-			language() { return "en"; }
-		})() as any;
+			params() {
+				return { id: "invalid-uuid" };
+			}
+			body() {
+				return { name: "Jane" };
+			}
+			status() {
+				return containerMock.status();
+			}
+			badRequest(_l: string, _t: string) {
+				return new Error("Bad Request");
+			}
+			language() {
+				return "en";
+			}
+		})() as unknown as container;
 
 		expect(putUpdateEntity(request)).rejects.toThrow("Bad Request");
 		expect(repositoryMock.update).not.toHaveBeenCalled();
@@ -149,12 +187,22 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 
 	it("should throw 400 if body validation fails", async () => {
 		const request = new (class {
-			params() { return { id: validId }; }
-			body() { return { name: "" }; } // Invalid name
-			status() { return containerMock.status(); }
-			badRequest(l: string, t: string) { return new Error("Bad Request"); }
-			language() { return "en"; }
-		})() as any;
+			params() {
+				return { id: validId };
+			}
+			body() {
+				return { name: "" };
+			}
+			status() {
+				return containerMock.status();
+			}
+			badRequest(_l: string, _t: string) {
+				return new Error("Bad Request");
+			}
+			language() {
+				return "en";
+			}
+		})() as unknown as container;
 
 		expect(putUpdateEntity(request)).rejects.toThrow("Bad Request");
 		expect(repositoryMock.update).not.toHaveBeenCalled();
@@ -162,12 +210,22 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 
 	it("should propagate database errors", async () => {
 		const request = new (class {
-			params() { return { id: validId }; }
-			body() { return { name: "Jane" }; }
-			status() { return containerMock.status(); }
-			badRequest(l: string, t: string) { return containerMock.badRequest(l, t); }
-			language() { return "en"; }
-		})() as any;
+			params() {
+				return { id: validId };
+			}
+			body() {
+				return { name: "Jane" };
+			}
+			status() {
+				return containerMock.status();
+			}
+			badRequest(l: string, t: string) {
+				return containerMock.badRequest(l, t);
+			}
+			language() {
+				return "en";
+			}
+		})() as unknown as container;
 
 		repositoryMock.returning.mockRejectedValue(new Error("DB Error"));
 
