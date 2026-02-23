@@ -16,9 +16,11 @@ const actions = {
 
 const responses = {
 	profile: z.object({
-		subject: z.string(),
-		email: z.string().optional(),
-		name: z.string().optional(),
+		session: z.object({
+			id: z.string(),
+			name: z.string(),
+		}),
+		token: z.string(),
 	}),
 };
 

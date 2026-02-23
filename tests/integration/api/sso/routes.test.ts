@@ -1,7 +1,17 @@
 import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
+import { referencesMock } from "@tests/mocks/references.mock";
+import { repositoryMock } from "@tests/mocks/repository.mock";
 
 mock.module("@infrastructure/cache/connection", () => ({ default: createRedisClientMock() }));
+mock.module("@infrastructure/repositories/repository", () => ({
+	default: repositoryMock,
+	withPagination: referencesMock.withPagination,
+}));
+mock.module("@infrastructure/repositories/references", () => ({
+	...referencesMock,
+	pgIndex: mock(() => []),
+}));
 
 import { providers } from "@domain/credentials/constants";
 import ssoRoutes from "@domain/sso/routes";
@@ -24,6 +34,9 @@ beforeAll(() => {
 afterEach(() => {
 	if (exchangeSpy) exchangeSpy.mockRestore();
 	if (userSpy) userSpy.mockRestore();
+	repositoryMock.execute.mockClear();
+	repositoryMock.insert.mockClear();
+	repositoryMock.returning.mockClear();
 });
 
 describe("Domain - SSO Routes", () => {
@@ -75,6 +88,9 @@ describe("Domain - SSO Routes", () => {
 			name: "Mock User",
 		});
 
+		repositoryMock.execute.mockResolvedValue([]);
+		repositoryMock.returning.mockResolvedValue([{ id: "uuid-123" }]);
+
 		const server = await webserver.create();
 		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
 		await server.ready();
@@ -91,9 +107,8 @@ describe("Domain - SSO Routes", () => {
 
 		expect(response.statusCode).toBe(200);
 		const body = response.json();
-		expect(body.subject).toBe("12345");
-		expect(body.email).toBe("mock@google.com");
-		expect(body.name).toBe("Mock User");
+		expect(body.session).toBeDefined();
+		expect(body.token).toBeDefined();
 	});
 
 	it("Should fail on /callback if missing code", async () => {
