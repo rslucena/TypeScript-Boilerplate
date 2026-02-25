@@ -89,6 +89,7 @@ describe("Domain - SSO Routes", () => {
 		});
 
 		repositoryMock.execute.mockResolvedValue([]);
+		repositoryMock.insert.mockReturnValue(repositoryMock);
 		repositoryMock.returning.mockResolvedValue([{ id: "uuid-123" }]);
 
 		const server = await webserver.create();
