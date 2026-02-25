@@ -60,6 +60,36 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      PROCESS_PORT: "3000"
+      PROCESS_DOMAIN: "http://localhost:3000"
+      PROCESS_CORS_ORIGIN: "*"
+      REDIS_SERVER: localhost
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ""
+      REDIS_SSL: "false"
+      REDIS_STACK: "true"
+      POSTGRES_SERVER: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: db
+      RATE_LIMIT_MAX: "100"
+      RATE_LIMIT_WINDOW: "60"
+      AUTH_SALT: salt
+      SHOW_LOG: "false"
+      LOG_LEVEL: info
+      APP_NAME: "Test App"
+      APP_DESCRIPTION: "Test Description"
+      APP_VERSION: "0.0.1"
+      APP_FOLDER_KEY: "keys"
+      APP_HTTP2: "false"
+      APP_CERT: "keys/cert.pem"
+      APP_KEY: "keys/key.pem"
+      SSO_GOOGLE_CLIENT_ID: test-client-id
+      SSO_GOOGLE_CLIENT_SECRET: test-client-secret
+      SSO_GOOGLE_REDIRECT_URI: "http://localhost/callback"
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Setup Bun
@@ -79,6 +109,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run Tests
         run: bun run tests
+
 
   build:
     runs-on: ubuntu-latest

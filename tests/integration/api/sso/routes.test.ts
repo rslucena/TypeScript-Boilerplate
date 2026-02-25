@@ -1,8 +1,11 @@
 import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
+import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 
+mock.module("@infrastructure/settings/environment", () => createEnvMock());
+mock.module("node:fs", () => fsMock);
 mock.module("@infrastructure/cache/connection", () => ({ default: createRedisClientMock() }));
 mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
