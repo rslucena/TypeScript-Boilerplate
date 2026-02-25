@@ -13,16 +13,6 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 }));
 
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: {
-		json: {
-			get: mock(() => Promise.resolve(null)),
-			set: mock(() => Promise.resolve()),
-		},
-	},
-}));
-
 mock.module("@infrastructure/repositories/references", () => ({
 	__esModule: true,
 	tag: referencesMock.tag,
@@ -36,6 +26,7 @@ mock.module("@infrastructure/repositories/references", () => ({
 import { providers } from "@domain/credentials/constants";
 import postLocalLogin from "@domain/sso/actions/post-local-login";
 import * as jwt from "@infrastructure/authentication/jwt";
+import cache from "@infrastructure/cache/actions";
 import { container } from "@infrastructure/server/interface";
 
 describe("SSO Domain Actions : postLocalLogin", () => {
@@ -57,11 +48,15 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 
 		repositoryMock.execute.mockClear();
 
+		spyOn(cache.json, "get").mockResolvedValue(null);
+		spyOn(cache.json, "set").mockResolvedValue("");
+
 		jwtSpy = spyOn(jwt, "create").mockReturnValue("header.payload.signature");
 	});
 
 	afterEach(() => {
 		jwtSpy.mockRestore();
+		mock.restore();
 	});
 
 	it("should return 400 when body does not follow the schema", async () => {

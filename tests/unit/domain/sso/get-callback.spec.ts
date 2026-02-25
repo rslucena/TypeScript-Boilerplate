@@ -11,16 +11,6 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 }));
 
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: {
-		json: {
-			get: mock(() => Promise.resolve(null)),
-			set: mock(() => Promise.resolve()),
-		},
-	},
-}));
-
 mock.module("@infrastructure/repositories/references", () => ({
 	__esModule: true,
 	tag: referencesMock.tag,
@@ -34,6 +24,7 @@ mock.module("@infrastructure/repositories/references", () => ({
 import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import * as jwt from "@infrastructure/authentication/jwt";
+import cache from "@infrastructure/cache/actions";
 import * as oidc from "@infrastructure/sso/oidc";
 
 const mockNormalizedUser = {
@@ -61,6 +52,9 @@ describe("SSO Domain Actions : getCallback", () => {
 		repositoryMock.returning.mockClear();
 		repositoryMock.execute.mockClear();
 
+		spyOn(cache.json, "get").mockResolvedValue(null);
+		spyOn(cache.json, "set").mockResolvedValue("");
+
 		jwtSpy = spyOn(jwt, "create").mockReturnValue("header.payload.signature");
 		oidcExchangeSpy = spyOn(oidc, "exchangeToken").mockResolvedValue({ access_token: "abc", token_type: "Bearer" });
 		oidcUserSpy = spyOn(oidc, "getNormalizedUser").mockResolvedValue(mockNormalizedUser);
@@ -72,6 +66,7 @@ describe("SSO Domain Actions : getCallback", () => {
 		jwtSpy.mockRestore();
 		oidcExchangeSpy.mockRestore();
 		oidcUserSpy.mockRestore();
+		mock.restore();
 	});
 
 	it("should create new identity and credential for new user", async () => {
