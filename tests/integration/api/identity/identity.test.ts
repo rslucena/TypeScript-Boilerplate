@@ -17,7 +17,13 @@ mock.module("@infrastructure/repositories/references", () => ({
 	pgIndex: mock(() => []),
 	zodIdentifier: { id: z.string() },
 }));
-mock.module("@infrastructure/server/request", () => ({ default: serverRequestMock }));
+
+import * as requestModule from "@infrastructure/server/request";
+
+mock.module("@infrastructure/server/request", () => ({
+	...requestModule,
+	default: serverRequestMock,
+}));
 
 import identityRoutes from "@domain/identity/routes";
 import { createIdentityBuilder } from "@tests/builders/identity.builder";
