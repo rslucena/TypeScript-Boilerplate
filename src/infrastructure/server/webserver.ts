@@ -71,7 +71,7 @@ async function webserver(): Promise<server> {
 		}
 
 		const er = new err().internalServerError(lang);
-		if (env.isDev && error instanceof Error) {
+		if (process.env.NODE_ENV === "development" && error instanceof Error) {
 			er.message = error.message;
 		}
 
