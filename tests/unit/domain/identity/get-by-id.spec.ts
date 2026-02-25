@@ -13,7 +13,10 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	withPagination: mock((qb) => qb),
 }));
 
+import * as requestModule from "@infrastructure/server/request";
+
 mock.module("@infrastructure/server/request", () => ({
+	...requestModule,
 	container: mock(() => containerMock),
 	authentication: mock(() => ({ create: mock().mockReturnValue("token") })),
 }));

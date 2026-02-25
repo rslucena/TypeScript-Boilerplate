@@ -15,7 +15,10 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	withPagination: mock((qb) => qb),
 }));
 
+import * as requestModule from "@infrastructure/server/request";
+
 mock.module("@infrastructure/server/request", () => ({
+	...requestModule,
 	__esModule: true,
 	container: mock((...args) => {
 		const instance = Object.create(containerMock);
