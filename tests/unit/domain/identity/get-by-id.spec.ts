@@ -1,10 +1,8 @@
 import { mock } from "bun:test";
-import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 
-const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
@@ -61,7 +59,7 @@ describe("Identity Domain Actions : getById", () => {
 
 	it("should return cached identity if available", async () => {
 		const cachedData = [{ id: 1, name: "Test" }];
-		const reference = referencesMock.tag("identity", "find{id}", { id: validId });
+		const _reference = referencesMock.tag("identity", "find{id}", { id: validId });
 		mockJsonGet.mockResolvedValueOnce(cachedData);
 		containerMock.params.mockReturnValue({ id: validId });
 

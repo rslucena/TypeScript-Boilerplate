@@ -1,12 +1,10 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { container } from "@infrastructure/server/interface";
-import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 import "@domain/identity/schema";
 
-const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
