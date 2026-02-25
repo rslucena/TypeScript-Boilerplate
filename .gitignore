@@ -1,5 +1,7 @@
 # Essentials
-.docker/*
+.agent
+.docker
+.vscode
 .DS_Store
 .DS_Store?
 Thumbs.db
