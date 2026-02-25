@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
@@ -19,8 +19,8 @@ import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
-let exchangeSpy: any;
-let userSpy: any;
+let exchangeSpy: Mock<typeof oidc.exchangeToken>;
+let userSpy: Mock<typeof oidc.getNormalizedUser>;
 
 beforeAll(() => {
 	const google = oidcProviders[providers.GOOGLE];

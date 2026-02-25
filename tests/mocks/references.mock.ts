@@ -1,9 +1,20 @@
+import type { Mock } from "bun:test";
 import { mock } from "bun:test";
+import type { Column } from "@tests/builders/column.builders";
 import { columnBuilder } from "@tests/builders/column.builders";
 import { z } from "zod";
 
-export const createReferencesMock = () => ({
-	tag: mock((domain, method, conditions) => {
+export interface ReferencesMockType {
+	tag: Mock<(domain: string, method: string, conditions?: Record<string, string>) => string>;
+	hash: Mock<(val: string) => string>;
+	pgIndex: Mock<() => unknown[]>;
+	identifier: Record<string, Column>;
+	zodIdentifier: Record<string, z.ZodTypeAny>;
+	withPagination: { shape: { "req.page": z.ZodTypeAny } };
+}
+
+export const createReferencesMock = (): ReferencesMockType => ({
+	tag: mock((domain: string, method: string, conditions?: Record<string, string>) => {
 		let collection = `${domain}/${method}`;
 		if (!conditions) return collection.toLowerCase().trim();
 		collection += "/";
@@ -33,4 +44,4 @@ export const createReferencesMock = () => ({
 	},
 });
 
-export const referencesMock = createReferencesMock();
+export const referencesMock: ReferencesMockType = createReferencesMock();

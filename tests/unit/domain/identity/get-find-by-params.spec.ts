@@ -39,8 +39,8 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "b
 
 describe("Identity Domain Actions : getFindByParams", () => {
 	let getFindByParams: CallableFunction;
-	let mockJsonGet: Mock<any>;
-	let mockJsonSet: Mock<any>;
+	let mockJsonGet: Mock<typeof cache.json.get>;
+	let mockJsonSet: Mock<typeof cache.json.set>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();

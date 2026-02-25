@@ -1,9 +1,9 @@
-import { afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import { exchangeToken, getAuthorizationUrl, getNormalizedUser } from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
-let fetchSpy: any;
+let fetchSpy: Mock<typeof fetch>;
 
 beforeAll(() => {
 	const google = oidcProviders[providers.GOOGLE];
@@ -64,7 +64,7 @@ describe("Infrastructure - SSO Connect", () => {
 				{ status: 200 },
 			),
 		);
-		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
 
 		const result = await exchangeToken(providers.GOOGLE, "mock_auth_code");
 
@@ -90,7 +90,7 @@ describe("Infrastructure - SSO Connect", () => {
 					status: 200,
 				}),
 			);
-		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as any);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
 
 		const result = await getNormalizedUser(providers.GITHUB, { access_token: "mock_git_token" });
 

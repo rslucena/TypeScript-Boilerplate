@@ -1,5 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
 import type { AnyType, guise } from "@infrastructure/server/interface";
+// @ts-expect-error: Bun runtime supports query parameters for imports
 import { container, err } from "@infrastructure/server/interface?v=unit";
 import type { FastifyReply, FastifyRequest } from "fastify";
 

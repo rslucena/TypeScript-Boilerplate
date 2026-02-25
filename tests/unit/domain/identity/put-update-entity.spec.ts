@@ -39,7 +39,7 @@ import cache from "@infrastructure/cache/actions";
 
 describe("Identity Domain Actions : putUpdateEntity", () => {
 	let putUpdateEntity: CallableFunction;
-	let mockJsonDel: Mock<any>;
+	let mockJsonDel: Mock<typeof cache.json.del>;
 	const validId = "123e4567-e89b-12d3-a456-426614174000";
 
 	beforeEach(async () => {
@@ -48,7 +48,6 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 		containerMock.body.mockReturnValue({});
 		containerMock.language.mockReturnValue("en");
 
-		// Reset repository mocks
 		repositoryMock.update.mockClear();
 		repositoryMock.update.mockReturnThis();
 
@@ -79,7 +78,6 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 		repositoryMock.execute.mockClear();
 		repositoryMock.execute.mockResolvedValue([]);
 
-		// Setup cache mock
 		mockJsonDel = spyOn(cache.json, "del").mockResolvedValue(1);
 		spyOn(cache.json, "get").mockResolvedValue(null);
 		spyOn(cache.json, "set").mockResolvedValue("");

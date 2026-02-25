@@ -42,7 +42,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "b
 
 describe("Identity Domain Actions : postNewEntity", () => {
 	let postNewEntity: CallableFunction;
-	let mockJsonDel: Mock<any>;
+	let mockJsonDel: Mock<typeof cache.json.del>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();

@@ -35,9 +35,9 @@ const mockNormalizedUser = {
 
 describe("SSO Domain Actions : getCallback", () => {
 	let getCallback: CallableFunction;
-	let jwtSpy: Mock<any>;
-	let oidcExchangeSpy: Mock<any>;
-	let oidcUserSpy: Mock<any>;
+	let jwtSpy: Mock<typeof jwt.create>;
+	let oidcExchangeSpy: Mock<typeof oidc.exchangeToken>;
+	let oidcUserSpy: Mock<typeof oidc.getNormalizedUser>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();
@@ -70,32 +70,27 @@ describe("SSO Domain Actions : getCallback", () => {
 	});
 
 	it("should create new identity and credential for new user", async () => {
-		// Mock findByProviderSubject returning empty
 		repositoryMock.execute.mockResolvedValueOnce([]);
-		// Mock getByIdentityEmail returning empty
 		repositoryMock.execute.mockResolvedValueOnce([]);
 
 		const result = await getCallback(containerMock);
 
 		expect(result.token).toBe("header.payload.signature");
 		expect(result.session.name).toBe("OAuth User");
-		expect(repositoryMock.insert).toHaveBeenCalledTimes(2); // Identity then Credential
+		expect(repositoryMock.insert).toHaveBeenCalledTimes(2);
 	});
 
 	it("should link to existing identity if email matches", async () => {
-		// Mock findByProviderSubject returning empty
 		repositoryMock.execute.mockResolvedValueOnce([]);
-		// Mock getByIdentityEmail returning match
 		repositoryMock.execute.mockResolvedValueOnce([{ id: "existing-id", name: "Existing User" }]);
 
 		const result = await getCallback(containerMock);
 
 		expect(result.session.id).toBe("existing-id");
-		expect(repositoryMock.insert).toHaveBeenCalledTimes(1); // Only Credential
+		expect(repositoryMock.insert).toHaveBeenCalledTimes(1);
 	});
 
 	it("should return existing identity if credential exists", async () => {
-		// Mock findByProviderSubject returning match
 		repositoryMock.execute.mockResolvedValueOnce([{ identityId: "very-old-id" }]);
 
 		const result = await getCallback(containerMock);
