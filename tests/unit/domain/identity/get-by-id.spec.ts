@@ -9,11 +9,6 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: redisClientMock,
-}));
-
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
 	default: repositoryMock,
@@ -35,11 +30,14 @@ mock.module("@infrastructure/repositories/references", () => ({
 	zodIdentifier: referencesMock.zodIdentifier,
 }));
 
+import cache from "@infrastructure/cache/actions";
 import "@domain/identity/schema";
-import { beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "bun:test";
 
 describe("Identity Domain Actions : getById", () => {
 	let getById: CallableFunction;
+	let mockJsonGet: Mock<any>;
+	let mockJsonSet: Mock<any>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();
@@ -47,19 +45,16 @@ describe("Identity Domain Actions : getById", () => {
 		containerMock.params.mockReturnValue({});
 		containerMock.query.mockReturnValue({});
 		containerMock.body.mockReturnValue({});
-		redisClientMock.get.mockClear();
-		redisClientMock.set.mockClear();
-		redisClientMock.del.mockClear();
-		redisClientMock.scan.mockClear();
-		redisClientMock.expire.mockClear();
-		redisClientMock.json.get.mockClear();
-		redisClientMock.json.set.mockClear();
-		redisClientMock.ping.mockClear();
-		repositoryMock.execute.mockClear();
-		repositoryMock.insert.mockClear();
-		repositoryMock.values.mockClear();
 		repositoryMock.returning.mockClear();
+
+		mockJsonGet = spyOn(cache.json, "get").mockResolvedValue(null);
+		mockJsonSet = spyOn(cache.json, "set").mockResolvedValue("");
+
 		getById = (await import("@domain/identity/actions/get-by-id")).default;
+	});
+
+	afterEach(() => {
+		mock.restore();
 	});
 
 	const validId = "123e4567-e89b-12d3-a456-426614174000";
@@ -67,29 +62,28 @@ describe("Identity Domain Actions : getById", () => {
 	it("should return cached identity if available", async () => {
 		const cachedData = [{ id: 1, name: "Test" }];
 		const reference = referencesMock.tag("identity", "find{id}", { id: validId });
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: [reference] });
-		redisClientMock.json.get.mockResolvedValueOnce(cachedData);
+		mockJsonGet.mockResolvedValueOnce(cachedData);
 		containerMock.params.mockReturnValue({ id: validId });
 
 		const result = await getById(containerMock);
 		expect(result).toEqual([{ id: 1, name: "Test" }]);
-		expect(redisClientMock.json.get).toHaveBeenCalled();
+		expect(mockJsonGet).toHaveBeenCalled();
 		expect(repositoryMock.execute).not.toHaveBeenCalled();
 	});
 
 	it("should return identity from repository if not cached", async () => {
-		redisClientMock.json.get.mockResolvedValueOnce(null);
+		mockJsonGet.mockResolvedValueOnce(null);
 		repositoryMock.execute.mockResolvedValueOnce([{ id: 1, name: "Test" }]);
 		containerMock.params.mockReturnValue({ id: validId });
 
 		const result = await getById(containerMock);
 		expect(result).toEqual([{ id: 1, name: "Test" }]);
 		expect(repositoryMock.execute).toHaveBeenCalled();
-		expect(redisClientMock.json.set).toHaveBeenCalled();
+		expect(mockJsonSet).toHaveBeenCalled();
 	});
 
 	it("should throw error if identity not found", async () => {
-		redisClientMock.json.get.mockResolvedValueOnce(null);
+		mockJsonGet.mockResolvedValueOnce(null);
 		repositoryMock.execute.mockResolvedValueOnce([]);
 		containerMock.params.mockReturnValue({ id: validId });
 

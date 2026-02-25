@@ -11,11 +11,6 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: redisClientMock,
-}));
-
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
 	default: repositoryMock,
@@ -41,8 +36,12 @@ mock.module("@infrastructure/repositories/references", () => ({
 	zodIdentifier: referencesMock.zodIdentifier,
 }));
 
+import { afterEach, type Mock, spyOn } from "bun:test";
+import cache from "@infrastructure/cache/actions";
+
 describe("Identity Domain Actions : putUpdateEntity", () => {
 	let putUpdateEntity: CallableFunction;
+	let mockJsonDel: Mock<any>;
 	const validId = "123e4567-e89b-12d3-a456-426614174000";
 
 	beforeEach(async () => {
@@ -82,11 +81,16 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 		repositoryMock.execute.mockClear();
 		repositoryMock.execute.mockResolvedValue([]);
 
-		// Reset redis mock
-		redisClientMock.json.del.mockClear();
-		redisClientMock.json.get.mockResolvedValue(null);
+		// Setup cache mock
+		mockJsonDel = spyOn(cache.json, "del").mockResolvedValue(1);
+		spyOn(cache.json, "get").mockResolvedValue(null);
+		spyOn(cache.json, "set").mockResolvedValue("");
 
 		putUpdateEntity = (await import("@domain/identity/actions/put-update-entity")).default;
+	});
+
+	afterEach(() => {
+		mock.restore();
 	});
 
 	it("should update identity and return it", async () => {
@@ -131,7 +135,7 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 		expect(repositoryMock.update).toHaveBeenCalled();
 		expect(repositoryMock.set).toHaveBeenCalled();
 		expect(repositoryMock.where).toHaveBeenCalled();
-		expect(redisClientMock.json.del).toHaveBeenCalled();
+		expect(mockJsonDel).toHaveBeenCalled();
 	});
 
 	it("should throw 404 if identity not found", async () => {
@@ -159,7 +163,7 @@ describe("Identity Domain Actions : putUpdateEntity", () => {
 		repositoryMock.returning.mockResolvedValueOnce([]);
 
 		expect(putUpdateEntity(request)).rejects.toThrow("Not Found");
-		expect(redisClientMock.json.del).not.toHaveBeenCalled();
+		expect(mockJsonDel).not.toHaveBeenCalled();
 	});
 
 	it("should throw 400 if params validation fails", async () => {

@@ -9,11 +9,6 @@ const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
 const referencesMock = createReferencesMock();
 
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: redisClientMock,
-}));
-
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
 	default: repositoryMock,
@@ -41,23 +36,32 @@ mock.module("@infrastructure/repositories/references", () => ({
 
 const validId = "123e4567-e89b-12d3-a456-426614174000";
 
+import cache from "@infrastructure/cache/actions";
 import "@domain/identity/schema";
-import { beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "bun:test";
 
 describe("Identity Domain Actions : postNewEntity", () => {
 	let postNewEntity: CallableFunction;
+	let mockJsonDel: Mock<any>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();
 		containerMock.body.mockReturnValue({});
-		redisClientMock.del.mockClear();
-		redisClientMock.scan.mockClear();
 		repositoryMock.insert.mockReturnThis();
 		repositoryMock.values.mockReturnThis();
 		repositoryMock.onConflictDoNothing.mockReturnThis();
 		repositoryMock.returning.mockClear();
 		repositoryMock.execute.mockClear();
+
+		mockJsonDel = spyOn(cache.json, "del").mockResolvedValue(1);
+		spyOn(cache.json, "get").mockResolvedValue(null);
+		spyOn(cache.json, "set").mockResolvedValue("");
+
 		postNewEntity = (await import("@domain/identity/actions/post-new-entity")).default;
+	});
+
+	afterEach(() => {
+		mock.restore();
 	});
 
 	it("should create new identity and return it", async () => {
@@ -65,12 +69,11 @@ describe("Identity Domain Actions : postNewEntity", () => {
 		containerMock.body.mockReturnValue(identityData);
 		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
 		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...identityData }]);
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["identity/find:some-key"] });
 
 		const result = await postNewEntity(containerMock);
 		expect(result).toEqual([{ id: validId, ...identityData }]);
 		expect(repositoryMock.insert).toHaveBeenCalled();
-		expect(redisClientMock.json.del).toHaveBeenCalled();
+		expect(mockJsonDel).toHaveBeenCalled();
 	});
 
 	it("should throw 409 if conflict (duplicate email)", async () => {
