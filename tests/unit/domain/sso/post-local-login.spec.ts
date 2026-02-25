@@ -127,7 +127,6 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 		});
 
 		repositoryMock.execute.mockResolvedValueOnce([{ id: "uuid-123", name: "Test User", email: validPayload.email }]);
-		repositoryMock.execute.mockResolvedValueOnce([{ id: "uuid-123", name: "Test User", email: validPayload.email }]);
 		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
 
 		const result = await postLocalLogin(request);
