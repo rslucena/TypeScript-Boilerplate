@@ -28,6 +28,13 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 		text: async () => await client.get(hash).catch(() => null),
 		json: async () => await client.json.get(hash).catch(() => null),
 	};
+	if (keys.length === 1) {
+		const action = await actions[isStack() ? type : "text"]();
+		if (!action) return null;
+		if (isStack()) return action as t;
+		return (safeParse<t>(action as string) ?? action) as t;
+	}
+
 	const contents: { [key: string]: t | null } = {};
 	for (let i = 0; i < keys.length; i++) {
 		const action = await actions[isStack() ? type : "text"]();
@@ -35,7 +42,8 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 		else if (isStack()) contents[hash] = action as t;
 		else contents[hash] = safeParse<t>(action as string) ?? (action as t);
 	}
-	return contents as t;
+
+	return contents as unknown as t;
 }
 
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {

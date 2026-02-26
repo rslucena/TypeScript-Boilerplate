@@ -49,7 +49,7 @@ describe("Cache Infrastructure", () => {
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			redisClientMock.get.mockResolvedValue("value");
 			const result = await cache.text.get("key");
-			expect(result).toEqual({ key: "value" });
+			expect(result).toEqual("value");
 			expect(redisClientMock.get).toHaveBeenCalledWith("key");
 		});
 
@@ -82,7 +82,7 @@ describe("Cache Infrastructure", () => {
 			const data = { foo: "bar" };
 			redisClientMock.json.get.mockResolvedValue(data);
 			const result = await cache.json.get("key");
-			expect(result).toEqual({ key: data });
+			expect(result).toEqual(data);
 			expect(redisClientMock.json.get).toHaveBeenCalledWith("key");
 		});
 

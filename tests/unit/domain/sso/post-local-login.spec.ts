@@ -81,7 +81,9 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 	});
 
 	it("should return 401 when the local credential does not exist", async () => {
-		repositoryMock.execute.mockResolvedValueOnce([{ id: "uuid-123", name: "Test User", email: validPayload.email }]);
+		repositoryMock.execute.mockResolvedValueOnce([
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
+		]);
 		repositoryMock.execute.mockResolvedValueOnce([]);
 
 		const request = new container({
@@ -97,7 +99,9 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 	});
 
 	it("should return 401 when the password does not match", async () => {
-		repositoryMock.execute.mockResolvedValueOnce([{ id: "uuid-123", name: "Test User", email: validPayload.email }]);
+		repositoryMock.execute.mockResolvedValueOnce([
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
+		]);
 		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
 		mockHashValue = "INVALID";
 
@@ -119,14 +123,16 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 			body: validPayload,
 		});
 
-		repositoryMock.execute.mockResolvedValueOnce([{ id: "uuid-123", name: "Test User", email: validPayload.email }]);
+		repositoryMock.execute.mockResolvedValueOnce([
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
+		]);
 		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
 
 		const result = await postLocalLogin(request);
 
 		expect(request.status()).toBe(200);
 		expect(result.token).toBe("header.payload.signature");
-		expect(result.session.id).toBe("uuid-123");
+		expect(result.session.id).toBe("123e4567-e89b-12d3-a456-426614174000");
 		expect(result.session.name).toBe("Test User");
 	});
 });

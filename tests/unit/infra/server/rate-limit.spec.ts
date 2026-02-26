@@ -41,7 +41,6 @@ describe("Rate Limit Middleware", () => {
 
 	it("should block request over limit", async () => {
 		redisClientMock.incr.mockResolvedValue(101);
-		console.log("TEST: Mock incr value set to 101");
 		await rateLimit(mockRequest, mockReply);
 		expect(redisClientMock.incr).toHaveBeenCalled();
 	});

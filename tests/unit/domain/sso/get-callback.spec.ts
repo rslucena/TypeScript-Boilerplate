@@ -35,7 +35,7 @@ describe("SSO Domain Actions : getCallback", () => {
 		containerMock.query.mockReturnValue({ provider: providers.GOOGLE, code: "code123" });
 		repositoryMock.insert.mockReturnThis();
 		repositoryMock.values.mockReturnThis();
-		repositoryMock.returning.mockResolvedValue([{ id: "uuid-123", name: "OAuth User" }]);
+		repositoryMock.returning.mockResolvedValue([{ id: "123e4567-e89b-12d3-a456-426614174000", name: "OAuth User" }]);
 		repositoryMock.execute.mockResolvedValue([]);
 
 		repositoryMock.insert.mockClear();
@@ -73,20 +73,22 @@ describe("SSO Domain Actions : getCallback", () => {
 
 	it("should link to existing identity if email matches", async () => {
 		repositoryMock.execute.mockResolvedValueOnce([]);
-		repositoryMock.execute.mockResolvedValueOnce([{ id: "existing-id", name: "Existing User" }]);
+		repositoryMock.execute.mockResolvedValueOnce([
+			{ id: "223e4567-e89b-12d3-a456-426614174000", name: "Existing User" },
+		]);
 
 		const result = await getCallback(containerMock);
 
-		expect(result.session.id).toBe("existing-id");
+		expect(result.session.id).toBe("223e4567-e89b-12d3-a456-426614174000");
 		expect(repositoryMock.insert).toHaveBeenCalledTimes(1);
 	});
 
 	it("should return existing identity if credential exists", async () => {
-		repositoryMock.execute.mockResolvedValueOnce([{ identityId: "very-old-id" }]);
+		repositoryMock.execute.mockResolvedValueOnce([{ identityId: "323e4567-e89b-12d3-a456-426614174000" }]);
 
 		const result = await getCallback(containerMock);
 
-		expect(result.session.id).toBe("very-old-id");
+		expect(result.session.id).toBe("323e4567-e89b-12d3-a456-426614174000");
 		expect(repositoryMock.insert).not.toHaveBeenCalled();
 	});
 });
