@@ -6,6 +6,7 @@ import { container } from "@infrastructure/server/interface";
 import credentials from "../entity";
 import { default as schema } from "../schema";
 import getById from "./get-by-id";
+import getFindByParams from "./get-find-by-params";
 
 export default async function postNewEntity(request: container) {
 	request.status(201);
@@ -21,6 +22,11 @@ export default async function postNewEntity(request: container) {
 	});
 
 	if (!roles) throw request.badRequest(request.language(), tag("credentials", "create/validation"));
+
+	const existing = await getFindByParams({ identityId: valid.data.identityId, provider: valid.data.provider });
+	if (existing.length) {
+		throw request.conflict(request.language(), tag("identity", valid.data.identityId));
+	}
 
 	const content = await repository
 		.insert(credentials)

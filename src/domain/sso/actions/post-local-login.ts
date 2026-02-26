@@ -1,4 +1,4 @@
-import getByProviderSubject from "@domain/credentials/actions/find-by-provider-subject";
+import getFindByParams from "@domain/credentials/actions/get-find-by-params";
 import { providers } from "@domain/credentials/constants";
 import getByEmail from "@domain/identity/actions/get-by-email";
 import * as jwt from "@infrastructure/authentication/jwt";
@@ -15,7 +15,7 @@ export default async function postLocalLogin(request: container) {
 
 	const identity = identities[0];
 
-	const credentials = await getByProviderSubject(providers.LOCAL, valid.data.email);
+	const credentials = await getFindByParams({ identityId: identity.id, provider: providers.LOCAL });
 	if (!credentials.length) throw request.unauthorized(request.language());
 
 	const credential = credentials[0];
