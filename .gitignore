@@ -79,7 +79,6 @@ api/_assets*
 .env
 .env.*
 !.env.exemple
-!.env.test
 
 # Docker
 **/.dockerignore

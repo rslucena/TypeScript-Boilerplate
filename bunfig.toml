@@ -1,6 +1,5 @@
 [test]
 preload = ["./tests/setup.ts"]
-envFile = ".env.test"
 coverage = true
 coveragePathIgnorePatterns = [
   "**/*/entity.ts",
