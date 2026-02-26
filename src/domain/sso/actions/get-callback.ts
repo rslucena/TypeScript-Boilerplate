@@ -1,4 +1,4 @@
-import getByProviderSubject from "@domain/credentials/actions/find-by-provider-subject";
+import getFindByParams from "@domain/credentials/actions/get-find-by-params";
 import { types } from "@domain/credentials/constants";
 import credentialsEntity from "@domain/credentials/entity";
 import getByEmail from "@domain/identity/actions/get-by-email";
@@ -17,7 +17,8 @@ export default async function getCallback(request: container) {
 	const tokens = await exchangeToken(valid.data.provider, valid.data.code);
 	const user = await getNormalizedUser(valid.data.provider, tokens);
 
-	const credential = (await getByProviderSubject(valid.data.provider, user.subject))[0];
+	const credentialsList = await getFindByParams({ provider: valid.data.provider, subject: user.subject });
+	const credential = credentialsList[0];
 
 	if (credential) {
 		const session = { id: credential.identityId, name: user.name || "User" };
