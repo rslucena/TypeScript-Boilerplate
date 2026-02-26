@@ -1,4 +1,5 @@
 import { describe, expect, it, mock } from "bun:test";
+// @ts-expect-error: Bun runtime supports query parameters for imports
 import { withPagination } from "@infrastructure/repositories/repository?v=unit";
 import type { PgSelect } from "drizzle-orm/pg-core";
 
@@ -21,6 +22,7 @@ describe("Repository Utilities", () => {
 
 	describe("manager logger", () => {
 		it("should use the defined logger and write messages", async () => {
+			// @ts-expect-error: Bun runtime supports query parameters for imports
 			const { default: manager } = await import("@infrastructure/repositories/repository?v=unit-logger");
 			expect(manager).toBeDefined();
 		});

@@ -12,6 +12,10 @@ const actions = {
 		code: z.string(),
 		state: z.string().optional(),
 	}),
+	local: z.object({
+		email: z.string().email(),
+		password: z.string().min(8),
+	}),
 };
 
 const responses = {

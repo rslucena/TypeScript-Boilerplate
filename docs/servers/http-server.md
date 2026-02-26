@@ -55,7 +55,7 @@ The server includes a global error handler that catches exceptions and normalize
 
 - **Validation Errors**: Automatically mapped from Zod errors.
 - **Unsupported Media Type**: Automatically handled to ensure JSON responses.
-- **Unknown Errors**: Masked as "An unknown error occurred" in production to prevent leaking stack traces.
+- **Unknown Errors**: Masked as "An unknown error occurred" in all environments when sent to the client. The full error (including stack traces and sensitive details) is logged internally for debugging.
 
 ## Usage in Routes
 

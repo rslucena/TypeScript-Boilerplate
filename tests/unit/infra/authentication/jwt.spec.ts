@@ -1,16 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
-import { generateRSAKeyPair } from "@infrastructure/pipes/crypto";
+import { fsMock } from "@tests/mocks/environment.mock";
 
-const { privateKey, publicKey } = generateRSAKeyPair();
-
-mock.module("node:fs", () => ({
-	readFileSync: mock((path: string) => {
-		if (path.includes("private.pem")) return privateKey;
-		if (path.includes("public.pem")) return publicKey;
-		if (path.includes("metadata.json")) return JSON.stringify({ kid: "test-kid" });
-		return "";
-	}),
-}));
+mock.module("node:fs", () => fsMock);
 
 import * as jwt from "@infrastructure/authentication/jwt";
 import type { guise } from "@infrastructure/server/interface";

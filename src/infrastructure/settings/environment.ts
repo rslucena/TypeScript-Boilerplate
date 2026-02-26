@@ -38,12 +38,13 @@ const schema = z.object({
 	SSO_GITHUB_REDIRECT_URI: z.string().url().optional(),
 });
 
+const isTest = process.env.NODE_ENV === "test";
+const isDev = process.env.NODE_ENV === "development";
+const isBuild = process.argv.some((arg) => arg.includes("exec-builder.ts") || arg.includes("generate-keys.ts"));
+
 const result = schema.safeParse(process.env);
 
 if (!result.success) {
-	const isTest = process.env.NODE_ENV === "test";
-	const isBuild = process.argv.some((arg) => arg.includes("exec-builder.ts") || arg.includes("generate-keys.ts"));
-
 	if (!isTest && !isBuild) {
 		const { fieldErrors } = result.error.flatten();
 		const errorMessages = Object.entries(fieldErrors)
@@ -55,4 +56,11 @@ if (!result.success) {
 	}
 }
 
-export const env = result.success ? result.data : (process.env as unknown as z.infer<typeof schema>);
+const data = result.success ? result.data : (process.env as unknown as z.infer<typeof schema>);
+
+export const env = {
+	...data,
+	isTest,
+	isDev,
+	isBuild,
+};

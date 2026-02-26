@@ -1,7 +1,27 @@
+import type { Mock } from "bun:test";
 import { mock } from "bun:test";
 
-const columnBuilder = () => {
-	const col = {
+export interface Column {
+	name: string;
+	dataType: string;
+	notNullValue: boolean;
+	uniqueValue: boolean;
+	primaryKeyValue: boolean;
+	defaultRandomValue: boolean;
+	defaultNowValue: boolean;
+	notNull: Mock<() => Column>;
+	unique: Mock<() => Column>;
+	primaryKey: Mock<() => Column>;
+	defaultRandom: Mock<() => Column>;
+	defaultNow: Mock<() => Column>;
+	default: Mock<() => Column>;
+	setName: Mock<(name: string) => Column>;
+	defaultConfig: Record<string, unknown>;
+	indexConfig: Record<string, unknown>;
+}
+
+const columnBuilder = (): Column => {
+	const col: Column = {
 		name: "column",
 		dataType: "string",
 		notNullValue: false,
@@ -46,7 +66,7 @@ const pgTableBuilder = mock((_, columns, callback) => {
 	return table;
 });
 
-const varcharBuilder = mock((name, options) => {
+const varcharBuilder = mock((name: string, options?: { length?: number }): Column => {
 	const col = columnBuilder();
 	col.name = name;
 	col.notNullValue = !options?.length;

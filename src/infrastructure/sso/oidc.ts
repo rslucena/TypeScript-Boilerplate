@@ -58,7 +58,7 @@ export async function exchangeToken(provider: providers, code: string) {
 	}>;
 }
 
-const jwksCache: Record<string, { keys: any[] }> = {};
+const jwksCache: Record<string, { keys: { kid: string; [k: string]: unknown }[] }> = {};
 
 export async function getProviderJwks(jwksUri: string) {
 	if (jwksCache[jwksUri]) return jwksCache[jwksUri];
@@ -66,7 +66,7 @@ export async function getProviderJwks(jwksUri: string) {
 	const response = await fetch(jwksUri);
 	if (!response.ok) throw new Error("Failed to fetch JWKS");
 
-	const data = (await response.json()) as { keys: any[] };
+	const data = (await response.json()) as { keys: { kid: string; [k: string]: unknown }[] };
 	jwksCache[jwksUri] = data;
 	return data;
 }
@@ -92,10 +92,10 @@ export async function verifyIdToken(provider: providers, token: string) {
 	if (!header?.kid || !payload) throw new Error("Invalid token content");
 
 	const jwks = await getProviderJwks(config.jwksUri);
-	const jwk = jwks.keys.find((k: any) => k.kid === header.kid);
+	const jwk = jwks.keys.find((k) => k.kid === header.kid);
 	if (!jwk) throw new Error("Matching JWK not found");
 
-	const publicKey = createPublicKey({ key: jwk, format: "jwk" });
+	const publicKey = createPublicKey({ key: jwk as JsonWebKey, format: "jwk" });
 	const signature = Buffer.from(parts[2], "base64url");
 	const data = `${parts[0]}.${parts[1]}`;
 
@@ -123,7 +123,6 @@ export async function getGitHubUser(accessToken: string): Promise<NormalizedUser
 	if (!response.ok) throw new Error("Failed to fetch GitHub user");
 	const profile = await response.json();
 
-	// Fetch primary email if not public
 	let email = profile.email;
 	if (!email) {
 		const emailsResponse = await fetch("https://api.github.com/user/emails", {
@@ -134,8 +133,8 @@ export async function getGitHubUser(accessToken: string): Promise<NormalizedUser
 			},
 		});
 		if (emailsResponse.ok) {
-			const emails = await emailsResponse.json();
-			const primary = emails.find((e: any) => e.primary);
+			const emails = (await emailsResponse.json()) as { primary: boolean; email: string }[];
+			const primary = emails.find((e) => e.primary);
 			if (primary) email = primary.email;
 		}
 	}

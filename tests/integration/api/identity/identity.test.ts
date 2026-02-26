@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { referencesMock } from "@tests/mocks/references.mock";
+import { createReferencesModuleMock, referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
 import { z } from "zod";
@@ -11,13 +11,19 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 	withPagination: referencesMock.withPagination,
 }));
-mock.module("@infrastructure/repositories/references", () => ({
-	...referencesMock,
-	identifier: { id: mock(() => "test-id") },
-	pgIndex: mock(() => []),
-	zodIdentifier: { id: z.string() },
+mock.module("@infrastructure/repositories/references", () =>
+	createReferencesModuleMock({
+		identifier: { id: mock(() => "test-id") } as never,
+		zodIdentifier: { id: z.string() } as never,
+	}),
+);
+
+import * as requestModule from "@infrastructure/server/request";
+
+mock.module("@infrastructure/server/request", () => ({
+	...requestModule,
+	default: serverRequestMock,
 }));
-mock.module("@infrastructure/server/request", () => ({ default: serverRequestMock }));
 
 import identityRoutes from "@domain/identity/routes";
 import { createIdentityBuilder } from "@tests/builders/identity.builder";

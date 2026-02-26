@@ -13,7 +13,7 @@ describe("Authentication Handler", () => {
 		},
 	};
 
-	// @ts-expect-error
+	// @ts-expect-error: Bun runtime supports query parameters for imports
 	const handler = new authentication(mockPlugins);
 
 	it("should return false if no plugins succeed", async () => {

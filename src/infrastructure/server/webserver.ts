@@ -48,15 +48,33 @@ async function webserver(): Promise<server> {
 	instance.register(fastifyHelmet, helmet);
 	instance.setNotFoundHandler((_request, reply) => reply.code(404).send());
 	instance.setErrorHandler((error: unknown, request, reply) => {
-		const er = new err().badRequest(request.headers["accept-language"]);
-		er.message = "An unknown error occurred";
-		if (error instanceof Error) {
-			if (error.message.startsWith("Unsupported Media Type")) {
-				request.headers["content-type"] = "application/json";
-				error.message = error.message.split(";")[0];
-			}
+		const lang = request.headers["accept-language"];
+		logger.error(error);
+
+		const errorMessage = error instanceof Error ? error.message : String(error);
+
+		if (errorMessage.startsWith("Unsupported Media Type")) {
+			const er = new err().badRequest(lang);
+			request.headers["content-type"] = "application/json";
+			er.message = errorMessage.split(";")[0];
+			return reply.headers(request.headers).code(er.statusCode).send(er);
+		}
+
+		if (
+			error &&
+			typeof error === "object" &&
+			("validation" in error || ("statusCode" in error && error.statusCode === 400))
+		) {
+			const er = new err().badRequest(lang);
+			er.message = errorMessage;
+			return reply.headers(request.headers).code(er.statusCode).send(er);
+		}
+
+		const er = new err().internalServerError(lang);
+		if (env.isDev && error instanceof Error) {
 			er.message = error.message;
 		}
+
 		return reply.headers(request.headers).code(er.statusCode).send(er);
 	});
 
