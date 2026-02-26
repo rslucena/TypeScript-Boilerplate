@@ -45,3 +45,21 @@ export const createReferencesMock = (): ReferencesMockType => ({
 });
 
 export const referencesMock: ReferencesMockType = createReferencesMock();
+
+/**
+ * Returns the module shape expected by mock.module("@infrastructure/repositories/references").
+ * Accepts an optional overrides to allow per-test customization (e.g. custom identifier).
+ */
+export const createReferencesModuleMock = (overrides: Partial<ReferencesMockType> = {}) => {
+	const refs = createReferencesMock();
+	return {
+		__esModule: true,
+		tag: refs.tag,
+		hash: refs.hash,
+		identifier: refs.identifier,
+		pgIndex: refs.pgIndex,
+		zodIdentifier: refs.zodIdentifier,
+		withPagination: refs.withPagination,
+		...overrides,
+	};
+};

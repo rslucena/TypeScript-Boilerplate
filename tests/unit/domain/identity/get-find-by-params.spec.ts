@@ -1,14 +1,13 @@
 import { mock } from "bun:test";
 
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { createReferencesMock } from "@tests/mocks/references.mock";
+import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 
 const _redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
-const referencesMock = createReferencesMock();
 
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
@@ -26,15 +25,7 @@ mock.module("@infrastructure/server/request", () => ({
 	container: mock(() => containerMock),
 }));
 
-mock.module("@infrastructure/repositories/references", () => ({
-	__esModule: true,
-	tag: referencesMock.tag,
-	hash: referencesMock.hash,
-	withPagination: referencesMock.withPagination,
-	identifier: referencesMock.identifier,
-	pgIndex: referencesMock.pgIndex,
-	zodIdentifier: referencesMock.zodIdentifier,
-}));
+mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
 import cache from "@infrastructure/cache/actions";
 import "@domain/identity/schema";

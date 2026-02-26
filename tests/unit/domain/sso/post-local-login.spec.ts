@@ -1,8 +1,7 @@
-import { createReferencesMock } from "@tests/mocks/references.mock";
+import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 
 const repositoryMock = createRepositoryMock();
-const referencesMock = createReferencesMock();
 
 import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 
@@ -13,15 +12,9 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 }));
 
-mock.module("@infrastructure/repositories/references", () => ({
-	__esModule: true,
-	tag: referencesMock.tag,
-	hash: mock((..._args) => mockHashValue),
-	identifier: referencesMock.identifier,
-	pgIndex: () => [],
-	zodIdentifier: referencesMock.zodIdentifier,
-	withPagination: referencesMock.withPagination,
-}));
+mock.module("@infrastructure/repositories/references", () =>
+	createReferencesModuleMock({ hash: mock((..._args) => mockHashValue) }),
+);
 
 import { providers } from "@domain/credentials/constants";
 import postLocalLogin from "@domain/sso/actions/post-local-login";

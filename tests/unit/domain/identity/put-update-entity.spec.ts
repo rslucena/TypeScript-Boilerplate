@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { container } from "@infrastructure/server/interface";
-import { createReferencesMock } from "@tests/mocks/references.mock";
+import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 import "@domain/identity/schema";
 
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
-const referencesMock = createReferencesMock();
 
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
@@ -28,14 +27,7 @@ mock.module("@infrastructure/server/request", () => ({
 	}),
 }));
 
-mock.module("@infrastructure/repositories/references", () => ({
-	__esModule: true,
-	tag: referencesMock.tag,
-	hash: referencesMock.hash,
-	identifier: referencesMock.identifier,
-	pgIndex: referencesMock.pgIndex,
-	zodIdentifier: referencesMock.zodIdentifier,
-}));
+mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
 import { afterEach, type Mock, spyOn } from "bun:test";
 import cache from "@infrastructure/cache/actions";
