@@ -68,10 +68,10 @@ function parse(token: string) {
 }
 
 async function session<T = guise["session"]>(request: container): Promise<T> {
-	const { authorization } = request.headers();
-	if (!authorization) throw new Error("Unauthorized");
+	const authHeader = request.headers().authorization || request.headers().Authorization;
+	if (!authHeader) throw new Error("Unauthorized");
 
-	const jwt = authorization.replace("Bearer", "").replace(" ", "");
+	const jwt = (authHeader as string).replace("Bearer", "").replace(" ", "");
 	const body = parse(jwt);
 	const Now = Math.floor(Date.now() / 1000);
 	if (typeof body.exp === "number" && Now > body.exp) throw new Error("Unauthorized");
