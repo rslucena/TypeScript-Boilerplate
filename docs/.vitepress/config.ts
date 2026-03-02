@@ -39,6 +39,15 @@ export default defineConfig({
                 ],
             },
             {
+                text: "API Reference & Usage",
+                items: [
+                    { text: "Introduction", link: "/api/introduction" },
+                    { text: "Authentication", link: "/api/authentication" },
+                    { text: "Error Handling", link: "/api/error-handling" },
+                    { text: "Swagger & OpenAPI", link: "/api/swagger-openapi" },
+                ]
+            },
+            {
                 text: "🌐 Servers",
                 items: [
                     { text: "HTTP/2", link: "/servers/http2" },
