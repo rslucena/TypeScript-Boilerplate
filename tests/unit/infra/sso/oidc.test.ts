@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
-import { exchangeToken, getAuthorizationUrl, getNormalizedUser } from "@infrastructure/sso/oidc";
+import { exchangeToken, getAuthorizationUrl, getNormalizedUser, verifyIdToken } from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
 let fetchSpy: Mock<typeof fetch>;
@@ -97,5 +97,126 @@ describe("Infrastructure - SSO Connect", () => {
 		expect(result.subject).toBe("12345");
 		expect(result.name).toBe("Mock User");
 		expect(result.email).toBe("mockuser@example.com");
+	});
+
+	it("Should throw when getting authorization URL with missing config", () => {
+		expect(() => getAuthorizationUrl("INVALID_PROVIDER" as providers, "state")).toThrowError(/not configured/);
+	});
+
+	it("Should throw when exchanging token with missing config", async () => {
+		await expect(exchangeToken("INVALID_PROVIDER" as providers, "code")).rejects.toThrowError(/not configured/);
+	});
+
+	it("Should throw when exchange token fetch fails", async () => {
+		const mockFetch = mock().mockResolvedValue(new Response("Error", { status: 400 }));
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
+
+		await expect(exchangeToken(providers.GOOGLE, "mock_code")).rejects.toThrowError(/Failed to exchange/);
+	});
+
+	it("Should throw when getting GitHub user fails", async () => {
+		const mockFetch = mock().mockResolvedValue(new Response("Error", { status: 401 }));
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
+
+		await expect(getNormalizedUser(providers.GITHUB, { access_token: "invalid" })).rejects.toThrowError(
+			/Failed to fetch GitHub/,
+		);
+	});
+
+	it("Should throw when normalize user is called with unsupported provider", async () => {
+		await expect(getNormalizedUser(providers.LOCAL, { access_token: "token" })).rejects.toThrowError(/not implemented/);
+	});
+
+	it("Should throw when parsing verifyIdToken with missing JWKS uri", async () => {
+		await expect(verifyIdToken("INVALID_PROVIDER" as providers, "invalid.token.format")).rejects.toThrowError(
+			/JWKS not supported/,
+		);
+	});
+
+	it("Should throw when verifyIdToken receives invalid token format", async () => {
+		await expect(verifyIdToken(providers.GOOGLE, "invalidtokenformat")).rejects.toThrowError(/Invalid token format/);
+	});
+
+	it("Should throw when verifyIdToken receives invalid token content", async () => {
+		// Three parts but not base64 valid json
+		await expect(verifyIdToken(providers.GOOGLE, "aaa.bbb.ccc")).rejects.toThrowError(/Invalid token content/);
+	});
+
+	it("Should fetch provider JWKS successfully", async () => {
+		const mockFetch = mock().mockResolvedValue(
+			new Response(JSON.stringify({ keys: [{ kid: "test-kid" }] }), { status: 200 }),
+		);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
+
+		const { getProviderJwks } = await import("@infrastructure/sso/oidc");
+		const result = await getProviderJwks("https://example.com/jwks");
+		expect(result.keys[0].kid).toBe("test-kid");
+	});
+
+	it("Should throw when getProviderJwks fails", async () => {
+		const mockFetch = mock().mockResolvedValue(new Response("Error", { status: 500 }));
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetch as unknown as typeof fetch);
+
+		const { getProviderJwks } = await import("@infrastructure/sso/oidc");
+		await expect(getProviderJwks("https://example.com/jwks-fail")).rejects.toThrowError(/Failed to fetch JWKS/);
+	});
+
+	it("Should throw when verifyIdToken receives expired token", async () => {
+		// Mock a token where the payload indicates expiration
+		const header = Buffer.from(JSON.stringify({ kid: "test-kid" })).toString("base64url");
+		const payload = Buffer.from(JSON.stringify({ sub: "sub123", exp: Math.floor(Date.now() / 1000) - 1000 })).toString(
+			"base64url",
+		);
+		const signature = Buffer.from("fakesignature").toString("base64url");
+		const token = `${header}.${payload}.${signature}`;
+
+		// Provide a valid JWKS
+		const mockFetchJwks = mock().mockResolvedValue(
+			new Response(JSON.stringify({ keys: [{ kid: "test-kid", kty: "RSA", n: "anbc", e: "AQAB" }] }), { status: 200 }),
+		);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetchJwks as unknown as typeof fetch);
+
+		// We mock crypto createVerify inside this to make it pass verify()
+		// but fail at exp
+		const crypto = await import("node:crypto");
+		spyOn(crypto, "createVerify").mockReturnValue({
+			update: mock(),
+			verify: mock().mockReturnValue(true),
+		} as unknown as ReturnType<typeof crypto.createVerify>);
+
+		spyOn(crypto, "createPublicKey").mockReturnValue("mockkey" as unknown as ReturnType<typeof crypto.createPublicKey>);
+
+		await expect(verifyIdToken(providers.GOOGLE, token)).rejects.toThrowError(/Token expired/);
+	});
+
+	it("Should verify Google user correctly on normalized user using ID Token", async () => {
+		const header = Buffer.from(JSON.stringify({ kid: "test-kid" })).toString("base64url");
+		const payloadObj = {
+			sub: "sub123",
+			email: "google@google.com",
+			name: "Google Name",
+			exp: Math.floor(Date.now() / 1000) + 1000,
+		};
+		const payload = Buffer.from(JSON.stringify(payloadObj)).toString("base64url");
+		const signature = Buffer.from("fakesignature").toString("base64url");
+		const token = `${header}.${payload}.${signature}`;
+
+		const mockFetchJwks = mock().mockResolvedValue(
+			new Response(JSON.stringify({ keys: [{ kid: "test-kid", kty: "RSA", n: "anbc", e: "AQAB" }] }), { status: 200 }),
+		);
+		fetchSpy = spyOn(globalThis, "fetch").mockImplementation(mockFetchJwks as unknown as typeof fetch);
+
+		const crypto = await import("node:crypto");
+		spyOn(crypto, "createVerify").mockReturnValue({
+			update: mock(),
+			verify: mock().mockReturnValue(true),
+		} as unknown as ReturnType<typeof crypto.createVerify>);
+		spyOn(crypto, "createPublicKey").mockReturnValue("mockkey" as unknown as ReturnType<typeof crypto.createPublicKey>);
+
+		const res = await getNormalizedUser(providers.GOOGLE, { access_token: "ignored", id_token: token });
+
+		expect(res.subject).toBe("sub123");
+		expect(res.email).toBe("google@google.com");
+		expect(res.name).toBe("Google Name");
 	});
 });

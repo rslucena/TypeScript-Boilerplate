@@ -53,11 +53,42 @@ describe("Cache Infrastructure", () => {
 			expect(redisClientMock.get).toHaveBeenCalledWith("key");
 		});
 
+		it("should return null if force is true", async () => {
+			const result = await cache.text.get("key", true);
+			expect(result).toBeNull();
+		});
+
+		it("should return null if scan returns no keys", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: [] });
+			const result = await cache.text.get("key");
+			expect(result).toBeNull();
+		});
+
+		it("should return null if action fails", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
+			redisClientMock.get.mockRejectedValue(new Error("Redis error"));
+			const result = await cache.text.get("key");
+			expect(result).toBeNull();
+		});
+
+		it("should return object containing multiple keys", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key1", "key2"] });
+			redisClientMock.get.mockResolvedValue("value");
+			const result = await cache.text.get("key");
+			expect(result).toEqual({ key: "value" });
+		});
+
 		it("should delete value correctly", async () => {
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			const result = await cache.text.del("key");
 			expect(result).toBe(1);
 			expect(redisClientMock.del).toHaveBeenCalledWith("key");
+		});
+
+		it("should return 0 when nothing to delete", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: [] });
+			const result = await cache.text.del("invalid_key");
+			expect(result).toBe(0);
 		});
 	});
 
@@ -91,6 +122,25 @@ describe("Cache Infrastructure", () => {
 			const result = await cache.json.del("key");
 			expect(result).toBe(1);
 			expect(redisClientMock.del).toHaveBeenCalledWith("key");
+		});
+
+		it("should return 0 when json nothing to delete", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: [] });
+			const result = await cache.json.del("invalid_key");
+			expect(result).toBe(0);
+		});
+
+		it("should return null if json scan returns no keys", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: [] });
+			const result = await cache.json.get("key");
+			expect(result).toBeNull();
+		});
+
+		it("should return multiple keys for json if scan returns multiple", async () => {
+			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key1", "key2"] });
+			redisClientMock.json.get.mockResolvedValue({ foo: "bar" });
+			const result = await cache.json.get("key");
+			expect(result).toEqual({ key: { foo: "bar" } });
 		});
 	});
 

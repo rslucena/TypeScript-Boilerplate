@@ -29,12 +29,12 @@
 		"gen:keys": "bun src/commands/generate-keys.ts",
 
 		"format": "bunx @biomejs/biome format --write --config-path ./biome.json .",
-
 		"lint": "bunx @biomejs/biome check --config-path ./biome.json .",
 		"lint:fix": "bunx @biomejs/biome check --write --config-path ./biome.json .",
 
-		"tests": "bun test --coverage",
 		"pb:health": "bun outdated",
+		"tests": "bun test --coverage",
+		"tests:ci": "./bin/act pull_request -W .github/workflows/ci.yml -P ubuntu-latest=catthehacker/ubuntu:act-latest",
 
 		"db:migrate:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit generate",
@@ -45,7 +45,6 @@
 		"dev": "bun --watch src/commands/exec-process.ts",
 
 		"prebuild": "bun run lint:fix && bun run gen:keys",
-
 		"postinstall": "lefthook install"
 	},
 	"devDependencies": {

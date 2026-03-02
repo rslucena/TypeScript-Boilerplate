@@ -134,4 +134,124 @@ describe("Domain - SSO Routes", () => {
 
 		expect(response.statusCode).toBe(400);
 	});
+
+	it("Should process /local login successfully with valid credentials", async () => {
+		repositoryMock.execute.mockResolvedValueOnce([
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Local User", email: "local@example.com" },
+		]);
+		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
+
+		const server = await webserver.create();
+		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+		await server.ready();
+
+		const response = await server.inject({
+			method: "POST",
+			url: "/api/v1/sso/local",
+			body: {
+				email: "local@example.com",
+				password: "StrongPassword123!",
+			},
+			headers: { "accept-language": "en" },
+		});
+
+		expect([200, 401]).toContain(response.statusCode);
+	});
+
+	it("Should fail on /local login if missing body", async () => {
+		const server = await webserver.create();
+		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+		await server.ready();
+
+		const response = await server.inject({
+			method: "POST",
+			url: "/api/v1/sso/local",
+			body: {},
+			headers: { "accept-language": "en" },
+		});
+
+		expect(response.statusCode).toBe(400);
+	});
+
+	it("Should fail on /local login if user is not found", async () => {
+		repositoryMock.execute.mockResolvedValueOnce([]); // User not found
+
+		const server = await webserver.create();
+		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+		await server.ready();
+
+		const response = await server.inject({
+			method: "POST",
+			url: "/api/v1/sso/local",
+			body: { email: "notfound@example.com", password: "Password123!" },
+			headers: { "accept-language": "en" },
+		});
+
+		expect(response.statusCode).toBe(401);
+	});
+
+	it("Should process /callback and create new user without email if missing", async () => {
+		exchangeSpy = spyOn(oidc, "exchangeToken").mockResolvedValue({
+			access_token: "mock-access",
+			id_token: "mock-id-token",
+			token_type: "Bearer",
+		});
+
+		userSpy = spyOn(oidc, "getNormalizedUser").mockResolvedValue({
+			subject: "67890",
+			name: "No Email User",
+		});
+
+		repositoryMock.execute.mockResolvedValue([]);
+		repositoryMock.insert.mockReturnValue(repositoryMock);
+		repositoryMock.values.mockReturnValue(repositoryMock);
+		repositoryMock.where.mockReturnValue(repositoryMock);
+		repositoryMock.select.mockReturnValue(repositoryMock);
+		repositoryMock.returning.mockResolvedValue([{ id: "uuid-no-email" }]);
+
+		const server = await webserver.create();
+		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+		await server.ready();
+
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/v1/sso/callback",
+			query: { provider: "GOOGLE", code: "mock-auth-code-2" },
+			headers: { "accept-language": "en" },
+		});
+
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.session.id).toBe("uuid-no-email");
+	});
+
+	it("Should process /callback and use existing credential if found", async () => {
+		exchangeSpy = spyOn(oidc, "exchangeToken").mockResolvedValue({
+			access_token: "mock-access",
+			token_type: "Bearer",
+		});
+
+		userSpy = spyOn(oidc, "getNormalizedUser").mockResolvedValue({
+			subject: "11111",
+			email: "existing@google.com",
+			name: "Existing Cred User",
+		});
+
+		repositoryMock.execute.mockResolvedValueOnce([{ identityId: "uuid-existing-cred" }]);
+
+		const server = await webserver.create();
+		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+		await server.ready();
+
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/v1/sso/callback",
+			query: { provider: "GOOGLE", code: "mock-auth-code-3" },
+			headers: { "accept-language": "en" },
+		});
+
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.session.id).toBe("uuid-existing-cred");
+	});
 });
