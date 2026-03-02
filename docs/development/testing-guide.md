@@ -531,6 +531,20 @@ test:
     - run: bun test --coverage
 ```
 
+### Running CI Locally (Act)
+
+You can run the full Quality Gate pipeline (Lint, Test and Build) locally using [`act`](https://nektosact.com/).
+
+Since Bun requires specific dependencies (like `unzip`) and modern Node.js versions which aren't fully supported in the default slim `act` image, you must specify a full robust image. 
+
+The project comes with a dedicated NPM script to run the PR pipeline using the required `catthehacker/ubuntu:act-latest` image:
+
+```bash
+bun run tests:ci
+```
+
+This will spin up a Docker container locally, install Bun, retrieve dependencies from cache, and run the exact same pipeline GitHub Actions runs—without needing to push a commit to see the result.
+
 ---
 
 **See Also:**

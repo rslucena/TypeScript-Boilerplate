@@ -10,7 +10,6 @@ enum providers {
 	LOCAL = "LOCAL",
 	GOOGLE = "GOOGLE",
 	GITHUB = "GITHUB",
-	INTERNAL_OIDC = "INTERNAL-OIDC",
 }
 
 export { types, providers };

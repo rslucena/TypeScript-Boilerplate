@@ -16,6 +16,7 @@ export default defineConfig({
     vite: {
         plugins: [groupIconVitePlugin()],
     },
+    lang: 'en-US',
     title: "Boilerplate",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
     themeConfig: {
@@ -60,6 +61,7 @@ export default defineConfig({
                     { text: "Overview", link: "/architecture/" },
                     { text: "Architecture Decisions", link: "/architecture/architecture-decisions" },
                     { text: "Identity vs Credentials", link: "/architecture/identity-vs-credentials" },
+                    { text: "SSO Flow", link: "/architecture/sso-flow" },
                     { text: "Plugin System", link: "/architecture/plugin-system" },
                 ],
             },

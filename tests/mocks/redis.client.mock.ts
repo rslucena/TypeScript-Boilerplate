@@ -24,7 +24,6 @@ export const createRedisClientMock = () => {
 	return redisMock;
 };
 
-// @ts-expect-error
 const globalMock = globalThis as unknown as { redisMockSingleton: ReturnType<typeof createRedisClientMock> };
 
 if (!globalMock.redisMockSingleton) {

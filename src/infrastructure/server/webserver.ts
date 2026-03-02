@@ -60,6 +60,16 @@ async function webserver(): Promise<server> {
 			return reply.headers(request.headers).code(er.statusCode).send(er);
 		}
 
+		if (
+			error &&
+			typeof error === "object" &&
+			("validation" in error || ("statusCode" in error && error.statusCode === 400))
+		) {
+			const er = new err().badRequest(lang);
+			er.message = errorMessage;
+			return reply.headers(request.headers).code(er.statusCode).send(er);
+		}
+
 		const er = new err().internalServerError(lang);
 		if (env.isDev && error instanceof Error) {
 			er.message = error.message;

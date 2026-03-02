@@ -13,7 +13,7 @@ const matrix: Record<types, Rule> = {
 		secretRequired: true,
 	},
 	[types.OIDC]: {
-		providers: [providers.GOOGLE, providers.GITHUB, providers.INTERNAL_OIDC],
+		providers: [providers.GOOGLE, providers.GITHUB],
 		subjectRequired: true,
 		secretRequired: false,
 	},

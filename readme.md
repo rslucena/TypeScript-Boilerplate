@@ -54,6 +54,7 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 - 🔒 **Secure Error Handling**: Internal errors are masked and logged, preventing sensitive data exposure
 - 🧪 **100% Tested**: Comprehensive unit tests with Bun's blazing-fast test runner
 - 🚀 **Blazing Fast**: Bun runtime delivers 3x faster performance than Node.js
+- 🔐 **SSO Ready**: Built-in OAuth2/OIDC structure for streamlined Identity management
 
 ---
 
@@ -129,11 +130,6 @@ docker-compose up -d --build
 # The application will be available at http://localhost:3000
 ```
 
-
-
-
-
-
 ---
 
 ## 🎨 CLI Code Generator
@@ -205,11 +201,12 @@ tests/              # Automated tests
 
 ## 🧪 Testing
 
-Comprehensive test suite using Bun's blazing-fast test runner:
+Comprehensive test suite using Bun's blazing-fast test runner with **>90% code coverage** for maximum reliability:
 
 ```bash
-bun test              # Run all tests
-bun test --watch      # Watch mode
+bun test              # Run all unit and integration tests
+bun test --watch      # Run tests in watch mode
+bun tests:ci          # Run github actions locally via act
 bun test --coverage   # Coverage report
 ```
 
