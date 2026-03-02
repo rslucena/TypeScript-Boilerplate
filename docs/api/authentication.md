@@ -1,104 +1,20 @@
 # API Authentication
 
-Ensuring the security of your API is paramount. The TypeScript Boilerplate provides a robust, standardized approach to authentication, making it simple to protect endpoints while maintaining flexibility for various authorization strategies (like JWT, OAuth2, or SSO).
+Ensuring the security of your API is paramount. The TypeScript Boilerplate uses a custom JSON Web Token (JWT) implementation utilizing asymmetric RSA keys (public/private key pairs).
 
-## Authentication Strategy Overview
+## The JWT Architecture (`src/infrastructure/authentication/jwt.ts`)
 
-The boilerplate favors a token-based authentication system using **JSON Web Tokens (JWT)**. This is generally preferred for stateless API architectures. The standard flow involves:
+Instead of relying on a shared symmetric secret (`HS256`), the boilerplate uses **RS256** signatures. This is a highly secure pattern common in enterprise applications.
 
-1.  **Client Authentication**: The client submits credentials (e.g., email/password, SSO token).
-2.  **Token Issuance**: The server validates credentials and issues a signed JWT.
-3.  **Token Usage**: The client includes the JWT in the `Authorization` header of subsequent requests.
-4.  **Token Validation**: The server intercepts the request, verifies the JWT signature and expiration, and grants access if valid.
-
-## Implementing Authentication on Routes
-
-To protect a Fastify route, the boilerplate uses custom plugins or hooks that inspect the incoming request. Typically, this is achieved by registering a global `onRequest` hook or applying an authentication middleware to specific routes.
-
-### Securing a Specific Route
-
-Here is an example of how you might require a valid Bearer token for a specific endpoint:
-
-```typescript
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-
-// Example Middleware/Hook (often defined in src/infrastructure/plugins/)
-async function verifyToken(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        await request.jwtVerify(); // Provided by @fastify/jwt
-    } catch (err) {
-        reply.code(401).send({
-            error: "UNAUTHORIZED",
-            message: "Missing or invalid authentication token"
-        });
-    }
-}
-
-export default async function protectedRoutes(fastify: FastifyInstance) {
-    fastify.route({
-        method: 'GET',
-        url: '/api/v1/secure-data',
-        preHandler: [verifyToken], // Requires authentication before handler execution
-        schema: {
-            tags: ['Secure'],
-            summary: 'Get Protected Data',
-            description: 'Requires a valid Bearer token.',
-            response: {
-                200: {
-                    description: 'Successful Response',
-                    type: 'object',
-                    properties: {
-                        data: { type: 'string' }
-                    }
-                }
-            }
-        },
-        handler: async (request, reply) => {
-            // request.user is populated by jwtVerify()
-            const userId = request.user.id;
-
-            return reply.send({ data: `Secret data for user ${userId}` });
-        }
-    });
-}
-```
-
-## Token Management (Getting a Token)
-
-When building an authentication endpoint (e.g., login), the process usually involves verifying credentials and generating the token payload.
-
-### Example: Login Endpoint
-
-**Endpoint:** `POST /api/v1/auth/login`
-
-**Request Body:**
-
-```json
-{
-  "email": "user@example.com",
-  "password": "SecurePassword123!"
-}
-```
-
-**Success Response (200 OK):**
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresIn": 3600,
-  "user": {
-      "id": "usr_123456",
-      "email": "user@example.com",
-      "role": "user"
-  }
-}
-```
+1.  **Keys:** The system expects a `private.pem`, `public.pem`, and `metadata.json` (containing the Key ID, `kid`) in the directory specified by `env.APP_FOLDER_KEY`. (You can generate these using `bun gen:keys`).
+2.  **Creation (`jwt.create`):** When a user successfully authenticates (e.g., via SSO or local login), a JWT is created. It is signed with the `private.pem`.
+3.  **Validation (`jwt.parse` & `jwt.session`):** When a client makes a request to a protected route, the server extracts the Bearer token, decodes it, and cryptographically verifies the signature using the `public.pem`.
 
 ## Using the Token (Client-Side)
 
-Once a client receives a token, it must be included in the `Authorization` header as a Bearer token for all protected requests.
+Once a client receives a token, it must be included in the `Authorization` header as a Bearer token.
 
-### Example Request (cURL)
+### Example Request
 
 ```bash
 curl -X GET https://api.yourdomain.com/api/v1/secure-data \
@@ -106,48 +22,32 @@ curl -X GET https://api.yourdomain.com/api/v1/secure-data \
   -H "Content-Type: application/json"
 ```
 
-### Example Request (JavaScript / Fetch)
+## Extracting the Session in Handlers
 
-```javascript
-const response = await fetch('https://api.yourdomain.com/api/v1/secure-data', {
-    method: 'GET',
-    headers: {
-        'Authorization': `Bearer ${token}`, // The token received from login
-        'Content-Type': 'application/json'
+The boilerplate provides a `session` utility function to extract and validate the JWT payload from an incoming request.
+
+```typescript
+import * as jwt from "@infrastructure/authentication/jwt";
+import type { container } from "@infrastructure/server/interface";
+
+export default async function myProtectedAction(request: container) {
+    try {
+        // This will extract the Bearer token from headers, parse it,
+        // verify the RSA signature, and check expiration.
+        // It throws an "Unauthorized" error if invalid.
+        const userSession = await jwt.session<{ id: string, email: string }>(request);
+
+        // Proceed with logic using userSession.id
+        return { data: `Hello, user ${userSession.id}` };
+
+    } catch (error) {
+         // The error handler will catch the "Unauthorized" string and can format it.
+         throw error;
     }
-});
-
-const data = await response.json();
-console.log(data);
-```
-
-### Example Request (Python / Requests)
-
-```python
-import requests
-
-url = "https://api.yourdomain.com/api/v1/secure-data"
-headers = {
-    "Authorization": f"Bearer {token}",
-    "Content-Type": "application/json"
 }
-
-response = requests.get(url, headers=headers)
-data = response.json()
-print(data)
 ```
 
 ## Advanced Authentication Patterns
 
-For more complex scenarios, the boilerplate architecture supports advanced patterns:
-
-*   **Identity vs Credentials**: We strongly advise separating the concept of a "User" (Identity) from their "Login Methods" (Credentials). This allows a single user to log in via password, Google OAuth, or enterprise SSO without duplicating accounts. Read more in our [Identity vs Credentials](../architecture/identity-vs-credentials.md) guide.
-*   **SSO Flow**: If integrating with Single Sign-On providers (like Okta or Auth0), the token issuance is handled externally. Your API primarily acts as a Resource Server validating the external JWT. See the [SSO Flow](../architecture/sso-flow.md) architecture document.
-*   **Role-Based Access Control (RBAC)**: Extend your token payload to include a `role` or `permissions` array. You can then create specific `preHandler` hooks to enforce authorization checks (e.g., `requireAdminRole`).
-
-## Security Best Practices
-
-*   **Always use HTTPS**: Tokens sent over plain HTTP can be easily intercepted.
-*   **Short Expiration Times**: Issue tokens with a short lifespan (e.g., 15-60 minutes) to minimize the risk of compromised tokens.
-*   **Refresh Tokens**: If long-lived sessions are required, implement a refresh token flow. The refresh token should be stored securely (e.g., HTTP-only cookies) and used solely to obtain new short-lived access tokens.
-*   **Secret Management**: Never hardcode your JWT secret. Use the `.env` file (`AUTH_SALT` or `JWT_SECRET`) and ensure it's a strong, cryptographically secure random string. The boilerplate enforces strict environment validation on startup.
+*   **SSO Integration:** The boilerplate has built-in support for OpenID Connect (OIDC). Refer to the `src/domain/sso/` module. The flow involves redirecting the user to the provider (`getAuthorizationUrl`), handling the callback, and issuing our own local RSA-signed JWT to the client.
+*   **Identity vs Credentials**: We strongly advise separating the concept of a "User" (Identity) from their "Login Methods" (Credentials). Read more in our [Identity vs Credentials](../architecture/identity-vs-credentials.md) guide.

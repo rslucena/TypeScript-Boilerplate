@@ -19,6 +19,7 @@ export default defineConfig({
     lang: 'en-US',
     title: "Boilerplate",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
+    lastUpdated: true,
     themeConfig: {
         version,
         search: {
@@ -43,6 +44,8 @@ export default defineConfig({
                 items: [
                     { text: "Introduction", link: "/api/introduction" },
                     { text: "Authentication", link: "/api/authentication" },
+                    { text: "Pagination & Filtering", link: "/api/pagination-filtering" },
+                    { text: "Rate Limiting", link: "/api/rate-limiting" },
                     { text: "Error Handling", link: "/api/error-handling" },
                     { text: "Swagger & OpenAPI", link: "/api/swagger-openapi" },
                 ]
