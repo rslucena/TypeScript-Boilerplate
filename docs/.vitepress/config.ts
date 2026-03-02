@@ -48,6 +48,7 @@ export default defineConfig({
                     { text: "Rate Limiting", link: "/api/rate-limiting" },
                     { text: "Error Handling", link: "/api/error-handling" },
                     { text: "Swagger & OpenAPI", link: "/api/swagger-openapi" },
+                    { text: "Health Check", link: "/api/health-check" },
                 ]
             },
             {
