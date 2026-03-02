@@ -50,7 +50,7 @@ function create(content: guise["session"], exp?: number) {
 
 function parse(token: string) {
 	const parts = token.split(".");
-	if (parts.length !== 3) throw new Error("Invalid token format");
+	if (parts.length !== 3) throw new Error("Unauthorized");
 
 	const [header, payload, signature] = parts;
 	const data = `${header}.${payload}`;
@@ -59,27 +59,23 @@ function parse(token: string) {
 
 	const { publicKey } = getKeys();
 	const isValid = rsaVerify(data, buffer, publicKey);
-	if (!isValid) throw new Error("Invalid signature");
+	if (!isValid) throw new Error("Unauthorized");
 
 	const body = safeParse<{ [key: string]: unknown }>(Buffer.from(payload, "base64url").toString());
-	if (!body) throw new Error("Invalid payload");
+	if (!body) throw new Error("Unauthorized");
 
 	return body;
 }
 
 async function session<T = guise["session"]>(request: container): Promise<T> {
-	const { authorization } = request.headers();
-	if (!authorization) throw new Error("Unauthorized");
+	const authHeader = request.headers().authorization || request.headers().Authorization;
+	if (!authHeader) throw new Error("Unauthorized");
 
-	const jwt = authorization.replace("Bearer", "").replace(" ", "");
-	try {
-		const body = parse(jwt);
-		const Now = Math.floor(Date.now() / 1000);
-		if (typeof body.exp === "number" && Now > body.exp) throw new Error("Unauthorized");
-		return body as T;
-	} catch {
-		throw new Error("Unauthorized");
-	}
+	const jwt = (authHeader as string).replace("Bearer", "").replace(" ", "");
+	const body = parse(jwt);
+	const Now = Math.floor(Date.now() / 1000);
+	if (typeof body.exp === "number" && Now > body.exp) throw new Error("Unauthorized");
+	return body as T;
 }
 
 function decode<T>(token: string): T {

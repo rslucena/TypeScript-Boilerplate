@@ -1,10 +1,12 @@
 import { describe, expect, it, mock } from "bun:test";
-import webserver from "@infrastructure/server/webserver";
+import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
 import { redisClientMock } from "@tests/mocks/redis.client.mock";
 
-mock.module("@infrastructure/cache/connection", () => ({
-	default: redisClientMock,
-}));
+mock.module("@infrastructure/settings/environment", () => createEnvMock());
+mock.module("node:fs", () => fsMock);
+mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
+
+import webserver from "@infrastructure/server/webserver";
 
 describe("Webserver Security: Error Handling", () => {
 	it("should NOT leak internal error messages in the response", async () => {

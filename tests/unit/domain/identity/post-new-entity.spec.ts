@@ -1,18 +1,12 @@
 import { mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { createReferencesMock } from "@tests/mocks/references.mock";
+import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 
-const redisClientMock = createRedisClientMock();
+const _redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
-const referencesMock = createReferencesMock();
-
-mock.module("@infrastructure/cache/actions", () => ({
-	__esModule: true,
-	default: redisClientMock,
-}));
 
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
@@ -20,7 +14,10 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	withPagination: mock((qb) => qb),
 }));
 
+import * as requestModule from "@infrastructure/server/request";
+
 mock.module("@infrastructure/server/request", () => ({
+	...requestModule,
 	__esModule: true,
 	container: mock((...args) => {
 		const instance = Object.create(containerMock);
@@ -30,34 +27,36 @@ mock.module("@infrastructure/server/request", () => ({
 	}),
 }));
 
-mock.module("@infrastructure/repositories/references", () => ({
-	__esModule: true,
-	tag: referencesMock.tag,
-	hash: referencesMock.hash,
-	identifier: referencesMock.identifier,
-	pgIndex: referencesMock.pgIndex,
-	zodIdentifier: referencesMock.zodIdentifier,
-}));
+mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
 const validId = "123e4567-e89b-12d3-a456-426614174000";
 
+import cache from "@infrastructure/cache/actions";
 import "@domain/identity/schema";
-import { beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "bun:test";
 
 describe("Identity Domain Actions : postNewEntity", () => {
 	let postNewEntity: CallableFunction;
+	let mockJsonDel: Mock<typeof cache.json.del>;
 
 	beforeEach(async () => {
 		containerMock.status.mockClear();
 		containerMock.body.mockReturnValue({});
-		redisClientMock.del.mockClear();
-		redisClientMock.scan.mockClear();
 		repositoryMock.insert.mockReturnThis();
 		repositoryMock.values.mockReturnThis();
 		repositoryMock.onConflictDoNothing.mockReturnThis();
 		repositoryMock.returning.mockClear();
 		repositoryMock.execute.mockClear();
+
+		mockJsonDel = spyOn(cache.json, "del").mockResolvedValue(1);
+		spyOn(cache.json, "get").mockResolvedValue(null);
+		spyOn(cache.json, "set").mockResolvedValue("");
+
 		postNewEntity = (await import("@domain/identity/actions/post-new-entity")).default;
+	});
+
+	afterEach(() => {
+		mock.restore();
 	});
 
 	it("should create new identity and return it", async () => {
@@ -65,12 +64,11 @@ describe("Identity Domain Actions : postNewEntity", () => {
 		containerMock.body.mockReturnValue(identityData);
 		repositoryMock.returning.mockResolvedValueOnce([{ id: validId }]);
 		repositoryMock.execute.mockResolvedValueOnce([{ id: validId, ...identityData }]);
-		redisClientMock.scan.mockResolvedValueOnce({ cursor: "0", keys: ["identity/find:some-key"] });
 
 		const result = await postNewEntity(containerMock);
 		expect(result).toEqual([{ id: validId, ...identityData }]);
 		expect(repositoryMock.insert).toHaveBeenCalled();
-		expect(redisClientMock.json.del).toHaveBeenCalled();
+		expect(mockJsonDel).toHaveBeenCalled();
 	});
 
 	it("should throw 409 if conflict (duplicate email)", async () => {

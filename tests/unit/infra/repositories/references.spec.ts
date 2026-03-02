@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+// @ts-expect-error: Bun runtime supports query parameters for imports
 import { hash, identifier, pgIndex, tag } from "@infrastructure/repositories/references?v=unit";
 import { columnBuilder } from "@tests/builders/column.builders";
 

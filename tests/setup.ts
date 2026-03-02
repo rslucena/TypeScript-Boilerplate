@@ -20,3 +20,6 @@ process.env.APP_DESCRIPTION = "Test Description";
 process.env.APP_VERSION = "0.0.1";
 process.env.PROCESS_CORS_ORIGIN = "*";
 process.env.PROCESS_DOMAIN = "http://localhost:3000";
+process.env.SSO_GOOGLE_CLIENT_ID = "test-client-id";
+process.env.SSO_GOOGLE_CLIENT_SECRET = "test-client-secret";
+process.env.SSO_GOOGLE_REDIRECT_URI = "http://localhost/callback";
