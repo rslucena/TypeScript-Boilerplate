@@ -103,6 +103,14 @@ export class err {
 			message: translate("CONFLICT", language),
 		};
 	}
+	internalServerError(language?: string) {
+		return {
+			statusCode: 500,
+			code: "ERR_INTERNAL_SERVER_ERROR",
+			error: "Internal Server Error",
+			message: translate("ERR_INTERNAL_SERVER_ERROR", language),
+		};
+	}
 }
 
 export class container<t = unknown> extends err {

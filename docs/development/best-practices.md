@@ -249,6 +249,19 @@ console.log("User login attempt", { email: user.email });
 console.log("User data", user); // { email, password, ... }
 ```
 
+### Avoid Sensitive Information Exposure in Errors
+
+Never return internal error messages or stack traces directly to the client. Always log the detailed error internally and return a generic, safe message.
+
+```typescript
+// ✅ Good: Generic message to user, detailed log internally
+logger.error(error);
+return reply.send({ message: "An unknown error occurred" });
+
+// ❌ Bad: Leaking internal details
+return reply.send({ message: error.message }); // Might contain DB credentials or file paths!
+```
+
 ### Validate All Inputs
 
 ```typescript

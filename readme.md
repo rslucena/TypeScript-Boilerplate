@@ -51,6 +51,7 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 - 💾 **Smart Caching**: Redis integration with automatic cache invalidation and **Graceful Degradation** for high availability
 - 📚 **Auto API Docs**: Swagger UI automatically generated from Zod schemas
 - 🌍 **i18n Ready**: Multi-language error messages and responses out of the box
+- 🔒 **Secure Error Handling**: Internal errors are masked and logged, preventing sensitive data exposure
 - 🧪 **100% Tested**: Comprehensive unit tests with Bun's blazing-fast test runner
 - 🚀 **Blazing Fast**: Bun runtime delivers 3x faster performance than Node.js
 
