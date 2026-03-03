@@ -15,6 +15,7 @@ export const createRedisClientMock = () => {
 			del: mock((..._args: unknown[]) => Promise.resolve(1)),
 		},
 		ping: mock(() => Promise.resolve("PONG")),
+		info: mock(() => Promise.resolve("redis_version:7.0.0")),
 		duplicate: mock(() => redisMock),
 		connect: mock(() => Promise.resolve()),
 		publish: mock((..._args: unknown[]) => Promise.resolve(1)),

@@ -17,4 +17,5 @@ export interface actions {
 	json: functions;
 	status: () => boolean;
 	ping: () => Promise<string>;
+	info: () => Promise<string>;
 }

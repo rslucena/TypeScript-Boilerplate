@@ -2,24 +2,10 @@ import request from "@infrastructure/server/request";
 import type { FastifyInstance } from "fastify";
 import getById from "./actions/get-by-id";
 import getFindByParams from "./actions/get-find-by-params";
-import getHealth from "./actions/get-health";
 import postNewEntity from "./actions/post-new-entity";
 import schema from "./schema";
 
 export default async function identityRoutes(api: FastifyInstance) {
-	api.get(
-		"/health",
-		{
-			schema: {
-				tags: ["identity"],
-				summary: "Get application health",
-				headers: schema.actions.headers,
-				response: { 200: schema.actions.health },
-			},
-		},
-		request.restricted(getHealth),
-	);
-
 	api.get(
 		"/:id",
 		{
