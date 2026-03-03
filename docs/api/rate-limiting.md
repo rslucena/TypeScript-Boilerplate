@@ -16,6 +16,21 @@ It utilizes a global `onRequest` hook registered in the Fastify webserver (`src/
 3.  **Expiration Window:** If the counter is 1 (meaning it's the first request in the window), it sets a TTL (Time-To-Live) on the Redis key using the `EXPIRE` command.
 4.  **Evaluation:** If the counter exceeds the maximum allowed limit, the request is immediately rejected.
 
+```mermaid
+flowchart TD
+    A[Incoming Request] --> B{Extract IP}
+    B --> C[Redis INCR counter_IP]
+    C --> D{Is counter == 1?}
+    
+    D -->|Yes| E[Set EXPIRE window]
+    D -->|No| F{Is counter > Limit?}
+    
+    E --> F
+    
+    F -->|Yes| G[Return 429 Too Many Requests]
+    F -->|No| H[Proceed to Route Handler]
+```
+
 ## Configuration
 
 The rate limiter is configured entirely via environment variables in your `.env` file. There are no hardcoded limits in the code.

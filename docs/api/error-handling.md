@@ -9,6 +9,22 @@ When an API encounters an error, the boilerplate handles it via a global error h
 *   **Internal Logging:** Full stack traces, SQL queries, and detailed error messages are logged internally using the infrastructure logger (Pino).
 *   **External Masking:** The API automatically masks internal details for server errors (500), replacing them with generic, translated messages based on the client's `Accept-Language` header. In development (`env.isDev`), the raw error message is exposed to aid debugging.
 
+```mermaid
+flowchart TD
+    A[Route Throws Error] --> B{Global Error Handler}
+    B --> C{Identify Type}
+    
+    C -->|Zod Validation| D[Extract Paths & Messages]
+    C -->|Custom Business| E[Extract Code & Message]
+    C -->|Unknown / 500| F[Mask Details & Log Stack]
+    
+    D --> G[Format Standard JSON Response]
+    E --> G
+    F --> G
+    
+    G --> H[Return JSON to Client]
+```
+
 ## Standard Error Response Format
 
 All errors returned by the API follow a consistent JSON structure, defined by the `err` class in `src/infrastructure/server/interface.ts`.

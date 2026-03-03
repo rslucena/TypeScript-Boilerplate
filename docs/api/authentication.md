@@ -10,6 +10,28 @@ Instead of relying on a shared symmetric secret (`HS256`), the boilerplate uses 
 2.  **Creation (`jwt.create`):** When a user successfully authenticates (e.g., via SSO or local login), a JWT is created. It is signed with the `private.pem`.
 3.  **Validation (`jwt.parse` & `jwt.session`):** When a client makes a request to a protected route, the server extracts the Bearer token, decodes it, and cryptographically verifies the signature using the `public.pem`.
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Auth as Auth Service
+    participant JWT as JWT Utility
+
+    Client->>API: POST /login (Credentials)
+    API->>Auth: Validate Credentials
+    Auth-->>API: Valid User
+    API->>JWT: Generate Token (Sign with Private Key)
+    JWT-->>API: Signed JWT
+    API-->>Client: 200 OK + JWT
+
+    Note over Client,API: Subsequent Requests
+    
+    Client->>API: GET /protected (Header: Bearer JWT)
+    API->>JWT: Verify Signature (Public Key)
+    JWT-->>API: Valid Payload
+    API-->>Client: 200 OK (Protected Data)
+```
+
 ## Using the Token (Client-Side)
 
 Once a client receives a token, it must be included in the `Authorization` header as a Bearer token.

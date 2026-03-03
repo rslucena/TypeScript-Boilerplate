@@ -40,6 +40,28 @@ export function withPagination<T extends PgSelect>(qb: T, page: number, size = 1
 }
 ```
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Fastify
+    participant Zod as Zod Validator
+    participant Action as Domain Action
+    participant Drizzle as Drizzle ORM
+    participant DB as Database
+    
+    Client->>Fastify: GET /items?req.page=2&req.page=10&name=foo
+    Fastify->>Zod: Validate req.page & query filters
+    Zod-->>Fastify: Valid Data {req.page: [2, 10], name: "foo"}
+    Fastify->>Action: Call Action with Valid Data
+    Action->>Drizzle: Build Query (.where(ilike(name, '%foo%')))
+    Action->>Drizzle: Apply `withPagination` (limit: 10, offset: 10)
+    Drizzle->>DB: Execute SQL Query
+    DB-->>Drizzle: Query Results
+    Drizzle-->>Action: Entity Array
+    Action-->>Fastify: Return Data
+    Fastify-->>Client: 200 OK + Paginated Items
+```
+
 ## Example: Building a Paginated Endpoint
 
 Here is how you combine the schema validation and the database modifier in an action (`get-find-by-params.ts`):
