@@ -17,7 +17,7 @@ const cache: actions = {
 		set: (hash, vals, ttl, key) => set({ type: "json", hash, vals, ttl, key }).catch(() => ""),
 	},
 	status: () => client.isOpen,
-	ping: () => (client.isOpen ? client.ping().catch(() => "PONG") : Promise.resolve("PONG")),
+	ping: () => (client.isOpen ? client.ping() : Promise.resolve("PONG")),
 };
 
 async function get<t>({ type, hash }: setmode, force = false): Promise<null | t> {

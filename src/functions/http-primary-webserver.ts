@@ -1,4 +1,5 @@
 import credentialsRoutes from "@domain/credentials/routes";
+import healthRoutes from "@domain/health/routes";
 import identityRoutes from "@domain/identity/routes";
 import ssoRoutes from "@domain/sso/routes";
 import Logs from "@infrastructure/logs/handler";
@@ -9,6 +10,7 @@ const logger = Logs.handler("webserver");
 
 (async () => {
 	const server = await webserver.create();
+	server.register(healthRoutes, { prefix: "/api/v1/health" });
 	server.register(identityRoutes, { prefix: "/api/v1/identities" });
 	server.register(credentialsRoutes, { prefix: "/api/v1/credentials" });
 	server.register(ssoRoutes, { prefix: "/api/v1/sso" });

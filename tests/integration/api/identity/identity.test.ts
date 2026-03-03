@@ -47,19 +47,6 @@ describe("Identity API Routes", () => {
 		await server.ready();
 	});
 
-	describe("GET /health", () => {
-		it("should return 200", async () => {
-			const response = await server.inject({
-				method: "GET",
-				url: "/api/v1/identities/health",
-				headers: {
-					authorization: "Bearer valid-token",
-				},
-			});
-			expect(response.statusCode).toBe(200);
-		});
-	});
-
 	describe("GET /api/v1/identities/:id", () => {
 		it("should return 401 if unauthorized", async () => {
 			const response = await server.inject({
