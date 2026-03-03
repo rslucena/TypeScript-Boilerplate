@@ -39,6 +39,16 @@ const readinessHealth = livenessHealth.extend({
 		heapUsed: z.number(),
 		external: z.number(),
 	}),
+	disk: z.object({
+		free: z.number(),
+		total: z.number(),
+	}),
+	features: z.object({
+		identity: z.object({
+			status: z.string(),
+			latency: z.number(),
+		}),
+	}),
 	dependencies: z.object({
 		database: z.object({
 			status: z.string(),

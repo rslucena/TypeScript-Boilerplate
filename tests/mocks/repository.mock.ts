@@ -27,7 +27,7 @@ export const createRepositoryMock = (): RepositoryMock => {
 		orderBy: mock(() => mockObj),
 		prepare: mock(() => mockObj),
 		$dynamic: mock(() => mockObj),
-		execute: mock().mockResolvedValue([]),
+		execute: mock().mockImplementation(() => Promise.resolve([])),
 		insert: mock(() => mockObj),
 		update: mock(() => mockObj),
 		set: mock(() => mockObj),

@@ -1,3 +1,5 @@
+import { statfs } from "node:fs/promises";
+import identity from "@domain/identity/entity";
 import cache from "@infrastructure/cache/actions";
 import manager from "@infrastructure/repositories/repository";
 import type { container } from "@infrastructure/server/interface";
@@ -48,6 +50,35 @@ export default async function getReadiness(request: container) {
 		request.status(503); // Service Unavailable if Redis is down
 	}
 
+	let diskFree = 0;
+	let diskTotal = 0;
+
+	const diskStats = await statfs("/").catch(() => null);
+	if (diskStats) {
+		diskTotal = diskStats.blocks * diskStats.bsize;
+		diskFree = diskStats.bfree * diskStats.bsize;
+	}
+
+	// Smoke test internal Identity API / DB Entity
+	let identityStatus = "degraded";
+	let identityLatency = -1;
+	const startIdentity = performance.now();
+	const identityResult = await manager
+		.select({ id: identity.id })
+		.from(identity)
+		.limit(1)
+		.execute()
+		.then(() => true)
+		.catch((error) => error);
+
+	if (identityResult && !(identityResult instanceof Error)) {
+		identityLatency = performance.now() - startIdentity;
+		identityStatus = "active";
+	} else {
+		isHealthy = false;
+		request.status(503);
+	}
+
 	return {
 		status: isHealthy ? "active" : "degraded",
 		version: "1.0.0", // Mocked version
@@ -58,6 +89,16 @@ export default async function getReadiness(request: container) {
 			heapTotal: memoryData.heapTotal,
 			heapUsed: memoryData.heapUsed,
 			external: memoryData.external,
+		},
+		disk: {
+			free: diskFree,
+			total: diskTotal,
+		},
+		features: {
+			identity: {
+				status: identityStatus,
+				latency: identityLatency,
+			},
 		},
 		dependencies: {
 			database: {
