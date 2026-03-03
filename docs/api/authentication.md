@@ -8,7 +8,27 @@ Instead of relying on a shared symmetric secret (`HS256`), the boilerplate uses 
 
 1.  **Keys:** The system expects a `private.pem`, `public.pem`, and `metadata.json` (containing the Key ID, `kid`) in the directory specified by `env.APP_FOLDER_KEY`. (You can generate these using `bun gen:keys`).
 2.  **Creation (`jwt.create`):** When a user successfully authenticates (e.g., via SSO or local login), a JWT is created. It is signed with the `private.pem`.
-3.  **Validation (`jwt.parse` & `jwt.session`):** When a client makes a request to a protected route, the server extracts the Bearer token, decodes it, and cryptographically verifies the signature using the `public.pem`.
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const authNodes = [
+  { id: 'client', type: 'multi-handle', label: 'Client', position: { x: 0, y: 150 } },
+  { id: 'api', type: 'multi-handle', label: 'API Gateway', position: { x: 250, y: 150 } },
+  { id: 'authSvc', type: 'multi-handle', label: 'Auth Validation', position: { x: 500, y: 50 }, class: 'bg-indigo-50 border-indigo-200' },
+  { id: 'jwtGen', type: 'multi-handle', label: 'JWT Generator', position: { x: 500, y: 250 }, class: 'bg-emerald-50 border-emerald-200' }
+]
+
+const authEdges = [
+  { id: 'e1', source: 'client', target: 'api', sourceHandle: 'right-source', targetHandle: 'left', label: 'POST /login', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'api', target: 'authSvc', sourceHandle: 'top-source', targetHandle: 'left', label: 'Validate', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'authSvc', target: 'api', sourceHandle: 'left-source', targetHandle: 'right', label: 'Valid', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'api', target: 'jwtGen', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Sign RSA', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'jwtGen', target: 'api', sourceHandle: 'left-source', targetHandle: 'right', label: 'JWT', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'api', target: 'client', sourceHandle: 'left-source', targetHandle: 'right', label: '200 OK + Token', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="authNodes" :edges="authEdges" :height="400" />
 
 ## Using the Token (Client-Side)
 

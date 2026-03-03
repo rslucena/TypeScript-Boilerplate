@@ -16,6 +16,34 @@ It utilizes a global `onRequest` hook registered in the Fastify webserver (`src/
 3.  **Expiration Window:** If the counter is 1 (meaning it's the first request in the window), it sets a TTL (Time-To-Live) on the Redis key using the `EXPIRE` command.
 4.  **Evaluation:** If the counter exceeds the maximum allowed limit, the request is immediately rejected.
 
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const rateNodes = [
+  { id: 'req', type: 'multi-handle', label: 'Incoming Request', position: { x: 250, y: 0 } },
+  { id: 'ip', type: 'multi-handle', label: 'Extract IP', position: { x: 250, y: 100 } },
+  { id: 'incr', type: 'multi-handle', label: 'Redis INCR IP', position: { x: 250, y: 200 }, class: 'bg-red-50 border-red-200' },
+  { id: 'first', type: 'multi-handle', label: 'Is counter == 1?', position: { x: 250, y: 300 } },
+  { id: 'expire', type: 'multi-handle', label: 'Set EXPIRE window', position: { x: 0, y: 400 }, class: 'bg-orange-50 border-orange-200' },
+  { id: 'checkLimit', type: 'multi-handle', label: 'Is counter > Limit?', position: { x: 250, y: 500 } },
+  { id: 'tooMany', type: 'multi-handle', label: 'Return 429 Too Many Requests', position: { x: 0, y: 650 }, class: 'bg-red-50 border-red-200' },
+  { id: 'proceed', type: 'multi-handle', label: 'Proceed to Handler', position: { x: 500, y: 650 }, class: 'bg-emerald-50 border-emerald-200' }
+]
+
+const rateEdges = [
+  { id: 'e1', source: 'req', target: 'ip', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'ip', target: 'incr', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'incr', target: 'first', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'first', target: 'expire', sourceHandle: 'left-source', targetHandle: 'top', label: 'Yes', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'first', target: 'checkLimit', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'No', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'expire', target: 'checkLimit', sourceHandle: 'bottom-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e7', source: 'checkLimit', target: 'tooMany', sourceHandle: 'left-source', targetHandle: 'top', label: 'Yes', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e8', source: 'checkLimit', target: 'proceed', sourceHandle: 'right-source', targetHandle: 'top', label: 'No', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="rateNodes" :edges="rateEdges" :height="750" />
+
 ## Configuration
 
 The rate limiter is configured entirely via environment variables in your `.env` file. There are no hardcoded limits in the code.

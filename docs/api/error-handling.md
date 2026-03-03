@@ -6,8 +6,34 @@ The TypeScript Boilerplate employs a secure, structured approach to error handli
 
 When an API encounters an error, the boilerplate handles it via a global error handler (`setErrorHandler` in `src/infrastructure/server/webserver.ts`).
 
-*   **Internal Logging:** Full stack traces, SQL queries, and detailed error messages are logged internally using the infrastructure logger (Pino).
-*   **External Masking:** The API automatically masks internal details for server errors (500), replacing them with generic, translated messages based on the client's `Accept-Language` header. In development (`env.isDev`), the raw error message is exposed to aid debugging.
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const errorNodes = [
+  { id: 'route', type: 'multi-handle', label: 'Route Throws Error', position: { x: 250, y: 0 } },
+  { id: 'handler', type: 'multi-handle', label: 'Global Error Handler', position: { x: 250, y: 100 }, class: 'bg-red-50 border-red-200' },
+  { id: 'type', type: 'multi-handle', label: 'Identify Type', position: { x: 250, y: 200 } },
+  { id: 'zod', type: 'multi-handle', label: 'Extract Paths', position: { x: 0, y: 350 }, class: 'bg-orange-50 border-orange-200' },
+  { id: 'custom', type: 'multi-handle', label: 'Extract Code/Message', position: { x: 250, y: 350 }, class: 'bg-yellow-50 border-yellow-200' },
+  { id: 'unknown', type: 'multi-handle', label: 'Mask Details/Log', position: { x: 500, y: 350 }, class: 'bg-gray-50 border-gray-200' },
+  { id: 'format', type: 'multi-handle', label: 'Format Response', position: { x: 250, y: 500 } },
+  { id: 'client', type: 'multi-handle', label: 'Return JSON', position: { x: 250, y: 600 } }
+]
+
+const errorEdges = [
+  { id: 'e1', source: 'route', target: 'handler', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e2', source: 'handler', target: 'type', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e3', source: 'type', target: 'zod', sourceHandle: 'left-source', targetHandle: 'top', label: 'Zod Validation', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 'type', target: 'custom', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Custom Business', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e5', source: 'type', target: 'unknown', sourceHandle: 'right-source', targetHandle: 'top', label: 'Unknown / 500', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'zod', target: 'format', sourceHandle: 'bottom-source', targetHandle: 'left', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e7', source: 'custom', target: 'format', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e8', source: 'unknown', target: 'format', sourceHandle: 'bottom-source', targetHandle: 'right', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e9', source: 'format', target: 'client', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="errorNodes" :edges="errorEdges" :height="700" />
 
 ## Standard Error Response Format
 
