@@ -1,9 +1,10 @@
 import { statfs } from "node:fs/promises";
-import identity from "@domain/identity/entity";
 import cache from "@infrastructure/cache/actions";
 import manager from "@infrastructure/repositories/repository";
 import type { container } from "@infrastructure/server/interface";
 import { sql } from "drizzle-orm";
+
+const checkDbLiveness = () => manager.execute(sql`SELECT version()`);
 
 export default async function getReadiness(request: container) {
 	request.status(200);
@@ -18,7 +19,7 @@ export default async function getReadiness(request: container) {
 	let dbVersion: string | undefined;
 	const startDb = performance.now();
 
-	const dbResult = await manager.execute(sql`SELECT version()`).catch((error) => error);
+	const dbResult = await checkDbLiveness().catch((error) => error);
 	if (dbResult && !(dbResult instanceof Error)) {
 		dbLatency = performance.now() - startDb;
 		dbStatus = "connected";
@@ -59,26 +60,6 @@ export default async function getReadiness(request: container) {
 		diskFree = diskStats.bfree * diskStats.bsize;
 	}
 
-	// Smoke test internal Identity API / DB Entity
-	let identityStatus = "degraded";
-	let identityLatency = -1;
-	const startIdentity = performance.now();
-	const identityResult = await manager
-		.select({ id: identity.id })
-		.from(identity)
-		.limit(1)
-		.execute()
-		.then(() => true)
-		.catch((error) => error);
-
-	if (identityResult && !(identityResult instanceof Error)) {
-		identityLatency = performance.now() - startIdentity;
-		identityStatus = "active";
-	} else {
-		isHealthy = false;
-		request.status(503);
-	}
-
 	return {
 		status: isHealthy ? "active" : "degraded",
 		version: "1.0.0", // Mocked version
@@ -93,12 +74,6 @@ export default async function getReadiness(request: container) {
 		disk: {
 			free: diskFree,
 			total: diskTotal,
-		},
-		features: {
-			identity: {
-				status: identityStatus,
-				latency: identityLatency,
-			},
 		},
 		dependencies: {
 			database: {

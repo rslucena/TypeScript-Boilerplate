@@ -68,7 +68,6 @@ describe("Health API Routes", () => {
 	describe("GET /api/v1/health/readiness", () => {
 		it("should return 200 and readiness data when healthy", async () => {
 			repositoryMock.execute.mockResolvedValueOnce([{ version: "PostgreSQL 14.0" }]);
-			repositoryMock.execute.mockResolvedValueOnce([{ id: "123" }]);
 			redisClientMock.ping.mockResolvedValue("PONG");
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			redisClientMock.get.mockResolvedValue("true");
@@ -88,8 +87,6 @@ describe("Health API Routes", () => {
 			expect(payload.uptime).toBeDefined();
 			expect(payload.memory).toBeDefined();
 			expect(payload.disk).toBeDefined();
-			expect(payload.features.identity.status).toBe("active");
-			expect(payload.features.identity.latency).toBeDefined();
 			expect(payload.dependencies.database.status).toBe("connected");
 			expect(payload.dependencies.database.version).toBe("PostgreSQL 14.0");
 			expect(payload.dependencies.cache.status).toBe("connected");
@@ -98,7 +95,6 @@ describe("Health API Routes", () => {
 
 		it("should return 503 and degraded status when database fails", async () => {
 			repositoryMock.execute.mockRejectedValueOnce(new Error("DB Connection Error"));
-			repositoryMock.execute.mockResolvedValueOnce([{ id: "123" }]);
 			redisClientMock.isOpen = true;
 			redisClientMock.ping.mockResolvedValue("PONG");
 
@@ -117,7 +113,6 @@ describe("Health API Routes", () => {
 
 		it("should return 503 and degraded status when cache fails", async () => {
 			repositoryMock.execute.mockResolvedValueOnce([{ version: "PostgreSQL 14.0" }]);
-			repositoryMock.execute.mockResolvedValueOnce([{ id: "123" }]);
 			redisClientMock.isOpen = true;
 			redisClientMock.ping.mockRejectedValueOnce(new Error("Cache Error"));
 
@@ -132,25 +127,6 @@ describe("Health API Routes", () => {
 			const payload = response.json();
 			expect(payload.status).toBe("degraded");
 			expect(payload.dependencies.cache.status).toBe("disconnected");
-		});
-
-		it("should return 503 and degraded status when identity internal feature check fails", async () => {
-			repositoryMock.execute.mockResolvedValueOnce([{ version: "PostgreSQL 14.0" }]); // db check ok
-			repositoryMock.execute.mockImplementationOnce(() => Promise.reject(new Error("Internal API Error")));
-			redisClientMock.isOpen = true;
-			redisClientMock.ping.mockResolvedValue("PONG");
-
-			const response = await server.inject({
-				method: "GET",
-				url: "/api/v1/health/readiness",
-				headers: {
-					authorization: "Bearer valid-token",
-				},
-			});
-			expect(response.statusCode).toBe(503);
-			const payload = response.json();
-			expect(payload.status).toBe("degraded");
-			expect(payload.features.identity.status).toBe("degraded");
 		});
 	});
 });
