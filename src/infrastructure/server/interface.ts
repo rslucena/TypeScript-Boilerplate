@@ -43,10 +43,12 @@ const readinessHealth = livenessHealth.extend({
 		database: z.object({
 			status: z.string(),
 			latency: z.number(),
+			version: z.string().optional(),
 		}),
 		cache: z.object({
 			status: z.string(),
 			latency: z.number(),
+			version: z.string().optional(),
 		}),
 	}),
 });

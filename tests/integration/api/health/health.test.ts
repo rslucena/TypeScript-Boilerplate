@@ -40,8 +40,10 @@ describe("Health API Routes", () => {
 
 		repositoryMock.execute.mockClear();
 		redisClientMock.ping.mockClear();
+		redisClientMock.info.mockClear();
 		redisClientMock.isOpen = true;
 		redisClientMock.ping.mockResolvedValue("PONG");
+		redisClientMock.info.mockResolvedValue("redis_version:7.0.0");
 
 		await server.ready();
 	});
@@ -62,7 +64,7 @@ describe("Health API Routes", () => {
 
 	describe("GET /api/v1/health/readiness", () => {
 		it("should return 200 and readiness data when healthy", async () => {
-			repositoryMock.execute.mockResolvedValue([{}]);
+			repositoryMock.execute.mockResolvedValue([{ version: "PostgreSQL 14.0" }]);
 			redisClientMock.ping.mockResolvedValue("PONG");
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key"] });
 			redisClientMock.get.mockResolvedValue("true");
@@ -82,7 +84,9 @@ describe("Health API Routes", () => {
 			expect(payload.uptime).toBeDefined();
 			expect(payload.memory).toBeDefined();
 			expect(payload.dependencies.database.status).toBe("connected");
+			expect(payload.dependencies.database.version).toBe("PostgreSQL 14.0");
 			expect(payload.dependencies.cache.status).toBe("connected");
+			expect(payload.dependencies.cache.version).toBe("7.0.0");
 		});
 
 		it("should return 503 and degraded status when database fails", async () => {

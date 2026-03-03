@@ -13,12 +13,15 @@ export default async function getReadiness(request: container) {
 	// Check Postgres Connection
 	let dbStatus = "disconnected";
 	let dbLatency = -1;
-	try {
-		const startDb = performance.now();
-		await manager.execute(sql`SELECT 1`);
+	let dbVersion: string | undefined;
+	const startDb = performance.now();
+
+	const dbResult = await manager.execute(sql`SELECT version()`).catch((error) => error);
+	if (dbResult && !(dbResult instanceof Error)) {
 		dbLatency = performance.now() - startDb;
 		dbStatus = "connected";
-	} catch (_error) {
+		dbVersion = dbResult[0]?.version as string;
+	} else {
 		isHealthy = false;
 		request.status(503); // Service Unavailable if DB is down
 	}
@@ -26,20 +29,23 @@ export default async function getReadiness(request: container) {
 	// Check Redis Connection
 	let redisStatus = "disconnected";
 	let redisLatency = -1;
-	try {
-		const startRedis = performance.now();
-		const isOpen = cache.status();
-		const response = await cache.ping();
+	let redisVersion: string | undefined;
+	const startRedis = performance.now();
+	const isOpen = cache.status();
+
+	const response = await cache.ping().catch(() => null);
+	if (isOpen && response === "PONG") {
 		redisLatency = performance.now() - startRedis;
-		if (isOpen && response === "PONG") {
-			redisStatus = "connected";
-		} else {
-			isHealthy = false;
-			request.status(503); // Service Unavailable if Redis is down
+		redisStatus = "connected";
+
+		const info = await cache.info().catch(() => "");
+		const versionMatch = info.match(/redis_version:([0-9.]+)/);
+		if (versionMatch) {
+			redisVersion = versionMatch[1];
 		}
-	} catch (_error) {
+	} else {
 		isHealthy = false;
-		request.status(503);
+		request.status(503); // Service Unavailable if Redis is down
 	}
 
 	return {
@@ -57,10 +63,12 @@ export default async function getReadiness(request: container) {
 			database: {
 				status: dbStatus,
 				latency: dbLatency,
+				version: dbVersion,
 			},
 			cache: {
 				status: redisStatus,
 				latency: redisLatency,
+				version: redisVersion,
 			},
 		},
 	};

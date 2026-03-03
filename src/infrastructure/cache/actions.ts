@@ -18,6 +18,7 @@ const cache: actions = {
 	},
 	status: () => client.isOpen,
 	ping: () => (client.isOpen ? client.ping() : Promise.resolve("PONG")),
+	info: () => (client.isOpen ? client.info() : Promise.resolve("")),
 };
 
 async function get<t>({ type, hash }: setmode, force = false): Promise<null | t> {
