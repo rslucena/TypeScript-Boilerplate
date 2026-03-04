@@ -35,9 +35,11 @@ const repoEdges = [
 
 **New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)  
 **Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)  
-**Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices)  
+**Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices) | [Repository Pattern](/development/base-repository-pattern)
+**Security & Infrastructure?** → [Environment](/development/environment-configuration) | [Security & Keys](/development/security-and-keys) | [Database Migrations](/development/database-migrations)
+**API & Auth?** → [Identity, Credentials & SSO](/api/identity-credentials-sso) | [Health Check](/api/health-check)
 **Testing?** → [Testing Guide](/development/testing-guide)  
-**Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment)  
+**Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment) | [Process Manager](/devops/process-manager-reference)
 **Need help?** → [Troubleshooting](/reference/troubleshooting)
 
 ## The Web Development "Sweet Spot"
@@ -107,7 +109,7 @@ Visualize the project structure and how the different layers interact:
 | server       | [Core Fastify (HTTP)](/servers/http-server) and [Scalable WebSockets](/servers/websockets). |
 | settings     | Environment variables and application-wide configuration.                  |
 
-## References
+## Internal References
 
 - [Typescript](https://www.typescriptlang.org)
 - [Drizzle ORM](https://orm.drizzle.team)

@@ -1,3 +1,34 @@
+---
+title: Rate Limiting
+description: API logic reference for rate limiting.
+---
+<script setup>
+import { MarkerType } from "@vue-flow/core";
+
+const nodes = [
+  { id: "req", type: "multi-handle", label: "Incoming Request", position: { x: 217, y: -39.750000000000036 } },
+  { id: "ip", type: "multi-handle", label: "Extract IP", position: { x: 249, y: 81.99999999999997 } },
+  { id: "incr", type: "multi-handle", label: "Redis INCR IP", position: { x: 235, y: 215.00000000000003 } },
+  { id: "first", type: "multi-handle", label: "Is counter == 1?", position: { x: 227.99999999999994, y: 359.0000000000001 } },
+  { id: "expire", type: "multi-handle", label: "Set EXPIRE window", position: { x: -9.000000000000014, y: 448.00000000000006 } },
+  { id: "checkLimit", type: "multi-handle", label: "Is counter > Limit?", position: { x: 218.99999999999994, y: 535 } },
+  { id: "tooMany", type: "multi-handle", label: "Return 429 Too Many Requests", position: { x: 169.50000000000028, y: 688.3906249999999 } },
+  { id: "proceed", type: "multi-handle", label: "Proceed to Handler", position: { x: 476.9999999999999, y: 683.0000000000001 } },
+];
+
+const edges = [
+  { id: "e1", source: "req", target: "ip", sourceHandle: "bottom-source", targetHandle: "top", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#218728" } },
+  { id: "e2", source: "ip", target: "incr", sourceHandle: "bottom-source", targetHandle: "top", label: "Validate", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#19714f" } },
+  { id: "e3", source: "incr", target: "first", sourceHandle: "bottom-source", targetHandle: "top", label: "Valid Data", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#1b7937" } },
+  { id: "e4", source: "first", target: "expire", sourceHandle: "left-source", targetHandle: "top", label: "Yes", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#1f984a" } },
+  { id: "e5", source: "first", target: "checkLimit", sourceHandle: "bottom-source", targetHandle: "top", label: "No", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#ff0000" } },
+  { id: "e6", source: "expire", target: "checkLimit", sourceHandle: "bottom-source", targetHandle: "left", label: "Execute SQL", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#207932" } },
+  { id: "e8", source: "checkLimit", target: "proceed", sourceHandle: "right-source", targetHandle: "top", label: "No", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#1b9339" } },
+  { id: "vueflow__edge-checkLimitbottom-source-tooManytop", source: "checkLimit", target: "tooMany", sourceHandle: "bottom-source", targetHandle: "top", label: "Yes", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#ff0000" } },
+];
+
+</script>
+
 # Rate Limiting
 
 Rate limiting is an essential defense mechanism for high-performance APIs, preventing abuse, mitigating DDoS attacks, and ensuring fair resource usage among clients. The TypeScript Boilerplate implements a robust, distributed rate-limiting strategy using Redis.
@@ -16,33 +47,7 @@ It utilizes a global `onRequest` hook registered in the Fastify webserver (`src/
 3.  **Expiration Window:** If the counter is 1 (meaning it's the first request in the window), it sets a TTL (Time-To-Live) on the Redis key using the `EXPIRE` command.
 4.  **Evaluation:** If the counter exceeds the maximum allowed limit, the request is immediately rejected.
 
-<script setup>
-import { MarkerType } from '@vue-flow/core'
-
-const rateNodes = [
-  { id: 'req', type: 'multi-handle', label: 'Incoming Request', position: { x: 250, y: 0 } },
-  { id: 'ip', type: 'multi-handle', label: 'Extract IP', position: { x: 250, y: 100 } },
-  { id: 'incr', type: 'multi-handle', label: 'Redis INCR IP', position: { x: 250, y: 200 }, class: 'bg-red-50 border-red-200' },
-  { id: 'first', type: 'multi-handle', label: 'Is counter == 1?', position: { x: 250, y: 300 } },
-  { id: 'expire', type: 'multi-handle', label: 'Set EXPIRE window', position: { x: 0, y: 400 }, class: 'bg-orange-50 border-orange-200' },
-  { id: 'checkLimit', type: 'multi-handle', label: 'Is counter > Limit?', position: { x: 250, y: 500 } },
-  { id: 'tooMany', type: 'multi-handle', label: 'Return 429 Too Many Requests', position: { x: 0, y: 650 }, class: 'bg-red-50 border-red-200' },
-  { id: 'proceed', type: 'multi-handle', label: 'Proceed to Handler', position: { x: 500, y: 650 }, class: 'bg-emerald-50 border-emerald-200' }
-]
-
-const rateEdges = [
-  { id: 'e1', source: 'req', target: 'ip', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2', source: 'ip', target: 'incr', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3', source: 'incr', target: 'first', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4', source: 'first', target: 'expire', sourceHandle: 'left-source', targetHandle: 'top', label: 'Yes', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5', source: 'first', target: 'checkLimit', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'No', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e6', source: 'expire', target: 'checkLimit', sourceHandle: 'bottom-source', targetHandle: 'left', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e7', source: 'checkLimit', target: 'tooMany', sourceHandle: 'left-source', targetHandle: 'top', label: 'Yes', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e8', source: 'checkLimit', target: 'proceed', sourceHandle: 'right-source', targetHandle: 'top', label: 'No', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
-]
-</script>
-
-<InteractiveFlow :nodes="rateNodes" :edges="rateEdges" :height="750" />
+<InteractiveFlow :nodes="nodes" :edges="edges" :height="750" />
 
 ## Configuration
 

@@ -28,7 +28,7 @@ export default defineConfig({
         nav: [
             { text: "Home", link: "/" },
             { text: "Guide", link: "/guide/getting-started" },
-            { text: "Reference", link: "/reference/cache-actions-reference" },
+            { text: "Internal Reference", link: "/reference/cache-actions-reference" },
         ],
         sidebar: [
             {
@@ -66,6 +66,8 @@ export default defineConfig({
                     { text: "Template System", link: "/development/template-system-architecture" },
                     { text: "Testing Guide", link: "/development/testing-guide" },
                     { text: "Best Practices", link: "/development/best-practices" },
+                    { text: "Repository Pattern", link: "/development/base-repository-pattern" },
+                    { text: "Security & Keys", link: "/development/security-and-keys" },
                 ],
             },
             {
@@ -87,8 +89,11 @@ export default defineConfig({
                 ],
             },
             {
-                text: "📚 Reference",
+                text: "📚 Internal Reference",
                 items: [
+                    { text: "Container Object", link: "/reference/container-object" },
+                    { text: "Base Repository", link: "/reference/repository-api" },
+                    { text: "Template Engine", link: "/reference/template-engine-variables" },
                     { text: "Cache Actions", link: "/reference/cache-actions-reference" },
                     { text: "Messages Actions", link: "/reference/messages-actions-reference" },
                     { text: "Logs Actions", link: "/reference/logs-actions-reference" },

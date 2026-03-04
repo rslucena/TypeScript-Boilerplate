@@ -1,3 +1,33 @@
+---
+title: Pagination, Filtering & Sorting
+description: API logic reference for pagination, filtering and sorting.
+---
+<script setup>
+import { MarkerType } from "@vue-flow/core";
+
+const nodes = [
+  { id: "client", type: "multi-handle", label: "Client", position: { x: 210.12658170419115, y: -165.3706985456029 }},
+  { id: "fastify", type: "multi-handle", label: "Fastify Route", position: { x: 332.9550434283039, y: 9.787121752076402 }},
+  { id: "zod", type: "multi-handle", label: "Zod Validator", position: { x: 571.1390213110951, y: -87.06628048505614 }},
+  { id: "action", type: "multi-handle", label: "Domain Action", position: { x: 438.98982975111807, y: 161.09422339010376 }},
+  { id: "drizzle", type: "multi-handle", label: "Drizzle ORM", position: { x: 450.2506223699075, y: 313.7097624254103 }},
+  { id: "db", type: "multi-handle", label: "Database", position: { x: 634.0257982331852, y: 439.74172984930317 }},
+];
+
+const edges = [
+  { id: "e2", source: "fastify", target: "zod", sourceHandle: "top-source", targetHandle: "left", label: "Validate", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep"},
+  { id: "e3", source: "zod", target: "fastify", sourceHandle: "left-source", targetHandle: "top", label: "Valid Data", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep"},
+  { id: "e5", source: "action", target: "drizzle", sourceHandle: "right-source", targetHandle: "left", label: "Build Query", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep"},
+  { id: "e6", source: "drizzle", target: "db", sourceHandle: "right-source", targetHandle: "left", label: "Execute SQL", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep"},
+  { id: "vueflow__edge-fastifyright-source-actiontop", source: "fastify", target: "action", sourceHandle: "right-source", targetHandle: "top", label: "Call Action", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#b1b1b7" } },
+  { id: "vueflow__edge-dbtop-source-drizzletop", source: "db", target: "drizzle", sourceHandle: "top-source", targetHandle: "top", label: "Results", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#36922f" } },
+  { id: "vueflow__edge-fastifyleft-source-clientleft", source: "fastify", target: "client", sourceHandle: "left-source", targetHandle: "left", label: "200 OK", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#2d8726" } },
+  { id: "vueflow__edge-clientright-source-fastifytop", source: "client", target: "fastify", sourceHandle: "right-source", targetHandle: "top", label: "GET /items", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#b1b1b7" } },
+  { id: "vueflow__edge-actionleft-source-fastifybottom", source: "action", target: "fastify", sourceHandle: "left-source", targetHandle: "bottom", label: "Return", animated: true, markerEnd: MarkerType.ArrowClosed, type: "smoothstep", style: { stroke: "#258e49" } },
+];
+
+</script>
+
 # Pagination, Filtering & Sorting
 
 When building APIs that return lists of resources, it's essential to paginate results to ensure performance and reduce payload sizes. The TypeScript Boilerplate provides standardized utilities to handle pagination and filtering seamlessly using Zod and Drizzle ORM.
@@ -40,33 +70,7 @@ export function withPagination<T extends PgSelect>(qb: T, page: number, size = 1
 }
 ```
 
-<script setup>
-import { MarkerType } from '@vue-flow/core'
-
-const pagNodes = [
-  { id: 'client', type: 'multi-handle', label: 'Client', position: { x: 0, y: 100 } },
-  { id: 'fastify', type: 'multi-handle', label: 'Fastify Route', position: { x: 250, y: 100 } },
-  { id: 'zod', type: 'multi-handle', label: 'Zod Validator', position: { x: 500, y: 0 }, class: 'bg-indigo-50 border-indigo-200' },
-  { id: 'action', type: 'multi-handle', label: 'Domain Action', position: { x: 500, y: 200 } },
-  { id: 'drizzle', type: 'multi-handle', label: 'Drizzle ORM', position: { x: 750, y: 200 }, class: 'bg-orange-50 border-orange-200' },
-  { id: 'db', type: 'multi-handle', label: 'Database', position: { x: 1000, y: 200 }, class: 'bg-blue-50 border-blue-200' }
-]
-
-const pagEdges = [
-  { id: 'e1', source: 'client', target: 'fastify', sourceHandle: 'right-source', targetHandle: 'left', label: 'GET /items?name=foo', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e2', source: 'fastify', target: 'zod', sourceHandle: 'top-source', targetHandle: 'left', label: 'Validate', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e3', source: 'zod', target: 'fastify', sourceHandle: 'left-source', targetHandle: 'top', label: 'Valid Data', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e4', source: 'fastify', target: 'action', sourceHandle: 'right-source', targetHandle: 'left', label: 'Call Action', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e5', source: 'action', target: 'drizzle', sourceHandle: 'right-source', targetHandle: 'left', label: 'Build Query', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e6', source: 'drizzle', target: 'db', sourceHandle: 'right-source', targetHandle: 'left', label: 'Execute SQL', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
-  { id: 'e7', source: 'db', target: 'drizzle', sourceHandle: 'left-source', targetHandle: 'right', label: 'Results', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e8', source: 'drizzle', target: 'action', sourceHandle: 'left-source', targetHandle: 'right', label: 'Entities', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e9', source: 'action', target: 'fastify', sourceHandle: 'left-source', targetHandle: 'right', label: 'Return', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
-  { id: 'e10', source: 'fastify', target: 'client', sourceHandle: 'left-source', targetHandle: 'right', label: '200 OK', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed }
-]
-</script>
-
-<InteractiveFlow :nodes="pagNodes" :edges="pagEdges" :height="400" />
+<InteractiveFlow :nodes="nodes" :edges="edges" />
 
 ## Example: Building a Paginated Endpoint
 

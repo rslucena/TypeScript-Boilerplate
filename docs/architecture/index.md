@@ -100,7 +100,7 @@ Contains implementation details of technical services:
 - **Cache**: Redis integration for high-performance data storage with **Graceful Degradation** for high availability.
 - **Repository**: Database connection and base repository patterns.
 - **Messages**: Communication layer (distributed via Redis or internal via Node events).
-- **Plugins**: Agent system for modular extensions (e.g., Authentication).
+- **Plugins**: Agent system for modular extensions (e.g., [Authentication](/api/identity-credentials-sso)).
 
 ## Request Flow
 

@@ -55,22 +55,105 @@ const pluginEdges = [
   { id: 'p5', source: 'h', target: 'c', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Set Session', type: 'smoothstep',animated: true, markerEnd: MarkerType.ArrowClosed },
   { id: 'p6', source: 'h', target: 's', sourceHandle: 'left-source', targetHandle: 'right', label: 'Proceed/401', type: 'smoothstep',animated: true, markerEnd: MarkerType.ArrowClosed }
 ]
+
+const styleDev = { type: 'smoothstep', style: {stroke: '#8B5CF6'}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const styleProd = { type: 'smoothstep', style: {stroke: '#F59E0B'}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const styleCore = { type: 'smoothstep', style: {stroke: '#3B82F6'}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const styleSuccess = { type: 'smoothstep', style: {stroke: '#10B981'}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const styleError = { type: 'smoothstep', style: {stroke: '#EF4444'}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
+const seqNodes = [
+  { id: 'c', type: 'multi-handle', label: 'Client Request', position: { x: 0, y: 150 } },
+  { id: 'f', type: 'multi-handle', label: 'Fastify Hook', position: { x: 250, y: 150 } },
+  { id: 'mgr', type: 'multi-handle', label: 'plugins.ts', position: { x: 500, y: 150 } },
+  { id: 'api', type: 'multi-handle', label: 'API Key Strategy', position: { x: 750, y: 50 } },
+  { id: 'jwt', type: 'multi-handle', label: 'JWT Strategy', position: { x: 750, y: 250 } },
+  { id: 'inj', type: 'multi-handle', label: 'Inject Session', position: { x: 1000, y: 150 } },
+  { id: 'fail', type: 'multi-handle', label: '401 Unauthorized', position: { x: 750, y: 400 } },
+  { id: 'proc', type: 'multi-handle', label: 'Proceed Action', position: { x: 1250, y: 150 } }
+]
+
+const seqEdges = [
+  { id: 's1', source: 'c', target: 'f', sourceHandle: 'right-source', targetHandle: 'left', label: 'x-api-key', ...styleCore },
+  { id: 's2', source: 'f', target: 'mgr', sourceHandle: 'right-source', targetHandle: 'left', label: 'Trigger', ...styleCore },
+  { id: 's3', source: 'mgr', target: 'api', sourceHandle: 'top-source', targetHandle: 'left', label: 'Priority 1', ...styleDev },
+  { id: 's4', source: 'mgr', target: 'jwt', sourceHandle: 'bottom-source', targetHandle: 'left', label: 'Priority 2', ...styleProd },
+  { id: 's5', source: 'api', target: 'inj', sourceHandle: 'right-source', targetHandle: 'top', label: 'Valid Key', ...styleSuccess },
+  { id: 's6', source: 'api', target: 'jwt', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Invalid', ...styleError },
+  { id: 's7', source: 'jwt', target: 'inj', sourceHandle: 'right-source', targetHandle: 'bottom', label: 'Valid Token', ...styleSuccess },
+  { id: 's8', source: 'jwt', target: 'fail', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'Invalid', ...styleError },
+  { id: 's9', source: 'inj', target: 'proc', sourceHandle: 'right-source', targetHandle: 'left', ...styleSuccess }
+]
 </script>
 
 <InteractiveFlow :nodes="pluginNodes" :edges="pluginEdges" />
 
-## How to Add a New Plugin
+## How to Add a New Authentication Plugin
 
-1.  **Define the Strategy**: Create a function that accepts a `container` and returns data or throws an error.
-2.  **Register**: Add it to `src/infrastructure/settings/plugins.ts`.
-3.  **Use**: The data returned by the strategy is available in `request.session()`.
+O Boilerplate foi desenhado para aceitar N métodos de autenticação simultâneos sem poluir o Core do Fastify. A classe `authentication.ts` irá lidar com todas as estratégias registradas e injetar no request a primeira que retornar sucesso.
 
-### Example Strategy
+### 1. Define the Strategy
+Create a function inside `infrastructure/authentication/strategies/` that accepts the Fastify `container` and either returns the user payload or throws an error.
 
 ```typescript
-async function myCustomAuth(request: container) {
-    const key = request.headers()["x-api-key"];
-    if (key === "secret") return { user: "admin" };
-    throw new Error("Invalid Key");
+// src/infrastructure/authentication/strategies/api-key.ts
+import type { container } from "@infrastructure/server/interface";
+
+export async function verifyApiKey(request: container) {
+	const key = request.headers()["x-api-key"];
+	if (key === process.env.SECRET_API_KEY) {
+		return { role: "admin", type: "api-key" };
+	}
+	throw new Error("Invalid or Missing API Key");
 }
 ```
+
+### 2. Register the Plugin
+Injete a sua nova estratégia no "Ecosystem" passivo localizado em `src/infrastructure/settings/plugins.ts`. O campo `name` no objeto determina a chave que será acessível na sessão.
+
+```typescript
+// src/infrastructure/settings/plugins.ts
+import * as jwt from "@infrastructure/authentication/jwt";
+import { verifyApiKey } from "@infrastructure/authentication/strategies/api-key";
+
+export default {
+	authentication: {
+		// Existing JWT Strategy
+		JWT: {
+			priority: 2, 
+			active: true,
+			strategy: jwt.session,
+		},
+		// Your new Custom Strategy
+		API_KEY: {
+			priority: 1, // Will run BEFORE JWT (Lower number first)
+			active: true, 
+			strategy: verifyApiKey,
+		}
+	},
+}
+```
+
+### 3. Accessing the Data
+The `authentication.ts` module runs sorting by `priority`. If your `API_KEY` returns successfully, the request is instantly authenticated.
+
+You can retrieve the result inside your Domain Actions via the `.session()` method:
+
+```typescript
+// Inside any restricted action
+export default async function myAction(request: container) {
+   const sessionData = request.session();
+   
+   if (sessionData.API_KEY) {
+	   console.log("Authenticated via API Key:", sessionData.API_KEY.role);
+   } else if (sessionData.JWT) {
+	   console.log("Authenticated via JWT Token:", sessionData.JWT.email);
+   }
+}
+```
+
+### Middleware Sequence Flow
+
+This is how the `src/infrastructure/server/authentication.ts` orchestrates the login passively:
+
+<InteractiveFlow :nodes="seqNodes" :edges="seqEdges" />
