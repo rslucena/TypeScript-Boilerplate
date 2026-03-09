@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
@@ -12,7 +13,6 @@ mock.module("@infrastructure/repositories/repository", () => ({
 
 mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
-import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import * as jwt from "@infrastructure/authentication/jwt";
 import cache from "@infrastructure/cache/actions";

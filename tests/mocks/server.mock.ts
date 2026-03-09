@@ -24,23 +24,43 @@ export const createServerRequestMock = () => ({
 		if (auth !== "Bearer valid-token") {
 			return reply.code(401).send({ error: "Unauthorized" });
 		}
-		const result = await fn({
+		let currentStatus = 200;
+		const container = {
+			_status: 200,
 			params: () => req.params,
 			query: () => req.query,
 			body: () => req.body,
 			headers: () => req.headers,
-			status: (s: number) => reply.status(s),
-		});
+			status: function (s: number) {
+				if (s) {
+					currentStatus = s;
+					this._status = s;
+					reply.status(s);
+				}
+				return currentStatus;
+			},
+		};
+		const result = await fn(container);
 		return reply.send(result);
 	},
 	noRestricted: (fn: CallableFunction) => async (req: FastifyRequest, reply: FastifyReply) => {
-		const result = await fn({
+		let currentStatus = 200;
+		const container = {
+			_status: 200,
 			params: () => req.params,
 			query: () => req.query,
 			body: () => req.body,
 			headers: () => req.headers,
-			status: (s: number) => reply.status(s),
-		});
+			status: function (s: number) {
+				if (s) {
+					currentStatus = s;
+					this._status = s;
+					reply.status(s);
+				}
+				return currentStatus;
+			},
+		};
+		const result = await fn(container);
 		return reply.send(result);
 	},
 });

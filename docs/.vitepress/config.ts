@@ -19,6 +19,7 @@ export default defineConfig({
     lang: 'en-US',
     title: "Boilerplate",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
+    lastUpdated: true,
     themeConfig: {
         version,
         search: {
@@ -27,7 +28,7 @@ export default defineConfig({
         nav: [
             { text: "Home", link: "/" },
             { text: "Guide", link: "/guide/getting-started" },
-            { text: "Reference", link: "/reference/cache-actions-reference" },
+            { text: "Internal Reference", link: "/reference/cache-actions-reference" },
         ],
         sidebar: [
             {
@@ -37,6 +38,18 @@ export default defineConfig({
                     { text: "Complete Example", link: "/guide/complete-example" },
                     { text: "Quick Navigation", link: "/guide/quick-navigation" },
                 ],
+            },
+            {
+                text: "API Reference & Usage",
+                items: [
+                    { text: "Introduction", link: "/api/introduction" },
+                    { text: "Authentication", link: "/api/authentication" },
+                    { text: "Pagination & Filtering", link: "/api/pagination-filtering" },
+                    { text: "Rate Limiting", link: "/api/rate-limiting" },
+                    { text: "Error Handling", link: "/api/error-handling" },
+                    { text: "Swagger & OpenAPI", link: "/api/swagger-openapi" },
+                    { text: "Health Check", link: "/api/health-check" },
+                ]
             },
             {
                 text: "🌐 Servers",
@@ -53,6 +66,8 @@ export default defineConfig({
                     { text: "Template System", link: "/development/template-system-architecture" },
                     { text: "Testing Guide", link: "/development/testing-guide" },
                     { text: "Best Practices", link: "/development/best-practices" },
+                    { text: "Repository Pattern", link: "/development/base-repository-pattern" },
+                    { text: "Security & Keys", link: "/development/security-and-keys" },
                 ],
             },
             {
@@ -74,8 +89,11 @@ export default defineConfig({
                 ],
             },
             {
-                text: "📚 Reference",
+                text: "📚 Internal Reference",
                 items: [
+                    { text: "Container Object", link: "/reference/container-object" },
+                    { text: "Base Repository", link: "/reference/repository-api" },
+                    { text: "Template Engine", link: "/reference/template-engine-variables" },
                     { text: "Cache Actions", link: "/reference/cache-actions-reference" },
                     { text: "Messages Actions", link: "/reference/messages-actions-reference" },
                     { text: "Logs Actions", link: "/reference/logs-actions-reference" },

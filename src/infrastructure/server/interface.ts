@@ -25,10 +25,36 @@ const headers = z.object({
 	"accept-language": z.string().default("en"),
 });
 
-const health = z.object({
+const livenessHealth = z.object({
 	status: z.string(),
 	version: z.string(),
 	date: z.string(),
+});
+
+const readinessHealth = livenessHealth.extend({
+	uptime: z.number(),
+	memory: z.object({
+		rss: z.number(),
+		heapTotal: z.number(),
+		heapUsed: z.number(),
+		external: z.number(),
+	}),
+	disk: z.object({
+		free: z.number(),
+		total: z.number(),
+	}),
+	dependencies: z.object({
+		database: z.object({
+			status: z.string(),
+			latency: z.number(),
+			version: z.string().optional(),
+		}),
+		cache: z.object({
+			status: z.string(),
+			latency: z.number(),
+			version: z.string().optional(),
+		}),
+	}),
 });
 
 type server = FastifyInstance<
@@ -167,4 +193,14 @@ export class container<t = unknown> extends err {
 	}
 }
 
-export { type JWT, errorSchema, type guise, headers, health, replyErrorSchema, type server, type AnyType };
+export {
+	type JWT,
+	errorSchema,
+	type guise,
+	headers,
+	livenessHealth,
+	readinessHealth,
+	replyErrorSchema,
+	type server,
+	type AnyType,
+};

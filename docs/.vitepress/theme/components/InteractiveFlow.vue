@@ -1,7 +1,7 @@
 <script setup>
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
+import { Controls, ControlButton } from '@vue-flow/controls'
 import { ref } from 'vue'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
@@ -26,6 +26,47 @@ const nodeTypes = {
 
 const { onInit, onNodeDragStop, onConnect } = useVueFlow()
 
+const copySuccess = ref(false)
+
+const exportToBuilder = () => {
+  const nodesExport = props.nodes.map(n => ({
+    id: n.id,
+    type: n.type,
+    label: n.label || n.data?.label,
+    position: n.position,
+    style: { ...n.style, ...n.data?.style }
+  }))
+
+  const edgesExport = props.edges.map(e => ({
+    id: e.id,
+    source: e.source,
+    target: e.target,
+    sourceHandle: e.sourceHandle,
+    targetHandle: e.targetHandle,
+    label: e.label || e.data?.label,
+    animated: e.animated || e.data?.animated,
+    markerEnd: 'MarkerType.ArrowClosed',
+    type: e.type,
+    style: { ...e.style, ...e.data?.style }
+  }))
+
+  const scriptContent = `
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const nodes = ${JSON.stringify(nodesExport, null, 2)}
+
+const edges = ${JSON.stringify(edgesExport, null, 2).replace(/"markerEnd": "MarkerType.ArrowClosed"/g, 'markerEnd: MarkerType.ArrowClosed')}
+<\/script>
+
+<InteractiveFlow :nodes="nodes" :edges="edges" />
+`
+
+  navigator.clipboard.writeText(scriptContent.trim())
+  copySuccess.value = true
+  setTimeout(() => { copySuccess.value = false }, 2000)
+}
+
 onInit((vueFlowInstance) => {
   vueFlowInstance.fitView()
 })
@@ -46,7 +87,12 @@ onInit((vueFlowInstance) => {
       >
         <Background pattern-color="#aaa" :gap="16" />
         
-        <Controls />
+        <Controls>
+          <ControlButton title="Export to Builder" @click="exportToBuilder">
+            <svg v-if="copySuccess" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z" fill="currentColor"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="none" d="M0 0h24v24H0z"/><path d="M13 10h5l-6 6-6-6h5V3h2v7zm-9 9h16v-7h2v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-8h2v7z" fill="currentColor"/></svg>
+          </ControlButton>
+        </Controls>
         
         <slot />
       </VueFlow>

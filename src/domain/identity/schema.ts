@@ -1,5 +1,5 @@
 import { withPagination, zodIdentifier } from "@infrastructure/repositories/references";
-import { headers, health } from "@infrastructure/server/interface";
+import { headers } from "@infrastructure/server/interface";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { array, object, string, type ZodString } from "zod";
 import { default as identity } from "./entity";
@@ -25,7 +25,6 @@ const auth = object({
 
 const actions = {
 	headers,
-	health,
 	id: select.pick({ id: true }).required(),
 	read: select.omit({ id: true }).extend(withPagination.shape),
 	create: create.omit({ id: true }),

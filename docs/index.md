@@ -1,16 +1,19 @@
 ---
 title: Home
-description: TypeScript Boilerplate - A minimalistic project template for Node.js back-end applications with Bun runtime
+description: TypeScript Boilerplate - A professional, modular project template for high-performance server-side applications using Bun.
 layout: home
 
 hero:
   name: TypeScript Boilerplate
-  text: Blazing-fast TypeScript Backend
-  tagline: Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Experience the speed of Go with the familiarity of TypeScript.
+  text: Build Blazing-Fast APIs
+  tagline: A modern, scalable, and production-ready boilerplate for API development. Featuring Auto-CRUD Scaffolding, Type-Safe ORM, integrated Swagger docs, and Smart Caching. Experience Go-like speed with the developer ergonomics of TypeScript.
   actions:
     - theme: brand
       text: Quick Navigation
       link: /guide/quick-navigation
+    - theme: alt
+      text: API Reference & Usage
+      link: /api/introduction
     - theme: alt
       text: View on GitHub
       link: https://github.com/rslucena/TypeScript-Boilerplate
@@ -18,20 +21,20 @@ hero:
 features:
   - icon: ⚡
     title: Near Go-like Performance
-    details: Powered by the Bun runtime for exceptional speed and efficiency
-  - icon: 🛠️
-    title: Batteries Included
-    details: CLI scaffolding, i18n support, and integrated caching out of the box
-  - icon: 🏗️
-    title: Clean Architecture
-    details: Zero-dependency TypeScript templates with maintainable code structure
+    details: Powered by the Bun runtime, delivering up to 3x faster execution and startup times compared to standard Node.js.
+  - icon: 🔒
+    title: End-to-End Type Safety
+    details: Built with Drizzle ORM and Zod validation, ensuring robust type checking from database schema to API endpoint responses.
+  - icon: 📚
+    title: Auto-Generated API Docs
+    details: Instantly generate interactive Swagger UI documentation from your Zod schemas and Fastify route definitions.
   - icon: 🚀
     title: Auto-CRUD Generation
-    details: Scaffold complete domains with a single command
-  - icon: 🌍
-    title: Internationalization
-    details: Built-in i18n support for multi-language applications
+    details: Scaffold complete domain structures in seconds—including routes, schemas, and tests—with our custom CLI generator.
+  - icon: 🛡️
+    title: Secure Error Handling
+    details: Professional error handling that automatically masks sensitive internal details while providing clear feedback to clients.
   - icon: 🔄
     title: Smart Caching
-    details: Redis-powered caching with automatic invalidation
+    details: Built-in Redis integration featuring automatic cache invalidation and graceful degradation for high availability.
 ---
