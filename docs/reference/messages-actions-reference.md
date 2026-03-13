@@ -2,7 +2,6 @@
 title: Messages Actions Reference
 description: Message/Event system API reference
 ---
-
 # Messages Actions Reference
 
 This document presents the actions available for interacting with the messaging system, which supports both Redis Pub/Sub and Node.js Internal Events.
@@ -24,6 +23,7 @@ export interface triggers {
 ## Methods (Messages - Redis)
 
 ### Ping the messaging. `ping`
+
 The `ping` function is used to verify if the Redis messaging service is available and responding correctly.
 
 **Returns**: A `Promise<string>` resolving to a ping result (usually "PONG").
@@ -37,9 +37,11 @@ messages.ping()
 ```
 
 ### Publish a message. `pub`
+
 The `pub` function facilitates the publication of a value to a specified Redis topic.
 
 **Parameters**:
+
 - `topic`: The topic (channel) name.
 - `value`: The data to be published (will be stringified to JSON).
 
@@ -54,9 +56,11 @@ messages.pub('user/created', { id: 1, name: 'John Doe' })
 ```
 
 ### Subscribe to a topic. `sub`
+
 The `sub` function enables subscription to a designated Redis topic.
 
 **Parameters**:
+
 - `topic`: The topic name (supports patterns like `user/*`).
 - `callback`: A function invoked whenever a message is received.
 
@@ -73,6 +77,7 @@ messages.sub('user/*', async (message, topic) => {
 ## Methods (Events - Internal)
 
 ### Publish an event. `pub`
+
 Internal events are used for communication between components within the same process.
 
 ```typescript
@@ -82,6 +87,7 @@ events.pub('internal/notification', { message: 'Something happened!' });
 ```
 
 ### Subscribe to an event. `sub`
+
 Subscribe to internal events.
 
 ```typescript

@@ -2,7 +2,6 @@
 title: Deployment Guide
 description: Production deployment guide
 ---
-
 # Deployment Guide
 
 Complete guide to deploying your TypeScript Boilerplate application to production.
@@ -11,13 +10,13 @@ Complete guide to deploying your TypeScript Boilerplate application to productio
 
 Before deploying, ensure:
 
-- [ ] All tests passing (`bun test`)
-- [ ] Environment variables documented in `.env.exemple`
-- [ ] Sensitive data removed from logs
-- [ ] Database migrations tested
-- [ ] Docker build succeeds locally
-- [ ] CORS configured for production domains
-- [ ] Error messages use i18n keys (no hardcoded strings)
+- \[ \] All tests passing (`bun test`)
+- \[ \] Environment variables documented in `.env.exemple`
+- \[ \] Sensitive data removed from logs
+- \[ \] Database migrations tested
+- \[ \] Docker build succeeds locally
+- \[ \] CORS configured for production domains
+- \[ \] Error messages use i18n keys (no hardcoded strings)
 
 ## Deployment Options
 
@@ -216,6 +215,7 @@ railway link
 #### Step 3: Add Services
 
 From Railway Dashboard:
+
 - Add PostgreSQL database
 - Add Redis
 - Note connection URLs
@@ -248,14 +248,17 @@ Visit [render.com](https://render.com) and connect your GitHub repo
 #### Step 2: Create Services
 
 1. **Create PostgreSQL Database:**
+
    - New → PostgreSQL
    - Note the Internal Database URL
 
 2. **Create Redis:**
+
    - New → Redis
    - Note the Internal Redis URL
 
 3. **Create Web Service:**
+
    - New → Web Service
    - Connect your repo
    - Build Command: `bun install && bun db:migrate:push`
@@ -264,6 +267,7 @@ Visit [render.com](https://render.com) and connect your GitHub repo
 #### Step 3: Configure Environment
 
 In Web Service settings → Environment:
+
 ```
 NODE_ENV=production
 DATABASE_URL=<from PostgreSQL>
@@ -433,37 +437,41 @@ fly releases rollback <version>
 ## Security Hardening
 
 1. **Use secrets management:**
+
    ```bash
    fly secrets set API_KEY=xxx
    ```
 
-2. **Configure Rate Limiting:**
-   The boilerplate uses a custom Redis-based rate limit. You must define these variables in your environment (e.g., `.env` or CI/CD secrets):
+2. **Configure Rate Limiting**:The boilerplate uses a custom Redis-based rate limit. You must define these variables in your environment (e.g., `.env` or CI/CD secrets):
+
    ```bash
    RATE_LIMIT_MAX=100      # Maximum requests per window
    RATE_LIMIT_WINDOW=60    # Window size in seconds
    ```
 
 3. **Update dependencies regularly:**
+
    ```bash
    bun update
    ```
 
 4. **Scan for vulnerabilities:**
+
    ```bash
    bun audit
    ```
 
 ## Post-Deployment
 
-- [ ] Test all endpoints manually
-- [ ] Verify Swagger docs at `/docs`
-- [ ] Monitor error rates
-- [ ] Test rollback procedure
-- [ ] Document any production-specific configs
+- \[ \] Test all endpoints manually
+- \[ \] Verify Swagger docs at `/docs`
+- \[ \] Monitor error rates
+- \[ \] Test rollback procedure
+- \[ \] Document any production-specific configs
 
 ## Support
 
 For deployment issues:
+
 - Check [Troubleshooting Guide](/reference/troubleshooting)
 - Open [GitHub Issue](https://github.com/rslucena/TypeScript-Boilerplate/issues)

@@ -2,45 +2,12 @@
 title: Quick Navigation
 description: Quick navigation to the most important files and folders
 ---
-
-<script setup>
-import { MarkerType } from '@vue-flow/core'
-
-const style = { type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed, style: { strokeWidth: 1.5 } }
-
-const repoNodes = [
-  { id: 'src', type: 'multi-handle', label: 'src/', position: { x: 300, y: -50 } },
-  { id: 'cmd', type: 'multi-handle', label: 'commands/', position: { x: 50, y: 100 } },
-  { id: 'dom', type: 'multi-handle', label: 'domain/', position: { x: 170, y: 160 } },
-  { id: 'fn', type: 'multi-handle', label: 'functions/', position: { x: 290, y: 100 } },
-  { id: 'infra', type: 'multi-handle', label: 'infrastructure/', position: { x: 510, y: 100 } },
-  
-  { id: 'cache', type: 'multi-handle', label: 'cache/', position: { x: 400, y: 200 } },
-  { id: 'db', type: 'multi-handle', label: 'repositories/', position: { x: 517, y: 200 } },
-  { id: 'srv', type: 'multi-handle', label: 'server/', position: { x: 660, y: 200 } }
-]
-
-const repoEdges = [
-  { id: 'e-src-cmd', sourceHandle: 'left-source', targetHandle: 'top', source: 'src', target: 'cmd', ...style },
-  { id: 'e-src-dom', sourceHandle: 'left-source', targetHandle: 'top', source: 'src', target: 'dom', ...style },
-  { id: 'e-src-fn', sourceHandle: 'bottom-source', targetHandle: 'top',source: 'src', target: 'fn', ...style },
-  { id: 'e-src-infra', sourceHandle: 'right-source', targetHandle: 'top', source: 'src', target: 'infra', ...style },
-  { id: 'e-infra-cache', sourceHandle: 'left-source', targetHandle: 'top', source: 'infra', target: 'cache', ...style, type: 'smoothstep' },
-  { id: 'e-infra-db', sourceHandle: 'bottom-source', targetHandle: 'top', source: 'infra', target: 'db', ...style, type: 'smoothstep' },
-  { id: 'e-infra-srv', sourceHandle: 'right-source', targetHandle: 'top', source: 'infra', target: 'srv', ...style, type: 'smoothstep' }
-]
-</script>
-
 # 🎯 Quick Navigation
 
-**New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)  
-**Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)  
-**Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices) | [Repository Pattern](/development/base-repository-pattern)
-**Security & Infrastructure?** → [Environment](/development/environment-configuration) | [Security & Keys](/development/security-and-keys) | [Database Migrations](/development/database-migrations)
-**API & Auth?** → [Identity, Credentials & SSO](/api/identity-credentials-sso) | [Health Check](/api/health-check)
-**Testing?** → [Testing Guide](/development/testing-guide)  
-**Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment) | [Process Manager](/devops/process-manager-reference)
-**Need help?** → [Troubleshooting](/reference/troubleshooting)
+**New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)\
+**Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)\
+**Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices) | [Repository Pattern](/development/base-repository-pattern)**Security & Infrastructure?** → [Environment](/development/environment-configuration) | [Security & Keys](/development/security-and-keys) | [Database Migrations](/development/database-migrations)**API & Auth?** → [Identity, Credentials & SSO](/api/identity-credentials-sso) | [Health Check](/api/health-check)**Testing?** → [Testing Guide](/development/testing-guide)\
+**Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment) | [Process Manager](/devops/process-manager-reference)**Need help?** → [Troubleshooting](/reference/troubleshooting)
 
 ## The Web Development "Sweet Spot"
 
@@ -68,46 +35,19 @@ This project utilizes continuous integration to automate checks and builds:
 
 ## Technologies Used
 
-| Technology  | Description                                                                                                                    |
-|-------------|--------------------------------------------------------------------------------------------------------------------------------|
-| Typescript  | A programming language that adds static typing to JavaScript. Facilitates the development of robust and scalable code.         |
-| Drizzle-ORM | An Object-Relational Mapping (ORM) library for TypeScript. Simplifies database interactions.                                   |
-| Fastify     | A fast and low overhead web framework for Node.js.                                                                             |
-| Redis       | An in-memory data structure store, widely used as a cache or message broker. Enhances data storage and retrieval efficiency.   |
-| TSX         | TypeScript Execute. A CLI tool to execute TypeScript files with zero configuration.                                            |
-| TSUP        | A fast TypeScript bundler tool. Simplifies the build and distribution process.                                                 |
-| Biome       | A fast all-in-one toolchain for web projects (formatter and linter), used to maintain code quality.                            |
-| Bun Test    | A fast test runner for JavaScript and TypeScript projects, used to ensure code quality.                                        |
-| PM2         | Process manager for Node.js applications that simplifies deployment, management, and monitoring of applications in production. |
-| Status Page | Monitors the availability and performance of online services (Uptime Kuma).                                                    |
+TechnologyDescriptionTypescriptA programming language that adds static typing to JavaScript. Facilitates the development of robust and scalable code.Drizzle-ORMAn Object-Relational Mapping (ORM) library for TypeScript. Simplifies database interactions.FastifyA fast and low overhead web framework for Node.js.RedisAn in-memory data structure store, widely used as a cache or message broker. Enhances data storage and retrieval efficiency.TSXTypeScript Execute. A CLI tool to execute TypeScript files with zero configuration.TSUPA fast TypeScript bundler tool. Simplifies the build and distribution process.BiomeA fast all-in-one toolchain for web projects (formatter and linter), used to maintain code quality.Bun TestA fast test runner for JavaScript and TypeScript projects, used to ensure code quality.PM2Process manager for Node.js applications that simplifies deployment, management, and monitoring of applications in production.Status PageMonitors the availability and performance of online services (Uptime Kuma).
 
 ## Interactive Repository Map
 
 Visualize the project structure and how the different layers interact:
 
-<InteractiveFlow :nodes="repoNodes" :edges="repoEdges" />
-
 ### Main Folders (`src/`)
 
-| Folder | Description |
-|:---|:---|
-| **`commands/`** | Application entry points, process handlers (PM2), and build scripts. |
-| **`domain/`** | Business logic layer: Entities, Actions, Schemas, and Routes organized by domain. |
-| **`functions/`** | Shared utilities and helper functions used across the project. |
-| **`infrastructure/`** | Technical implementation: Cache, Database, Server, i18n, etc. |
+FolderDescription`commands/`Application entry points, process handlers (PM2), and build scripts.`domain/`Business logic layer: Entities, Actions, Schemas, and Routes organized by domain.`functions/`Shared utilities and helper functions used across the project.`infrastructure/`Technical implementation: Cache, Database, Server, i18n, etc.
 
 ### Infrastructure Details
 
-| Folder       | Description                                                                |
-|--------------|----------------------------------------------------------------------------|
-| cache        | Redis implementation for fast data retrieval with TTL support.             |
-| languages    | Internationalization (i18n) support for multi-language responses.          |
-| logs         | Standardized logging handlers.                                             |
-| messages     | Messaging system supporting both Redis (Pub/Sub) and Node.js Events.       |
-| migrations   | Automated database schema versioning scripts via Drizzle Kit.              |
-| repositories | Data access layer and database connection management.                      |
-| server       | [Core Fastify (HTTP)](/servers/http-server) and [Scalable WebSockets](/servers/websockets). |
-| settings     | Environment variables and application-wide configuration.                  |
+FolderDescriptioncacheRedis implementation for fast data retrieval with TTL support.languagesInternationalization (i18n) support for multi-language responses.logsStandardized logging handlers.messagesMessaging system supporting both Redis (Pub/Sub) and Node.js Events.migrationsAutomated database schema versioning scripts via Drizzle Kit.repositoriesData access layer and database connection management.server[Core Fastify (HTTP)](/servers/http-server) and [Scalable WebSockets](/servers/websockets).settingsEnvironment variables and application-wide configuration.
 
 ## Internal References
 
@@ -121,6 +61,4 @@ Visualize the project structure and how the different layers interact:
 - [PM2](https://pm2.keymetrics.io)
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma)
 
-> **Observations:**
-> This list of folders is not exhaustive. The project may contain other files and directories not listed here.
-> For more detailed information, refer to the specific documentation pages in the sidebar.
+> **Observations**:This list of folders is not exhaustive. The project may contain other files and directories not listed here. For more detailed information, refer to the specific documentation pages in the sidebar.
