@@ -75,7 +75,7 @@ describe("Cache Infrastructure", () => {
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key1", "key2"] });
 			redisClientMock.get.mockResolvedValue("value");
 			const result = await cache.text.get("key");
-			expect(result).toEqual({ key: "value" });
+			expect(result).toEqual({ key1: "value", key2: "value" });
 		});
 
 		it("should delete value correctly", async () => {
@@ -140,7 +140,7 @@ describe("Cache Infrastructure", () => {
 			redisClientMock.scan.mockResolvedValue({ cursor: "0", keys: ["key1", "key2"] });
 			redisClientMock.json.get.mockResolvedValue({ foo: "bar" });
 			const result = await cache.json.get("key");
-			expect(result).toEqual({ key: { foo: "bar" } });
+			expect(result).toEqual({ key1: { foo: "bar" }, key2: { foo: "bar" } });
 		});
 	});
 
