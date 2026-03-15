@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, type Mock, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import type { container } from "@infrastructure/server/interface";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
@@ -7,11 +8,10 @@ const redisClientMock = createRedisClientMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 mock.module("@infrastructure/repositories/repository", () => ({ default: repositoryMock }));
 
-import cache from "@infrastructure/cache/actions";
 import getReadiness from "../../../../src/domain/health/actions/get-readiness";
 
 describe("Health Domain Actions : getReadiness", () => {
-	let req: any;
+	let req: ReturnType<typeof createContainerMock>;
 
 	beforeEach(() => {
 		req = createContainerMock();
@@ -30,7 +30,7 @@ describe("Health Domain Actions : getReadiness", () => {
 		redisClientMock.ping.mockResolvedValue("PONG");
 		redisClientMock.info.mockResolvedValue("redis_version:7.2.0");
 
-		const result = await getReadiness(req);
+		const result = await getReadiness(req as unknown as container);
 
 		expect(req.status).toHaveBeenCalledWith(200);
 		expect(result.status).toBe("active");
@@ -45,7 +45,7 @@ describe("Health Domain Actions : getReadiness", () => {
 		redisClientMock.ping.mockResolvedValue("PONG");
 		redisClientMock.info.mockResolvedValue("redis_version:7.2.0");
 
-		const result = await getReadiness(req);
+		const result = await getReadiness(req as unknown as container);
 
 		expect(req.status).toHaveBeenCalledWith(503);
 		expect(result.status).toBe("degraded");
@@ -57,7 +57,7 @@ describe("Health Domain Actions : getReadiness", () => {
 		repositoryMock.execute.mockResolvedValueOnce([{ version: "PostgreSQL 15.0" }]);
 		redisClientMock.ping.mockRejectedValueOnce(new Error("Cache Error"));
 
-		const result = await getReadiness(req);
+		const result = await getReadiness(req as unknown as container);
 
 		expect(req.status).toHaveBeenCalledWith(503);
 		expect(result.status).toBe("degraded");
@@ -69,7 +69,7 @@ describe("Health Domain Actions : getReadiness", () => {
 		repositoryMock.execute.mockResolvedValueOnce([{ version: "PostgreSQL 15.0" }]);
 		redisClientMock.ping.mockRejectedValueOnce(new Error("Timeout"));
 
-		const result = await getReadiness(req);
+		const result = await getReadiness(req as unknown as container);
 
 		expect(req.status).toHaveBeenCalledWith(503);
 		expect(result.status).toBe("degraded");
@@ -81,7 +81,7 @@ describe("Health Domain Actions : getReadiness", () => {
 		redisClientMock.ping.mockResolvedValue("PONG");
 		redisClientMock.info.mockRejectedValueOnce(new Error("Command not allowed"));
 
-		const result = await getReadiness(req);
+		const result = await getReadiness(req as unknown as container);
 
 		expect(req.status).toHaveBeenCalledWith(200);
 		expect(result.status).toBe("active");
