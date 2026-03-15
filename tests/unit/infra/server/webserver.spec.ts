@@ -28,4 +28,11 @@ describe("Webserver HTTP/2 Configuration", () => {
 		expect(server.initialConfig.https).toBeUndefined();
 		await server.close();
 	});
+
+	it("should configure trustProxy based on env.APP_TRUST_PROXY", async () => {
+		mockEnv.APP_TRUST_PROXY = 2;
+		const server = await webserver.create();
+		expect(server).toBeDefined();
+		await server.close();
+	});
 });
