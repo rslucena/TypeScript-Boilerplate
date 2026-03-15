@@ -7,7 +7,7 @@ description: CLI generator tool for creating complete CRUD domains
 
 To accelerate development and maintain consistency across domain modules, the project includes a CLI generator tool that creates complete CRUD domains in seconds. It also automatically registers the new routes and formats the code.
 
-> **💡 Want to understand how the generator works internally?**  
+> **💡 Want to understand how the generator works internally?**
 > See [Template System Architecture](/development/template-system-architecture) for a deep dive into the zero-dependency template engine.
 
 ## How to use
@@ -77,17 +77,17 @@ const structEdges = [
 
 /* --- Action Flows --- */
 const createFlow = (idPrefix, steps) => ({
-  nodes: steps.map((label, i) => ({ 
-    id: `${idPrefix}-${i}`, 
-    label, 
+  nodes: steps.map((label, i) => ({
+    id: `${idPrefix}-${i}`,
+    label,
     position: { x: i * 100, y: i * 100 },
     type: 'multi-handle'
-    
+
   })),
-  edges: steps.slice(0, -1).map((_, i) => ({ 
-    id: `${idPrefix}-e${i}`, 
-    source: `${idPrefix}-${i}`, 
-    target: `${idPrefix}-${i+1}`, 
+  edges: steps.slice(0, -1).map((_, i) => ({
+    id: `${idPrefix}-e${i}`,
+    source: `${idPrefix}-${i}`,
+    target: `${idPrefix}-${i+1}`,
     sourceHandle: 'bottom-source', targetHandle: 'left',
     ...style2
   }))

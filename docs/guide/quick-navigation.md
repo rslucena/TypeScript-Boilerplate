@@ -14,7 +14,7 @@ const repoNodes = [
   { id: 'dom', type: 'multi-handle', label: 'domain/', position: { x: 170, y: 160 } },
   { id: 'fn', type: 'multi-handle', label: 'functions/', position: { x: 290, y: 100 } },
   { id: 'infra', type: 'multi-handle', label: 'infrastructure/', position: { x: 510, y: 100 } },
-  
+
   { id: 'cache', type: 'multi-handle', label: 'cache/', position: { x: 400, y: 200 } },
   { id: 'db', type: 'multi-handle', label: 'repositories/', position: { x: 517, y: 200 } },
   { id: 'srv', type: 'multi-handle', label: 'server/', position: { x: 660, y: 200 } }
@@ -33,12 +33,12 @@ const repoEdges = [
 
 # 🎯 Quick Navigation
 
-**New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)  
-**Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)  
+**New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)
+**Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)
 **Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices) | [Repository Pattern](/development/base-repository-pattern)
 **Security & Infrastructure?** → [Environment](/development/environment-configuration) | [Security & Keys](/development/security-and-keys) | [Database Migrations](/development/database-migrations)
 **API & Auth?** → [Identity, Credentials & SSO](/api/identity-credentials-sso) | [Health Check](/api/health-check)
-**Testing?** → [Testing Guide](/development/testing-guide)  
+**Testing?** → [Testing Guide](/development/testing-guide)
 **Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment) | [Process Manager](/devops/process-manager-reference)
 **Need help?** → [Troubleshooting](/reference/troubleshooting)
 

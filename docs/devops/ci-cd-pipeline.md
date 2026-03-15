@@ -20,12 +20,12 @@ const overviewNodes = [
   { id: 'pr', type: 'multi-handle', label: 'Pull Request', position: { x: 25, y: 100 }},
   { id: 'l', type: 'multi-handle', label: 'PR Labeler', position: { x: 31, y: 200 } },
   { id: 'qg', type: 'multi-handle', label: 'Quality Gate', position: { x: 25, y: 300 }},
-  
+
   // Staging
   { id: 'stg-box', label: 'Staging', position: { x: 250, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(156, 39, 176, 0.1)', border: '2px dashed #9C27B0', zIndex: -1 } },
   { id: 's', type: 'multi-handle', label: 'Push to Staging', position: { x: 275, y: 200 } },
   { id: 'rt', type: 'multi-handle', label: 'Release Train', position: { x: 283, y: 300 } },
-  
+
   // Production
   { id: 'prod-box',label: 'Production', position: { x: 500, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(76, 175, 80, 0.1)', border: '2px dashed #4CAF50', zIndex: -1 } },
   { id: 'm', type: 'multi-handle', label: 'Merge to Main', position: { x: 525, y: 300 } },
