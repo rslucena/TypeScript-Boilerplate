@@ -29,6 +29,7 @@ async function webserver(): Promise<server> {
 
 	const instance = fastify({
 		...http2,
+		trustProxy: true,
 		logger: Logs.settings("webserver"),
 		pluginTimeout: 20000,
 		requestTimeout: 20000,
