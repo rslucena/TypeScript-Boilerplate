@@ -2,6 +2,53 @@
 title: Complete Example
 description: Complete data flow demonstration when creating a new domain with all architectural layers
 ---
+
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const style = { type: 'smoothstep', style: {stroke: 'var(--vp-code-line-diff-add-symbol-color)', strokeWidth: 2}, animated: true, markerEnd: MarkerType.ArrowClosed }
+const style2 = { type: 'smoothstep', style: {stroke: 'var(--vp-code-color)', strokeWidth: 0.5}, animated: true, markerEnd: MarkerType.ArrowClosed }
+
+const flowNodes = [
+  { id: '1', type: 'multi-handle', label: 'Client', position: { x: 0, y: 0 } },
+  { id: '2', type: 'multi-handle', label: 'Route', position: { x: 250, y: 50 } },
+  { id: '3', type: 'multi-handle', label: 'Action', position: { x: 250, y: 250 } },
+  { id: '4', type: 'multi-handle', label: 'Validation', position: { x: 0, y: 150 } },
+  { id: '5', type: 'multi-handle', label: 'DB', position: { x: 250, y: 400 } },
+  { id: '6', type: 'multi-handle', label: 'Cache', position: { x: 500, y: 150 } }
+]
+
+const flowEdges = [
+  { id: 'e1-2', source: '1', target: '2', sourceHandle: 'top-source', targetHandle: 'top', label: 'POST /api/v1/identities', ...style2 },
+  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'postNewEntity()', ...style2 },
+  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'left-source', targetHandle: 'right', label: 'Validate body', ...style2 },
+  { id: 'e4-3', source: '4', target: '3', sourceHandle: 'right-source', targetHandle: 'bottom', label: 'Valid data', type: 'smoothstep', ...style },
+  { id: 'e3-5', source: '3', target: '5', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'INSERT identity', ...style2},
+  { id: 'e5-3', source: '5', target: '3', sourceHandle: 'top-source', targetHandle: 'bottom', label: 'Created identity', ...style2 },
+  { id: 'e3-6', source: '3', target: '6', sourceHandle: 'right-source', targetHandle: 'left', label: 'Invalidate keys', type: 'smoothstep', ...style2 },
+  { id: 'e3-2', source: '3', target: '2', sourceHandle: 'top-source', targetHandle: 'right', label: 'Identity data', ...style },
+  { id: 'e2-1', source: '2', target: '1', sourceHandle: 'top-source', targetHandle: 'bottom', label: '201 Created', type: 'step', ...style }
+]
+
+const cacheNodes = [
+  { id: 'c1', type: 'multi-handle', label: 'Request', position: { x: 0, y: 150 } },
+  { id: 'c2', type: 'multi-handle', label: 'Check Cache', position: { x: 200, y: 150 }, style: {color: 'white', border: 'none' } },
+  { id: 'c3', type: 'multi-handle', label: 'Return Cached', position: { x: 400, y: 50 }, style: { color: 'white', border: 'none' } },
+  { id: 'c4', type: 'multi-handle', label: 'Query Database', position: { x: 400, y: 250 }, style: {color: 'white', border: 'none' } },
+  { id: 'c5', type: 'multi-handle', label: 'Store in Cache', position: { x: 600, y: 250 } },
+  { id: 'c6', type: 'multi-handle', label: 'Return Data', position: { x: 800, y: 150 } }
+]
+
+const cacheEdges = [
+  { id: 'ce1', source: 'c1', target: 'c2', sourceHandle: 'right-source', targetHandle: 'left', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 'ce2', source: 'c2', target: 'c3', sourceHandle: 'top-source', targetHandle: 'left',animated: true, label: 'Hit', style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce3', source: 'c2', target: 'c4', sourceHandle: 'bottom-source', targetHandle: 'left', animated: true,label: 'Miss', style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce4', source: 'c4', target: 'c5', sourceHandle: 'right-source', targetHandle: 'left', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'ce5', source: 'c5', target: 'c6', sourceHandle: 'right-source', targetHandle: 'bottom', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' },
+  { id: 'ce6', source: 'c3', target: 'c6', sourceHandle: 'right-source', targetHandle: 'top', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed, type: 'smoothstep' }
+]
+</script>
+
 # Complete Example
 
 This example demonstrates the complete data flow when creating a new domain, showing how all the architectural layers work together. We will analyze each file and explain how they interact.
@@ -9,7 +56,6 @@ This example demonstrates the complete data flow when creating a new domain, sho
 ## Overview
 
 We'll create a complete domain with:
-
 - Database table definition
 - Validation schemas
 - REST API endpoints (CRUD)
@@ -20,19 +66,19 @@ We'll create a complete domain with:
 
 ::: code-group
 
-```bash
+```bash [bun]
 bun gen:domain product
 ```
 
-```bash
+```bash [npm]
 npm run gen:domain product
 ```
 
-```bash
+```bash [yarn]
 yarn gen:domain product
 ```
 
-```bash
+```bash [pnpm]
 pnpm gen:domain product
 ```
 
@@ -69,7 +115,6 @@ export default product;
 ```
 
 **Key Points:**
-
 - `columns`: Custom fields for your domain
 - `identifier`: Adds `id`, `createdAt`, `updatedAt`, `activated` (from infrastructure)
 - `pgIndex`: Creates database index for performance
@@ -114,7 +159,6 @@ export default { actions, entity: array(select) };
 ```
 
 **Key Points:**
-
 - `createInsertSchema`: Generates Zod schema from Drizzle table
 - Custom validation: Override default rules (e.g., email format, password length)
 - Action schemas: Separate schemas for each operation
@@ -170,7 +214,6 @@ export default async function productRoutes(api: FastifyInstance) {
 ```
 
 **Key Points:**
-
 - `schema.tags`: Groups endpoints in Swagger UI
 - `schema.params/body/headers`: Automatic validation
 - `request.restricted()`: Applies authentication middleware
@@ -222,6 +265,8 @@ export default async function postNewEntity(request: container) {
 
 ### Flow Diagram
 
+<InteractiveFlow :nodes="flowNodes" :edges="flowEdges" />
+
 ## Step 3: Request Flow Example
 
 Let's trace a complete request:
@@ -229,7 +274,6 @@ Let's trace a complete request:
 ### Creating a Product
 
 **Request:**
-
 ```bash
 curl -X POST http://localhost:3000/api/v1/products \
   -H "Content-Type: application/json" \
@@ -254,7 +298,6 @@ curl -X POST http://localhost:3000/api/v1/products \
 8. **Response** → Returns created product (201 status)
 
 **Response:**
-
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -270,7 +313,6 @@ curl -X POST http://localhost:3000/api/v1/products \
 ### Retrieving a Product
 
 **Request:**
-
 ```bash
 curl http://localhost:3000/api/v1/products/123e4567-e89b-12d3-a456-426614174000 \
   -H "Authorization: Bearer token"
@@ -278,8 +320,9 @@ curl http://localhost:3000/api/v1/products/123e4567-e89b-12d3-a456-426614174000 
 
 **Flow with Caching:**
 
-**Code (**`get-by-id.ts`**):**
+<InteractiveFlow :nodes="cacheNodes" :edges="cacheEdges" />
 
+**Code (`get-by-id.ts`):**
 ```typescript
 export default async function getById(request: container) {
   request.status(200);
@@ -324,7 +367,6 @@ export default async function getById(request: container) {
 ### Adding Custom Fields
 
 Edit `entity.ts`:
-
 ```typescript
 const columns = {
   name: varchar("name", { length: 50 }).notNull(),
@@ -341,7 +383,6 @@ const columns = {
 ### Enhancing Validation
 
 Edit `schema.ts`:
-
 ```typescript
 const create = createInsertSchema(user, {
   name: (schema) => schema.min(1).max(50),
@@ -359,7 +400,7 @@ After modifying the entity:
 
 ::: code-group
 
-```bash
+```bash [bun]
 # Generate migration
 bun db:migrate
 
@@ -367,7 +408,7 @@ bun db:migrate
 bun db:migrate:push
 ```
 
-```bash
+```bash [npm]
 # Generate migration
 npm run db:migrate
 
@@ -375,7 +416,7 @@ npm run db:migrate
 npm run db:migrate:push
 ```
 
-```bash
+```bash [yarn]
 # Generate migration
 yarn db:migrate
 
@@ -383,7 +424,7 @@ yarn db:migrate
 yarn db:migrate:push
 ```
 
-```bash
+```bash [pnpm]
 # Generate migration
 pnpm db:migrate
 
@@ -443,6 +484,5 @@ This example shows:
 ---
 
 **See Also:**
-
 - [Architecture](/architecture/) - Detailed architecture explanation
 - [Template System](/development/template-system-architecture) - How code generation works

@@ -31,6 +31,7 @@ async function webserver(): Promise<server> {
 		...http2,
 		trustProxy: true,
 		logger: Logs.settings("webserver"),
+		trustProxy: env.APP_TRUST_PROXY as boolean | string | string[] | number,
 		pluginTimeout: 20000,
 		requestTimeout: 20000,
 		disableRequestLogging: true,

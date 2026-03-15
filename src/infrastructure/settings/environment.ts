@@ -36,6 +36,17 @@ const schema = z.object({
 	SSO_GITHUB_CLIENT_ID: z.string().optional(),
 	SSO_GITHUB_CLIENT_SECRET: z.string().optional(),
 	SSO_GITHUB_REDIRECT_URI: z.string().url().optional(),
+	APP_TRUST_PROXY: z
+		.string()
+		.optional()
+		.transform((val) => {
+			if (!val) return false;
+			if (val === "true") return true;
+			if (val === "false") return false;
+			if (!Number.isNaN(Number(val))) return Number(val);
+			if (val.includes(",")) return val.split(",").map((v) => v.trim());
+			return val;
+		}),
 });
 
 const isTest = process.env.NODE_ENV === "test";
