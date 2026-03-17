@@ -27,6 +27,14 @@ const schema = z.object({
 	LOG_LEVEL: z.string(),
 	PROCESS_CORS_ORIGIN: z.string(),
 	APP_FOLDER_KEY: z.string(),
+	APP_TRUST_PROXY: z
+		.string()
+		.transform((val) => {
+			if (val === "true") return true;
+			if (val === "false") return false;
+			return val.split(",").map((ip) => ip.trim());
+		})
+		.optional(),
 	APP_HTTP2: z.string().transform((val) => val === "true"),
 	APP_CERT: z.string().refine((val) => val.endsWith(".crt") || val.endsWith(".pem")),
 	APP_KEY: z.string().refine((val) => val.endsWith(".key") || val.endsWith(".pem")),

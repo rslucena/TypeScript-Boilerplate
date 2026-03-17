@@ -194,13 +194,13 @@ export class container<t = unknown> extends err {
 }
 
 export {
-	type JWT,
+	type AnyType,
 	errorSchema,
 	type guise,
 	headers,
+	type JWT,
 	livenessHealth,
 	readinessHealth,
 	replyErrorSchema,
 	type server,
-	type AnyType,
 };
