@@ -2,6 +2,7 @@
 title: Troubleshooting
 description: Common issues and solutions
 ---
+
 # Troubleshooting
 
 Common issues and solutions when working with the TypeScript Boilerplate.
@@ -11,7 +12,6 @@ Common issues and solutions when working with the TypeScript Boilerplate.
 ### Problem: `bun: command not found`
 
 **Solution:**
-
 ```bash
 # Install Bun
 curl -fsSL https://bun.sh/install | bash
@@ -23,7 +23,6 @@ source ~/.bashrc  # or ~/.zshrc
 ### Problem: `docker-compose: command not found`
 
 **Solution:**
-
 ```bash
 # Install Docker Compose
 sudo apt-get install docker-compose  # Ubuntu/Debian
@@ -37,7 +36,6 @@ brew install docker-compose           # macOS
 **Cause:** Table was created manually or migration ran partially
 
 **Solution:**
-
 ```bash
 # Option 1: Drop and recreate (development only!)
 docker-compose down -v
@@ -53,13 +51,11 @@ bun db:migrate:push
 ### Problem: Can't connect to PostgreSQL
 
 **Symptoms:**
-
 ```
 Error: Connection refused at localhost:5432
 ```
 
 **Solution:**
-
 ```bash
 # 1. Check if container is running
 docker ps | grep postgres
@@ -79,7 +75,6 @@ docker-compose restart
 **Cause:** Forgot to run migrations
 
 **Solution:**
-
 ```bash
 # Always run this after modifying entity files
 bun db:migrate        # Generate migration
@@ -95,7 +90,6 @@ bun db:migrate:push   # Apply to database
 **Cause:** Cache not invalidated properly
 
 **Solution:**
-
 ```typescript
 // Ensure cache invalidation in your action
 await cache.json.del(tag("domain", "find*"));
@@ -107,13 +101,11 @@ await cache.json.del(tag("domain", "find{id}", { id }));
 ### Problem: Redis connection errors
 
 **Symptoms:**
-
 ```
 Error: Redis connection to localhost:6379 failed
 ```
 
 **Solution:**
-
 ```bash
 # 1. Ensure Redis container is running
 docker ps | grep redis
@@ -130,7 +122,6 @@ docker-compose restart redis
 ### Problem: `bun gen:domain` command not found
 
 **Solution:**
-
 ```bash
 # Run directly
 bun run src/commands/generate-domain.ts product
@@ -146,7 +137,6 @@ bun run src/commands/generate-domain.ts product
 **Cause:** Domain name contains invalid characters
 
 **Solution:**
-
 ```bash
 # ✅ Good: Use singular, lowercase, alphanumeric
 bun gen:domain product
@@ -164,7 +154,6 @@ bun gen:domain blog-post-123!
 **Cause:** Missing path alias configuration
 
 **Solution:**
-
 ```bash
 # 1. Check tsconfig.json has paths configured
 {
@@ -184,7 +173,6 @@ bun gen:domain blog-post-123!
 **Symptoms:** Mock functions not being called
 
 **Solution:**
-
 ```typescript
 // ✅ Correct: Mock before importing the module that uses it
 import { mock } from "bun:test";
@@ -205,7 +193,6 @@ mock.module("@infrastructure/cache/actions", ...);
 **Cause:** Routes not registered
 
 **Solution:**
-
 ```typescript
 // In src/functions/http-primary-webserver.ts
 import userRoutes from "@domain/user/routes";
@@ -217,6 +204,7 @@ import userRoutes from "@domain/user/routes";
   // ...
   await webserver.start(server, Number(process.env.PROCESS_PORT));
 })();
+
 ```
 
 ### Problem: Swagger not showing routes
@@ -224,7 +212,6 @@ import userRoutes from "@domain/user/routes";
 **Cause:** Schema missing from route definition
 
 **Solution:**
-
 ```typescript
 // ✅ Good: Schema properly defined
 api.post("/", {
@@ -243,7 +230,6 @@ api.post("/", handler);
 ### Problem: CORS errors in browser
 
 **Solution:**
-
 ```typescript
 // In .env, configure CORS origins
 PROCESS_CORS_ORIGIN=http://localhost:3000,https://yourdomain.com
@@ -254,7 +240,6 @@ PROCESS_CORS_ORIGIN=http://localhost:3000,https://yourdomain.com
 ### Problem: Slow query performance
 
 **Diagnostic:**
-
 ```typescript
 // Add query timing
 const start = Date.now();
@@ -263,7 +248,6 @@ console.log(`Query took ${Date.now() - start}ms`);
 ```
 
 **Solutions:**
-
 ```typescript
 // 1. Add indexes
 pgIndex("entity", table, ["frequently_queried_column"])
@@ -284,7 +268,6 @@ withPagination(query, page, limit);
 **Symptoms:** Memory usage grows over time
 
 **Diagnostic:**
-
 ```bash
 # Monitor memory usage
 docker stats
@@ -294,7 +277,6 @@ NODE_OPTIONS="--max-old-space-size=4096" bun dev
 ```
 
 **Common Causes:**
-
 - Not closing database connections
 - Cache growing indefinitely
 - Event listeners not removed
@@ -304,7 +286,6 @@ NODE_OPTIONS="--max-old-space-size=4096" bun dev
 ### Problem: Build fails with TypeScript errors
 
 **Solution:**
-
 ```bash
 # 1. Clear cache
 rm -rf node_modules/.cache
@@ -320,7 +301,6 @@ bun install
 ### Problem: Docker build fails
 
 **Solution:**
-
 ```bash
 # 1. Clear Docker cache
 docker system prune -a
@@ -335,8 +315,8 @@ docker-compose build --no-cache
 
 ### Problem: `❌ Invalid environment variables`
 
-**Symptoms**:When starting the app via `bun dev` or `bun run dev`, it crashes immediately with a list like:
-
+**Symptoms:**
+When starting the app via `bun dev` or `bun run dev`, it crashes immediately with a list like:
 ```
 ❌ Invalid environment variables:
   - PROCESS_PORT: Invalid input: expected number, received NaN
@@ -344,19 +324,18 @@ docker-compose build --no-cache
 ...
 ```
 
-**Cause**:The boilerplate implements **Strict Environment Validation** via Zod. Most environment variables (Postgres, Redis, JWT Salt, etc.) are mandatory and do not have fallbacks to ensure production safety and "fail-fast" behavior.
+**Cause:**
+The boilerplate implements **Strict Environment Validation** via Zod. Most environment variables (Postgres, Redis, JWT Salt, etc.) are mandatory and do not have fallbacks to ensure production safety and "fail-fast" behavior.
 
 **Solution:**
-
-1. **Check your** `.env` **file**: Ensure every variable listed in the error message is defined in your `.env` file.
-2. **Verify Variable Names**: Names must match exactly (e.g., `POSTGRES_USER` not `DB_USER`).
-3. **Check Data Types**: Ports must be numbers, booleans must be `"true"` or `"false"`.
-4. **Sync with Exemple**: Run `cp .env.exemple .env` if you are starting from scratch and fill in all values.
+1.  **Check your `.env` file**: Ensure every variable listed in the error message is defined in your `.env` file.
+2.  **Verify Variable Names**: Names must match exactly (e.g., `POSTGRES_USER` not `DB_USER`).
+3.  **Check Data Types**: Ports must be numbers, booleans must be `"true"` or `"false"`.
+4.  **Sync with Exemple**: Run `cp .env.exemple .env` if you are starting from scratch and fill in all values.
 
 ### Problem: Environment variables not loading
 
 **Solution:**
-
 ```bash
 # 1. Ensure .env file exists
 cp .env.exemple .env
@@ -375,14 +354,12 @@ POSTGRES_PASSWORD=password
 ### Problem: Different behavior in development vs production
 
 **Diagnostic:**
-
 ```typescript
 console.log(process.env.NODE_ENV);
 // Should be 'development' locally, 'production' in prod
 ```
 
 **Solution:**
-
 ```bash
 # Explicitly set NODE_ENV
 NODE_ENV=production bun start
@@ -393,23 +370,19 @@ NODE_ENV=production bun start
 If your issue isn't listed here:
 
 1. **Check the logs:**
-
    ```bash
    docker-compose logs -f
    ```
 
 2. **Enable debug mode:**
-
    ```bash
    DEBUG=* bun dev
    ```
 
 3. **Search existing issues:**
-
    - [GitHub Issues](https://github.com/rslucena/TypeScript-Boilerplate/issues)
 
 4. **Ask for help:**
-
    - Open a new [GitHub Issue](https://github.com/rslucena/TypeScript-Boilerplate/issues/new)
    - Include:
      - Error message (full stack trace)
@@ -460,29 +433,22 @@ if (!result.success) console.log(result.error.format());
 ## Frequently Asked Questions (FAQ)
 
 ### 1. Can I use Node.js instead of Bun?
-
 The boilerplate is heavily optimized for **Bun**. While it's possible to run it with Node.js, you would lose the integrated test runner, the ultra-fast package manager, and some native optimizations. We highly recommend sticking with Bun for the intended performance gains.
 
 ### 2. How do I change from PostgreSQL to another database?
-
 The project uses **Drizzle ORM**, which supports various dialects (PostgreSQL, MySQL, SQLite). To switch:
-
 1. Update `docker-compose.yml` with the new database image.
 2. Change the DB driver in `infrastructure/repositories/repository.ts`.
 3. Update `drizzle.config.ts` to reflect the new dialect.
 4. Regenerate migrations.
 
 ### 3. How to add a new plugin/middleware?
-
 We follow Fastify's plugin architecture. You can:
-
 - Add a new file in `src/infrastructure/plugins/`.
 - Register it in `src/infrastructure/server/server.ts` or directly in your domain routes.
 
 ### 4. Is the Domain Generator customizable?
-
 Yes! The generator uses templates located in `src/commands/templates/` (if implemented as a separate directory) or directly within the `generate-domain.ts` script. You can modify these templates to include extra fields or different logic by default.
 
 ### 5. How to handle multiple environments (test, staging)?
-
 Use different `.env` files (e.g., `.env.test`, `.env.staging`) and load them by setting the `NODE_ENV` variable. The CI/CD pipeline already handles this for you using GitHub Secrets.
