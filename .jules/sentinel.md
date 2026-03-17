@@ -1,0 +1,1 @@
+## 2024-05-24 - Insecure CORS Origin Check | Vulnerability: Bypassing CORS restrictions via `String.prototype.startsWith()` on origin matching. | Learning: `startsWith` allows `https://example.com.malicious.com` to pass when validating `https://example.com`. | Prevention: Use exact string equality `===` or secure URL parsing for origin validation.
