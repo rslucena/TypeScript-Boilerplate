@@ -81,10 +81,8 @@ Instructions:
 
 	await writeFile(issueBodyPath, body);
 
-	const labels = agentName === "sentinel" ? "bug,security" : "feat,performance";
-
 	try {
-		execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}" --label "${labels}"`, {
+		execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}"`, {
 			stdio: "inherit",
 		});
 		console.log(`🚀 Issue created successfully for ${agentName}!`);
