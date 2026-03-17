@@ -4,6 +4,7 @@ interface RepositoryMock {
 	select: ReturnType<typeof mock<() => RepositoryMock>>;
 	from: ReturnType<typeof mock<() => RepositoryMock>>;
 	where: ReturnType<typeof mock<() => RepositoryMock>>;
+	innerJoin: ReturnType<typeof mock<() => RepositoryMock>>;
 	limit: ReturnType<typeof mock<() => RepositoryMock>>;
 	orderBy: ReturnType<typeof mock<() => RepositoryMock>>;
 	prepare: ReturnType<typeof mock<() => RepositoryMock>>;
@@ -23,6 +24,7 @@ export const createRepositoryMock = (): RepositoryMock => {
 		select: mock(() => mockObj),
 		from: mock(() => mockObj),
 		where: mock(() => mockObj),
+		innerJoin: mock(() => mockObj),
 		limit: mock(() => mockObj),
 		orderBy: mock(() => mockObj),
 		prepare: mock(() => mockObj),
