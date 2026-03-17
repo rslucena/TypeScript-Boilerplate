@@ -2,6 +2,7 @@
 title: CI/CD Pipeline
 description: Continuous integration and deployment setup
 ---
+
 # CI/CD Pipeline
 
 This boilerplate comes with a fully configured **GitHub Actions** pipeline to ensure code quality and automate deployments. The pipeline is designed to be zero-configuration for public repositories and provides a complete DevOps workflow out of the box.
@@ -10,6 +11,59 @@ This boilerplate comes with a fully configured **GitHub Actions** pipeline to en
 
 The CI/CD system follows a **Release Train** model using a `staging` branch for stabilization before production:
 
+<script setup>
+import { MarkerType } from '@vue-flow/core'
+
+const overviewNodes = [
+  // Development
+  { id: 'dev-box',  label: 'Development', position: { x: 0, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(33, 150, 243, 0.1)', border: '2px dashed #2196F3', zIndex: -1 } },
+  { id: 'pr', type: 'multi-handle', label: 'Pull Request', position: { x: 25, y: 100 }},
+  { id: 'l', type: 'multi-handle', label: 'PR Labeler', position: { x: 31, y: 200 } },
+  { id: 'qg', type: 'multi-handle', label: 'Quality Gate', position: { x: 25, y: 300 }},
+
+  // Staging
+  { id: 'stg-box', label: 'Staging', position: { x: 250, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(156, 39, 176, 0.1)', border: '2px dashed #9C27B0', zIndex: -1 } },
+  { id: 's', type: 'multi-handle', label: 'Push to Staging', position: { x: 275, y: 200 } },
+  { id: 'rt', type: 'multi-handle', label: 'Release Train', position: { x: 283, y: 300 } },
+
+  // Production
+  { id: 'prod-box',label: 'Production', position: { x: 500, y: 0 }, style: { width: '200px', height: '400px', backgroundColor: 'rgba(76, 175, 80, 0.1)', border: '2px dashed #4CAF50', zIndex: -1 } },
+  { id: 'm', type: 'multi-handle', label: 'Merge to Main', position: { x: 525, y: 300 } },
+  { id: 'r', type: 'multi-handle', label: 'Automated Release', position: { x: 505, y: 450 } },
+  { id: 'd', type: 'multi-handle', label: 'Docker Deploy', position: { x: 523, y: 550 } }
+]
+
+const overviewEdges = [
+  { id: 'e1', source: 'pr', target: 'l', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed, animated: true },
+  { id: 'e2', source: 'l', target: 'qg', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed, animated: true },
+  { id: 'e3', source: 'qg', target: 's', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, style: { stroke: '#2196F3' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e4', source: 's', target: 'rt', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed, animated: true },
+  { id: 'e5', source: 'rt', target: 'm', sourceHandle: 'right-source', targetHandle: 'left', type: 'smoothstep', animated: true, style: { stroke: '#9C27B0' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 'e6', source: 'm', target: 'r', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed, animated: true },
+  { id: 'e7', source: 'r', target: 'd', sourceHandle: 'bottom-source', targetHandle: 'top', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed, animated: true }
+]
+
+const releaseNodes = [
+  { id: 'dev', type: 'multi-handle', label: 'Developer', position: { x: -10, y: 0 } },
+  { id: 'git', type: 'multi-handle', label: 'Git', position: { x: 0, y: 200 } },
+  { id: 'ci', type: 'multi-handle', label: 'GitHub Actions', position: { x: 250, y: 50 }},
+  { id: 'sr', type: 'multi-handle', label: 'Semantic Rel.', position: { x: 250, y: 200 } },
+  { id: 'gh', type: 'multi-handle', label: 'GH Releases', position: { x: 350, y: 300 } }
+]
+
+const releaseEdges = [
+  { id: 're1', source: 'dev', target: 'git', sourceHandle: 'bottom-source', targetHandle: 'top', label: 'git commit/push', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 're2', source: 'git', target: 'ci', sourceHandle: 'right-source', targetHandle: 'left', label: 'Trigger', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed },
+  { id: 're3', source: 'ci', target: 'ci', sourceHandle: 'top-source', targetHandle: 'right', label: 'Test/Build', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 're4', source: 'ci', target: 'sr', sourceHandle: 'right-source', targetHandle: 'left', label: 'Success', type: 'smoothstep', animated: true, style: { stroke: '#4CAF50' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 're5', source: 'sr', target: 'sr', sourceHandle: 'top-source', targetHandle: 'right', label: 'Version Bump', type: 'smoothstep', markerEnd: MarkerType.ArrowClosed },
+  { id: 're6', source: 'sr', target: 'git', sourceHandle: 'bottom-source', targetHandle: 'bottom', label: 'Tag v1.0.0', type: 'smoothstep', animated: true, style: { strokeDasharray: '5,5' }, markerEnd: MarkerType.ArrowClosed },
+  { id: 're7', source: 'sr', target: 'gh', sourceHandle: 'right-source', targetHandle: 'top', label: 'Create Release', type: 'smoothstep', animated: true, markerEnd: MarkerType.ArrowClosed }
+]
+</script>
+
+<InteractiveFlow :nodes="overviewNodes" :edges="overviewEdges" />
+
 ## Workflows
 
 ### 1. Quality Gate (`ci.yml`)
@@ -17,46 +71,37 @@ The CI/CD system follows a **Release Train** model using a `staging` branch for 
 **Purpose:** Enforce code quality standards before merging
 
 **Triggers:**
-
 - Every `push` to `main` or `staging` branches
 - Every `pull_request` targeting `main` or `staging`
 
 **Optimization:**
-
 - **Concurrency:** Includes a `concurrency` group to cancel redundant runs.
 - **Caching:** Uses `actions/cache` to cache `bun` dependencies (`~/.bun/install/cache`), significantly reducing install times.
 
 **Jobs:**
 
 #### Lint
-
 ```yaml
 - name: Lint Check
   run: bun run lint:check
 ```
-
 Checks code style using Biome. Ensures consistent formatting and catches common errors.
 
 #### Test
-
 ```yaml
 - name: Run Tests
   run: bun run tests
 ```
-
 Runs the full test suite with coverage reporting.
 
 #### Build
-
 ```yaml
 - name: Build Project
   run: bun run build
 ```
-
 Verifies the project builds successfully for production.
 
 **Configuration:**
-
 ```yaml
 # .github/workflows/ci.yml
 name: Quality Gate
@@ -92,7 +137,6 @@ jobs:
 **Purpose:** Automatically categorize Pull Requests based on the files they modify.
 
 **What it does:**
-
 - Assigns labels like `feat`, `fix`, `docs`, `ci`, etc., automatically.
 - Helps maintainers quickly understand the scope of a PR.
 - Syncs labels if file changes are added to the PR.
@@ -102,12 +146,10 @@ jobs:
 **Purpose:** Automate the stabilization process between `staging` and `main` branches.
 
 **Triggers:**
-
 - Scheduled (Weekly on Mondays)
 - Manual trigger (Workflow Dispatch)
 
 **What it does:**
-
 - Checks for differences between `staging` and `main`.
 - Generates a release body summarizing commits.
 - Validates permissions and uses `gh pr create` to safely open a PR without overwriting branch history.
@@ -117,7 +159,6 @@ jobs:
 **Purpose:** Automatically version, tag, and release based on commit messages
 
 **Triggers:**
-
 - After Quality Gate passes on `main`
 - Uses `workflow_run` to ensure sequential execution
 
@@ -125,11 +166,18 @@ jobs:
 
 **How it works:**
 
+<InteractiveFlow :nodes="releaseNodes" :edges="releaseEdges" />
+
 **Commit Message Format:**
 
 Uses [Conventional Commits](https://www.conventionalcommits.org/):
 
-TypeVersion BumpExample`feat:`Minor (1.0.0 → 1.1.0)`feat: add user authenticationfix:`Patch (1.0.0 → 1.0.1)`fix: resolve login bugBREAKING CHANGE:`Major (1.0.0 → 2.0.0)`feat!: redesign APIdocs:`, `chore:`No release`docs: update README`
+| Type | Version Bump | Example |
+|------|-------------|---------|
+| `feat:` | Minor (1.0.0 → 1.1.0) | `feat: add user authentication` |
+| `fix:` | Patch (1.0.0 → 1.0.1) | `fix: resolve login bug` |
+| `BREAKING CHANGE:` | Major (1.0.0 → 2.0.0) | `feat!: redesign API` |
+| `docs:`, `chore:` | No release | `docs: update README` |
 
 **Configuration:**
 
@@ -155,11 +203,9 @@ TypeVersion BumpExample`feat:`Minor (1.0.0 → 1.1.0)`feat: add user authenticat
 **Purpose:** Build and push Docker images to GitHub Container Registry (GHCR)
 
 **Triggers:**
-
 - When a new GitHub Release is published
 
 **What it does:**
-
 1. Builds Docker image from `Dockerfile`
 2. Tags image with release version
 3. Pushes to `ghcr.io/<username>/<repo>`
@@ -206,7 +252,6 @@ jobs:
 ```
 
 **Pulling the image:**
-
 ```bash
 docker pull ghcr.io/<username>/<repo>:latest
 ```
@@ -215,8 +260,7 @@ docker pull ghcr.io/<username>/<repo>:latest
 
 Before pushing, it is recommended to run local checks. This project uses **Client-side Git Hooks** managed by **Lefthook**.
 
-**Hooks Enforced (**`lefthook.yml`**):**
-
+**Hooks Enforced (`lefthook.yml`):**
 1. **Pre-commit:** Runs `biome check --write` on staged files. Applies formatting fixes automatically.
 2. **Pre-push:** Runs `bun test` to ensure tests pass before pushing to remote.
 
@@ -242,7 +286,6 @@ bun run build
 **Error:** `Found X errors`
 
 **Solution:**
-
 ```bash
 # Auto-fix most issues
 bunx biome check --write .
@@ -256,7 +299,6 @@ bun run lint:check
 **Error:** `X tests failed`
 
 **Solution:**
-
 ```bash
 # Run tests locally
 bun test
@@ -273,7 +315,6 @@ bun test --watch
 **Error:** `Build failed`
 
 **Solution:**
-
 ```bash
 # Check TypeScript errors
 bun run build
@@ -289,7 +330,6 @@ rm -rf dist && bun run build
 **Possible causes:**
 
 1. **Commit message doesn't follow convention**
-
    ```bash
    # ❌ Wrong
    git commit -m "added new feature"
@@ -299,12 +339,10 @@ rm -rf dist && bun run build
    ```
 
 2. **Quality Gate failed**
-
    - Check Actions tab for errors
    - Fix issues and push again
 
 3. **No releasable commits**
-
    - `docs:` and `chore:` don't trigger releases
    - Need at least one `feat:` or `fix:` commit
 
@@ -313,7 +351,6 @@ rm -rf dist && bun run build
 **Error:** `denied: permission_denied`
 
 **Solution:**
-
 1. Enable GitHub Packages in repository settings
 2. Ensure `GITHUB_TOKEN` has `packages: write` permission
 3. Make repository public or configure package visibility
@@ -391,8 +428,8 @@ jobs:
 5. **Secure secrets**: Never commit credentials
 6. **Test in branches**: Use feature branches and PRs
 
-**See Also:**
 
+**See Also:**
 - [Deployment](/devops/deployment) - Production deployment guide
 - [Testing Guide](/development/testing-guide) - Writing and running tests
 - [Troubleshooting](/reference/troubleshooting) - Common issues and solutions

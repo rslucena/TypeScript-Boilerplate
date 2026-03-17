@@ -18,10 +18,11 @@ const DEFAULT_TEST_ENV = {
 	SSO_GOOGLE_CLIENT_ID: "test-client-id" as string | undefined,
 	SSO_GOOGLE_CLIENT_SECRET: "test-client-secret" as string | undefined,
 	SSO_GOOGLE_REDIRECT_URI: "http://localhost/callback" as string | undefined,
+	APP_TRUST_PROXY: false as boolean | string | string[] | number,
 	isTest: true,
 	isDev: false,
 	isBuild: false,
-} as const;
+};
 
 type TestEnv = { [K in keyof typeof DEFAULT_TEST_ENV]: (typeof DEFAULT_TEST_ENV)[K] };
 

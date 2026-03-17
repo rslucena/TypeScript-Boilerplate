@@ -16,6 +16,9 @@ export interface Column {
 	defaultNow: Mock<() => Column>;
 	default: Mock<() => Column>;
 	setName: Mock<(name: string) => Column>;
+	build: Mock<(...args: unknown[]) => Column>;
+	buildForeignKeys: Mock<(...args: unknown[]) => unknown[]>;
+	buildExtraConfigColumn: Mock<(...args: unknown[]) => Column>;
 	defaultConfig: Record<string, unknown>;
 	indexConfig: Record<string, unknown>;
 }
@@ -54,6 +57,9 @@ const columnBuilder = (): Column => {
 			col.name = name;
 			return col;
 		}),
+		build: mock(() => col),
+		buildForeignKeys: mock(() => []),
+		buildExtraConfigColumn: mock(() => col),
 		defaultConfig: {},
 		indexConfig: {},
 	};
