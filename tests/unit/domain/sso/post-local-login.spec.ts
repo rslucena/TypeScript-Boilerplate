@@ -16,7 +16,6 @@ mock.module("@infrastructure/repositories/references", () =>
 	createReferencesModuleMock({ hash: mock((..._args) => mockHashValue) }),
 );
 
-import { providers } from "@domain/credentials/constants";
 import postLocalLogin from "@domain/sso/actions/post-local-login";
 import * as jwt from "@infrastructure/authentication/jwt";
 import cache from "@infrastructure/cache/actions";
@@ -36,6 +35,8 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 		repositoryMock.select.mockReturnThis();
 		repositoryMock.from.mockReturnThis();
 		repositoryMock.where.mockReturnThis();
+		repositoryMock.innerJoin.mockReturnThis();
+		repositoryMock.limit.mockReturnThis();
 		repositoryMock.prepare.mockReturnThis();
 		repositoryMock.execute.mockResolvedValue([]);
 
@@ -80,29 +81,10 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 		}
 	});
 
-	it("should return 401 when the local credential does not exist", async () => {
-		repositoryMock.execute.mockResolvedValueOnce([
-			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
-		]);
-		repositoryMock.execute.mockResolvedValueOnce([]);
-
-		const request = new container({
-			method: "POST",
-			body: validPayload,
-		});
-
-		try {
-			await postLocalLogin(request);
-		} catch (error: unknown) {
-			expect((error as { code: string }).code).toBe("ERR_UNAUTHORIZED");
-		}
-	});
-
 	it("should return 401 when the password does not match", async () => {
 		repositoryMock.execute.mockResolvedValueOnce([
-			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", secret: "hashed_secret" },
 		]);
-		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
 		mockHashValue = "INVALID";
 
 		const request = new container({
@@ -124,9 +106,8 @@ describe("SSO Domain Actions : postLocalLogin", () => {
 		});
 
 		repositoryMock.execute.mockResolvedValueOnce([
-			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", email: validPayload.email },
+			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Test User", secret: "hashed_secret" },
 		]);
-		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
 
 		const result = await postLocalLogin(request);
 

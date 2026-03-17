@@ -1,6 +1,5 @@
 # Essentials
 bin
-.agent
 .docker
 .vscode
 .DS_Store

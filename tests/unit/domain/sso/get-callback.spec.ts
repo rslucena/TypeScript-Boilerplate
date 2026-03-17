@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 
 const repositoryMock = createRepositoryMock();
 const containerMock = createContainerMock();
+
+import { afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 
 mock.module("@infrastructure/repositories/repository", () => ({
 	__esModule: true,
@@ -14,6 +15,7 @@ mock.module("@infrastructure/repositories/repository", () => ({
 mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
 import { providers } from "@domain/credentials/constants";
+import getCallback from "@domain/sso/actions/get-callback";
 import * as jwt from "@infrastructure/authentication/jwt";
 import cache from "@infrastructure/cache/actions";
 import * as oidc from "@infrastructure/sso/oidc";
@@ -25,7 +27,6 @@ const mockNormalizedUser = {
 };
 
 describe("SSO Domain Actions : getCallback", () => {
-	let getCallback: CallableFunction;
 	let jwtSpy: Mock<typeof jwt.create>;
 	let oidcExchangeSpy: Mock<typeof oidc.exchangeToken>;
 	let oidcUserSpy: Mock<typeof oidc.getNormalizedUser>;
@@ -49,8 +50,6 @@ describe("SSO Domain Actions : getCallback", () => {
 		jwtSpy = spyOn(jwt, "create").mockReturnValue("header.payload.signature");
 		oidcExchangeSpy = spyOn(oidc, "exchangeToken").mockResolvedValue({ access_token: "abc", token_type: "Bearer" });
 		oidcUserSpy = spyOn(oidc, "getNormalizedUser").mockResolvedValue(mockNormalizedUser);
-
-		getCallback = (await import("@domain/sso/actions/get-callback")).default;
 	});
 
 	afterEach(() => {
