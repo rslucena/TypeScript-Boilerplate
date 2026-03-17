@@ -13,13 +13,15 @@ on:
         options:
           - bolt
           - sentinel
+          - hammer
 
 jobs:
   discovery:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout Repository
@@ -40,6 +42,10 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PROJECT_NUMBER: ${{ vars.GH_PROJECT_NUMBER }}
+          GH_PROJECT_OWNER: ${{ vars.GH_PROJECT_OWNER }}
+          GH_STATUS_FIELD_ID: ${{ vars.GH_STATUS_FIELD_ID }}
+          GH_IN_PROGRESS_OPTION_ID: ${{ vars.GH_IN_PROGRESS_OPTION_ID }}
         run: bun src/commands/ai-agency.ts bolt
 
       - name: Run Security Discovery (Sentinel)
@@ -47,4 +53,19 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PROJECT_NUMBER: ${{ vars.GH_PROJECT_NUMBER }}
+          GH_PROJECT_OWNER: ${{ vars.GH_PROJECT_OWNER }}
+          GH_STATUS_FIELD_ID: ${{ vars.GH_STATUS_FIELD_ID }}
+          GH_IN_PROGRESS_OPTION_ID: ${{ vars.GH_IN_PROGRESS_OPTION_ID }}
         run: bun src/commands/ai-agency.ts sentinel
+
+      - name: Run Execution Agent (Hammer)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.agent == 'hammer'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PROJECT_NUMBER: ${{ vars.GH_PROJECT_NUMBER }}
+          GH_PROJECT_OWNER: ${{ vars.GH_PROJECT_OWNER }}
+          GH_STATUS_FIELD_ID: ${{ vars.GH_STATUS_FIELD_ID }}
+          GH_IN_PROGRESS_OPTION_ID: ${{ vars.GH_IN_PROGRESS_OPTION_ID }}
+        run: bun src/commands/ai-agency.ts hammer

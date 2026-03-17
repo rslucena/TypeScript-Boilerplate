@@ -13,6 +13,31 @@ if (!API_KEY) {
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+const PROJECT_NUMBER = process.env.GH_PROJECT_NUMBER;
+const OWNER = process.env.GH_PROJECT_OWNER;
+const STATUS_FIELD_ID = process.env.GH_STATUS_FIELD_ID;
+const IN_PROGRESS_OPTION_ID = process.env.GH_IN_PROGRESS_OPTION_ID;
+
+if (
+	!process.env.GH_PROJECT_NUMBER ||
+	!process.env.GH_PROJECT_OWNER ||
+	!process.env.GH_STATUS_FIELD_ID ||
+	!process.env.GH_IN_PROGRESS_OPTION_ID
+) {
+	console.error("❌ Error: Missing GitHub Project environment variables.");
+	process.exit(1);
+}
+
+interface ProjectItem {
+	id: string;
+	status: string;
+	content?: {
+		type: string;
+		title: string;
+		body: string;
+		number?: number;
+	};
+}
 
 async function getProjectContext(dir: string): Promise<string> {
 	let context = "";
@@ -36,6 +61,42 @@ async function getProjectContext(dir: string): Promise<string> {
 	return context;
 }
 
+async function getTodoIssue(): Promise<{ itemId: string; title: string; body: string; number?: number } | null> {
+	try {
+		console.log("🔍 Searching for tasks in 'Todo' column...");
+		const output = execSync(`gh project item-list ${PROJECT_NUMBER} --owner ${OWNER} --format json`, {
+			encoding: "utf-8",
+		});
+		const data = JSON.parse(output);
+
+		const todoItem = data.items.find((item: ProjectItem) => item.status === "Todo" && item.content?.type === "Issue");
+
+		if (!todoItem) return null;
+
+		return {
+			itemId: todoItem.id,
+			title: todoItem.content?.title || "",
+			body: todoItem.content?.body || "",
+			number: todoItem.content?.number,
+		};
+	} catch (_) {
+		console.error("❌ Failed to fetch items from project board.");
+		return null;
+	}
+}
+
+async function startTask(itemId: string) {
+	try {
+		console.log("🚀 Moving task to 'In Progress'...");
+		execSync(
+			`gh project item-edit --id ${itemId} --field-id "${STATUS_FIELD_ID}" --project ${PROJECT_NUMBER} --option-id "${IN_PROGRESS_OPTION_ID}" --owner ${OWNER}`,
+			{ stdio: "inherit" },
+		);
+	} catch (_) {
+		console.error("❌ Failed to move item to 'In Progress'.");
+	}
+}
+
 async function runAgent(agentName: string) {
 	const promptPath = join(process.cwd(), ".agent", "prompts", `${agentName}.md`);
 
@@ -44,19 +105,50 @@ async function runAgent(agentName: string) {
 		process.exit(1);
 	});
 
+	let hammerIssueContext = "";
+	let selectedIssue: { itemId: string; title: string; body: string; number?: number } | null = null;
+
+	if (agentName === "hammer") {
+		selectedIssue = await getTodoIssue();
+		if (!selectedIssue) {
+			console.log("✅ No tasks found in 'Todo' column. Hammer is resting.");
+			return;
+		}
+
+		console.log(`🔨 Hammer picked up task: ${selectedIssue.title}`);
+		await startTask(selectedIssue.itemId);
+
+		hammerIssueContext = `
+SELECTED ISSUE TO SOLVE:
+Issue #${selectedIssue.number}: ${selectedIssue.title}
+Issue Description:
+${selectedIssue.body}
+`;
+	}
+
 	console.log(`🤖 Starting analysis with agent: ${agentName}...`);
 	const context = await getProjectContext(join(process.cwd(), "src"));
 
 	const fullPrompt = `
 ${agentPrompt}
 
+${hammerIssueContext}
+
 Context from the repository (src folder):
 ${context}
 
 Instructions:
-1. Analyze the context based on your Mission and Rules.
-2. If you find something relevant to report, output ONLY a single GitHub Issue following the template specified in your Rules.
-3. If no issues are found, output: "NO_ISSUES_FOUND".
+1. If you are Bolt/Sentinel (Discovery): Output ONLY a single GitHub Issue diagnosis. If nothing is found, output: "NO_ISSUES_FOUND".
+2. If you are Hammer (Execution): 
+   - Analyze the SELECTED ISSUE and the code context.
+   - Output your implementation in a structured format so I can automate the PR:
+     BRANCH: [type/short-description, e.g., feat/optimize-cache or fix/sanitize-input. NO NUMBERS.]
+     TITLE: [PR Title]
+     DESCRIPTION: [Detailed PR Description, including 'Closes #${selectedIssue?.number}']
+     
+     FILE: src/path/to/file.ts
+     [Complete file content here]
+     ENDFILE
 `;
 
 	const result = await model.generateContent(fullPrompt);
@@ -67,9 +159,65 @@ Instructions:
 		return;
 	}
 
-	console.log("📝 Generating GitHub Issue...");
+	if (agentName === "hammer" && selectedIssue) {
+		console.log("🛠️ Hammer analysis complete. Processing implementation...");
 
-	// Create temporary file for issue body to handle multiline content safely
+		const branchMatch = responseText.match(/BRANCH:\s*(.*)/);
+		const titleMatch = responseText.match(/TITLE:\s*(.*)/);
+		const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=FILE:|$)/);
+
+		const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/issue-${selectedIssue.number || Date.now()}`;
+		// Sanitize branch name (remove numbers as per rule, although AI should follow it)
+		const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || `fix/automated-fix`;
+
+		const prTitle = titleMatch ? titleMatch[1].trim() : `Fix: ${selectedIssue.title}`;
+		const prDescription = descMatch ? descMatch[1].trim() : selectedIssue.body;
+
+		// Parse files: FILE: path\ncontent\nENDFILE
+		const fileBlocks = responseText.split("FILE:").slice(1);
+
+		if (fileBlocks.length > 0) {
+			try {
+				console.log(`📦 Creating branch: ${branchName}`);
+				try {
+					execSync(`git branch -D ${branchName}`, { stdio: "ignore" });
+				} catch (_) {}
+				execSync(`git checkout -b ${branchName}`, { stdio: "inherit" });
+
+				for (const block of fileBlocks) {
+					const [pathPart, ...contentParts] = block.split("ENDFILE")[0].trim().split("\n");
+					const filePath = pathPart.trim();
+					const fileContent = contentParts.join("\n").trim();
+
+					console.log(`📝 Applying changes to: ${filePath}`);
+					const absolutePath = join(process.cwd(), filePath);
+					await writeFile(absolutePath, fileContent);
+				}
+
+				console.log("🚀 Opening Pull Request to 'staging'...");
+				const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
+				await writeFile(tempDescPath, prDescription);
+				execSync(
+					`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
+					{
+						stdio: "inherit",
+					},
+				);
+				await unlink(tempDescPath);
+
+				execSync("git checkout -", { stdio: "inherit" });
+				console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
+			} catch (_) {
+				console.error("❌ Hammer encountered an error during PR creation.");
+			}
+		} else {
+			console.log("⚠️ No specific 'FILE:' blocks found. Implementation printed below for manual review:");
+			console.log(responseText);
+		}
+		return;
+	}
+
+	console.log("📝 Generating GitHub Issue (Discovery)...");
 	const issueBodyPath = join(process.cwd(), "temp-issue-body.md");
 	const lines = responseText.split("\n");
 	const title =
@@ -82,13 +230,12 @@ Instructions:
 	await writeFile(issueBodyPath, body);
 
 	try {
-		execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}"`, {
+		execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}" --project ${PROJECT_NUMBER}`, {
 			stdio: "inherit",
 		});
-		console.log(`🚀 Issue created successfully for ${agentName}!`);
+		console.log(`🚀 Issue created and added to Project board #${PROJECT_NUMBER}!`);
 	} catch (_) {
-		console.error("❌ Failed to create issue via gh CLI. Body preview:");
-		console.log(body);
+		console.error("❌ Failed to create issue via gh CLI.");
 	} finally {
 		await unlink(issueBodyPath);
 	}
