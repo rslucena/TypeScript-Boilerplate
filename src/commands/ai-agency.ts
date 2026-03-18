@@ -13,30 +13,15 @@ if (!API_KEY) {
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-const PROJECT_NUMBER = process.env.GH_PROJECT_NUMBER;
-const OWNER = process.env.GH_PROJECT_OWNER;
-const STATUS_FIELD_ID = process.env.GH_STATUS_FIELD_ID;
-const IN_PROGRESS_OPTION_ID = process.env.GH_IN_PROGRESS_OPTION_ID;
 
-if (
-	!process.env.GH_PROJECT_NUMBER ||
-	!process.env.GH_PROJECT_OWNER ||
-	!process.env.GH_STATUS_FIELD_ID ||
-	!process.env.GH_IN_PROGRESS_OPTION_ID
-) {
-	console.error("❌ Error: Missing GitHub Project environment variables.");
-	process.exit(1);
+interface GitHubIssue {
+	number: number;
+	title: string;
+	body: string;
 }
 
-interface ProjectItem {
-	id: string;
-	status: string;
-	content?: {
-		type: string;
-		title: string;
-		body: string;
-		number?: number;
-	};
+interface GitHubPR {
+	body: string;
 }
 
 async function getProjectContext(dir: string): Promise<string> {
@@ -61,62 +46,75 @@ async function getProjectContext(dir: string): Promise<string> {
 	return context;
 }
 
-async function getTodoIssue(): Promise<{ itemId: string; title: string; body: string; number?: number } | null> {
+async function getIssueToSolve(): Promise<{ number: number; title: string; body: string } | null> {
 	try {
-		console.log("🔍 Searching for tasks in 'Todo' column...");
-		const output = execSync(`gh project item-list ${PROJECT_NUMBER} --owner ${OWNER} --format json`, {
+		console.log("🔍 Checking open Pull Requests to avoid duplicate work...");
+		const prOutput = execSync("gh pr list --state open --json body", { encoding: "utf-8" });
+		const prs = JSON.parse(prOutput) as GitHubPR[];
+
+		const linkedIssues = new Set<number>();
+		const issueRegex = /#(\d+)/g;
+
+		for (const pr of prs) {
+			const matches = pr.body.matchAll(issueRegex);
+			for (const match of matches) {
+				linkedIssues.add(Number.parseInt(match[1]));
+			}
+		}
+
+		if (linkedIssues.size > 0) {
+			console.log(`ℹ️ Skipping issues already linked in open PRs: ${Array.from(linkedIssues).join(", ")}`);
+		}
+
+		console.log("🔍 Searching for available open issues...");
+		const issueOutput = execSync("gh issue list --state open --json number,title,body --limit 10", {
 			encoding: "utf-8",
 		});
-		const data = JSON.parse(output);
+		const issues = JSON.parse(issueOutput) as GitHubIssue[];
 
-		const todoItem = data.items.find((item: ProjectItem) => item.status === "Todo" && item.content?.type === "Issue");
+		const availableIssue = issues.find((issue) => !linkedIssues.has(issue.number));
 
-		if (!todoItem) return null;
+		if (!availableIssue) {
+			console.log("✅ No unassigned open issues found.");
+			return null;
+		}
 
 		return {
-			itemId: todoItem.id,
-			title: todoItem.content?.title || "",
-			body: todoItem.content?.body || "",
-			number: todoItem.content?.number,
+			number: availableIssue.number,
+			title: availableIssue.title,
+			body: availableIssue.body,
 		};
-	} catch (_) {
-		console.error("❌ Failed to fetch items from project board.");
+	} catch (error) {
+		console.error("❌ Failed to fetch issues or PRs from repository:", (error as Error).message);
 		return null;
-	}
-}
-
-async function startTask(itemId: string) {
-	try {
-		console.log("🚀 Moving task to 'In Progress'...");
-		execSync(
-			`gh project item-edit --id ${itemId} --field-id "${STATUS_FIELD_ID}" --project ${PROJECT_NUMBER} --option-id "${IN_PROGRESS_OPTION_ID}" --owner ${OWNER}`,
-			{ stdio: "inherit" },
-		);
-	} catch (_) {
-		console.error("❌ Failed to move item to 'In Progress'.");
 	}
 }
 
 async function runAgent(agentName: string) {
 	const promptPath = join(process.cwd(), ".agent", "prompts", `${agentName}.md`);
+	const rulesPath = join(process.cwd(), ".agent", "rules.md");
 
 	const agentPrompt = await readFile(promptPath, "utf-8").catch(() => {
 		console.error(`❌ Agent prompt file not found: ${promptPath}`);
 		process.exit(1);
 	});
 
+	const projectRules = await readFile(rulesPath, "utf-8").catch(() => {
+		console.warn("⚠️ Warning: .agent/rules.md not found.");
+		return "";
+	});
+
 	let hammerIssueContext = "";
-	let selectedIssue: { itemId: string; title: string; body: string; number?: number } | null = null;
+	let selectedIssue: { number: number; title: string; body: string } | null = null;
 
 	if (agentName === "hammer") {
-		selectedIssue = await getTodoIssue();
+		selectedIssue = await getIssueToSolve();
 		if (!selectedIssue) {
-			console.log("✅ No tasks found in 'Todo' column. Hammer is resting.");
+			console.log("✅ Hammer is resting. No new issues to solve.");
 			return;
 		}
 
-		console.log(`🔨 Hammer picked up task: ${selectedIssue.title}`);
-		await startTask(selectedIssue.itemId);
+		console.log(`🔨 Hammer picked up Issue #${selectedIssue.number}: ${selectedIssue.title}`);
 
 		hammerIssueContext = `
 SELECTED ISSUE TO SOLVE:
@@ -130,6 +128,10 @@ ${selectedIssue.body}
 	const context = await getProjectContext(join(process.cwd(), "src"));
 
 	const fullPrompt = `
+PROJECT RULES AND STANDARDS:
+${projectRules}
+
+AGENT PROMPT:
 ${agentPrompt}
 
 ${hammerIssueContext}
@@ -141,10 +143,11 @@ Instructions:
 1. If you are Bolt/Sentinel (Discovery): Output ONLY a single GitHub Issue diagnosis. If nothing is found, output: "NO_ISSUES_FOUND".
 2. If you are Hammer (Execution): 
    - Analyze the SELECTED ISSUE and the code context.
-   - Output your implementation in a structured format so I can automate the PR:
+   - Follow ALL PR and Implementation rules from the PROJECT RULES.
+   - Output your implementation in a structured format:
      BRANCH: [type/short-description, e.g., feat/optimize-cache or fix/sanitize-input. NO NUMBERS.]
      TITLE: [PR Title]
-     DESCRIPTION: [Detailed PR Description, including 'Closes #${selectedIssue?.number}']
+     DESCRIPTION: [Detailed PR Description. YOU MUST populate the '## Issues' section of the template with '- #${selectedIssue?.number}' to link the issue.]
      
      FILE: src/path/to/file.ts
      [Complete file content here]
@@ -167,13 +170,11 @@ Instructions:
 		const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=FILE:|$)/);
 
 		const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/issue-${selectedIssue.number || Date.now()}`;
-		// Sanitize branch name (remove numbers as per rule, although AI should follow it)
 		const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || `fix/automated-fix`;
 
 		const prTitle = titleMatch ? titleMatch[1].trim() : `Fix: ${selectedIssue.title}`;
 		const prDescription = descMatch ? descMatch[1].trim() : selectedIssue.body;
 
-		// Parse files: FILE: path\ncontent\nENDFILE
 		const fileBlocks = responseText.split("FILE:").slice(1);
 
 		if (fileBlocks.length > 0) {
@@ -207,8 +208,8 @@ Instructions:
 
 				execSync("git checkout -", { stdio: "inherit" });
 				console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
-			} catch (_) {
-				console.error("❌ Hammer encountered an error during PR creation.");
+			} catch (error) {
+				console.error("❌ Hammer encountered an error during PR creation:", (error as Error).message);
 			}
 		} else {
 			console.log("⚠️ No specific 'FILE:' blocks found. Implementation printed below for manual review:");
@@ -234,20 +235,8 @@ Instructions:
 			encoding: "utf-8",
 		}).trim();
 		console.log(`🚀 Issue created: ${issueUrl}`);
-
-		try {
-			execSync(`gh project item-add ${PROJECT_NUMBER} --owner ${OWNER} --url ${issueUrl}`, {
-				stdio: "inherit",
-			});
-			console.log(`🚀 Issue added to Project board #${PROJECT_NUMBER}!`);
-		} catch (projectError) {
-			console.error(`❌ Failed to add issue to project board. 
-              Tip: If your project is an Organization project, ensure GITHUB_TOKEN has 'project' write permissions or use a PAT (Personal Access Token) saved as GH_AGENCY_TOKEN secret.`);
-			console.error("Technical details:", (projectError as Error).message);
-		}
-	} catch (issueError) {
-		console.error("❌ Failed to create issue via gh CLI.");
-		console.error("Technical details:", (issueError as Error).message);
+	} catch (error) {
+		console.error("❌ Failed to create issue via gh CLI:", (error as Error).message);
 	} finally {
 		await unlink(issueBodyPath);
 	}

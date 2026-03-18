@@ -27,7 +27,6 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      repository-projects: write
 
     steps:
       - name: Checkout Repository
@@ -47,22 +46,14 @@ jobs:
         if: github.event_name == 'schedule' || github.event.inputs.agent == 'bolt'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
-          GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
-          GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
-          GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}
-          GH_IN_PROGRESS_OPTION_ID: ${{ secrets.GH_IN_PROGRESS_OPTION_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun src/commands/ai-agency.ts bolt
 
       - name: Run Security Discovery (Sentinel)
         if: github.event_name == 'schedule' || github.event.inputs.agent == 'sentinel'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
-          GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
-          GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
-          GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}
-          GH_IN_PROGRESS_OPTION_ID: ${{ secrets.GH_IN_PROGRESS_OPTION_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun src/commands/ai-agency.ts sentinel
 
   execution:
@@ -75,7 +66,6 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      repository-projects: write
 
     steps:
       - name: Checkout Repository
@@ -94,9 +84,5 @@ jobs:
       - name: Run Execution Agent (Hammer)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
-          GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
-          GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
-          GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}
-          GH_IN_PROGRESS_OPTION_ID: ${{ secrets.GH_IN_PROGRESS_OPTION_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun src/commands/ai-agency.ts hammer

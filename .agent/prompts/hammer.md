@@ -68,6 +68,11 @@ Follow the `.github/pull_request_template.md` structure:
 - **Benefits**: Expected performance/security gains.
 - **Type of change**: Mark appropriately.
 - **Checklist**: Complete all items.
+- **Issues Section**: YOU MUST populate the `## Issues` section with the link to the implemented issue using the format `- #NUMBER`. e.g.:
+  ```markdown
+  ## Issues
+  - #123
+  ```
 
 ---
 
