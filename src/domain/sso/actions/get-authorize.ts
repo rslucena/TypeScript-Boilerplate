@@ -12,6 +12,10 @@ export default async function getAuthorize(request: container) {
 	const url = getAuthorizationUrl(valid.data.provider, state);
 
 	request.status(302);
-	request.headers({ Location: url });
+	request.headers({
+		Location: url,
+		"Set-Cookie": `sso_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=300`,
+	});
+
 	return null;
 }
