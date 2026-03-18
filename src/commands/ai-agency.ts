@@ -230,12 +230,17 @@ Instructions:
 	await writeFile(issueBodyPath, body);
 
 	try {
-		execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}" --project ${PROJECT_NUMBER}`, {
+		const issueUrl = execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}"`, {
+			encoding: "utf-8",
+		}).trim();
+		console.log(`🚀 Issue created: ${issueUrl}`);
+
+		execSync(`gh project item-add ${PROJECT_NUMBER} --owner ${OWNER} --url ${issueUrl}`, {
 			stdio: "inherit",
 		});
-		console.log(`🚀 Issue created and added to Project board #${PROJECT_NUMBER}!`);
+		console.log(`🚀 Issue added to Project board #${PROJECT_NUMBER}!`);
 	} catch (_) {
-		console.error("❌ Failed to create issue via gh CLI.");
+		console.error("❌ Failed to create issue or add to project via gh CLI.");
 	} finally {
 		await unlink(issueBodyPath);
 	}
