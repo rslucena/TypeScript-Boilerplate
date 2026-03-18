@@ -1,8 +1,9 @@
-name: AI Agency Discovery
+name: AI Agency Discovery & Execution
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * *' # Discovery Agents (02:00 UTC)
+    - cron: '0 4 * * *' # Execution Agent (04:00 UTC)
   workflow_dispatch:
     inputs:
       agent:
@@ -17,6 +18,10 @@ on:
 
 jobs:
   discovery:
+    name: Discovery (Bolt & Sentinel)
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' ||
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'bolt' || github.event.inputs.agent == 'sentinel')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,7 +44,7 @@ jobs:
         run: bun install
 
       - name: Run Performance Discovery (Bolt)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.agent == 'bolt')
+        if: github.event_name == 'schedule' || github.event.inputs.agent == 'bolt'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +55,7 @@ jobs:
         run: bun src/commands/ai-agency.ts bolt
 
       - name: Run Security Discovery (Sentinel)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.agent == 'sentinel')
+        if: github.event_name == 'schedule' || github.event.inputs.agent == 'sentinel'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,8 +65,33 @@ jobs:
           GH_IN_PROGRESS_OPTION_ID: ${{ secrets.GH_IN_PROGRESS_OPTION_ID }}
         run: bun src/commands/ai-agency.ts sentinel
 
+  execution:
+    name: Execution (Hammer)
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 4 * * *' ||
+      github.event_name == 'workflow_dispatch' && github.event.inputs.agent == 'hammer'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      repository-projects: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
       - name: Run Execution Agent (Hammer)
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.agent == 'hammer'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
