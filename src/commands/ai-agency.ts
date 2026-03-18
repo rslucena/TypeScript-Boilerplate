@@ -7,6 +7,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = process.env.GEMINI_API_KEY;
 const SKIP_VERIFY = process.env.SKIP_VERIFY !== "false"; // Default to true
 
+// Use GH_AGENCY_TOKEN as GitHub PAT if available
+if (process.env.GH_AGENCY_TOKEN) {
+	process.env.GH_TOKEN = process.env.GH_AGENCY_TOKEN;
+}
+
 if (!API_KEY) {
 	console.error("❌ Error: GEMINI_API_KEY environment variable is not set.");
 	process.exit(1);
