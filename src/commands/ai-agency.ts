@@ -24,6 +24,17 @@ interface GitHubPR {
 	body: string;
 }
 
+function runCommand(command: string, options: any = { stdio: "inherit" }): string {
+	try {
+		const output = execSync(command, { encoding: "utf-8", ...options });
+		return output || "";
+	} catch (error: any) {
+		const stdout = error.stdout?.toString() || "";
+		const stderr = error.stderr?.toString() || "";
+		throw new Error(`${stdout}\n${stderr}`);
+	}
+}
+
 async function getProjectContext(dir: string): Promise<string> {
 	let context = "";
 	const files = readdirSync(dir);
@@ -49,7 +60,7 @@ async function getProjectContext(dir: string): Promise<string> {
 async function getIssueToSolve(): Promise<{ number: number; title: string; body: string } | null> {
 	try {
 		console.log("🔍 Checking open Pull Requests to avoid duplicate work...");
-		const prOutput = execSync("gh pr list --state open --json body", { encoding: "utf-8" });
+		const prOutput = runCommand("gh pr list --state open --json body", { stdio: "pipe" });
 		const prs = JSON.parse(prOutput) as GitHubPR[];
 
 		const linkedIssues = new Set<number>();
@@ -67,8 +78,8 @@ async function getIssueToSolve(): Promise<{ number: number; title: string; body:
 		}
 
 		console.log("🔍 Searching for available open issues...");
-		const issueOutput = execSync("gh issue list --state open --json number,title,body --limit 10", {
-			encoding: "utf-8",
+		const issueOutput = runCommand("gh issue list --state open --json number,title,body --limit 10", {
+			stdio: "pipe",
 		});
 		const issues = JSON.parse(issueOutput) as GitHubIssue[];
 
@@ -84,10 +95,132 @@ async function getIssueToSolve(): Promise<{ number: number; title: string; body:
 			title: availableIssue.title,
 			body: availableIssue.body,
 		};
-	} catch (error) {
-		console.error("❌ Failed to fetch issues or PRs from repository:", (error as Error).message);
+	} catch (error: any) {
+		console.error("❌ Failed to fetch issues or PRs from repository:", error.message);
 		return null;
 	}
+}
+
+async function applyImplementation(responseText: string, selectedIssue: GitHubIssue) {
+	const branchMatch = responseText.match(/BRANCH:\s*(.*)/i);
+	const titleMatch = responseText.match(/TITLE:\s*(.*)/i);
+	const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=CRITICAL_NOTES:|COMMIT_PLAN:|FILE:|$)/i);
+	const criticalNotesMatch = responseText.match(/CRITICAL_NOTES:\s*([\s\S]*?)(?=COMMIT_PLAN:|FILE:|$)/i);
+	const commitPlanMatch = responseText.match(/COMMIT_PLAN:\s*([\s\S]*?)(?=FILE:|$)/i);
+
+	const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/hammer-fix-issue-${selectedIssue.number}`;
+	const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || "fix/hammer-fix";
+
+	let prTitle = titleMatch ? titleMatch[1].trim() : `fix(core): ${selectedIssue.title}`;
+	if (!prTitle.includes("(") || !prTitle.includes("):")) {
+		prTitle = `fix(core): ${prTitle.replace(/^fix\s*:\s*/i, "").replace(/^feat\s*:\s*/i, "")}`;
+	}
+
+	const prDescription = descMatch ? descMatch[1].trim() : selectedIssue.body;
+	const fileBlocks = responseText.split(/FILE:\s*/i).slice(1);
+
+	if (fileBlocks.length === 0) {
+		throw new Error("No 'FILE:' blocks found in AI response.");
+	}
+
+	console.log(`📦 Creating branch: ${branchName}`);
+	try {
+		runCommand(`git branch -D ${branchName}`, { stdio: "ignore" });
+	} catch (_) {}
+	runCommand(`git checkout -b ${branchName}`, { stdio: "inherit" });
+
+	const filesByContext: Record<string, { paths: string[]; message: string }> = {};
+
+	for (const block of fileBlocks) {
+		const [pathPart, ...contentParts] = block
+			.split(/ENDFILE/i)[0]
+			.trim()
+			.split("\n");
+		const filePath = pathPart.trim();
+		const fileContent = contentParts.join("\n").trim();
+
+		console.log(`📝 Applying changes to: ${filePath}`);
+		const absolutePath = join(process.cwd(), filePath);
+		await writeFile(absolutePath, fileContent);
+
+		// Determine context for commit grouping
+		const parts = filePath.split("/");
+		const fileName = parts[parts.length - 1].replace(/\.ts$|\.spec\.ts$/, "");
+		let moduleName = "core";
+		if (filePath.startsWith("src/domain/")) {
+			moduleName = parts[2] || "domain";
+		} else if (filePath.startsWith("src/infrastructure/")) {
+			moduleName = parts[3] || parts[2] || "infra";
+		}
+
+		if (!filesByContext[moduleName]) {
+			let message = `fix(${moduleName}): refine ${moduleName} logic`;
+			if (commitPlanMatch) {
+				const planLines = commitPlanMatch[1].trim().split("\n");
+				const contextLine = planLines.find((l) => {
+					const low = l.toLowerCase();
+					return (
+						low.includes(`(${moduleName.toLowerCase()})`) ||
+						low.includes(`[${moduleName.toLowerCase()}]`) ||
+						low.includes(`(${fileName.toLowerCase()})`) ||
+						low.includes(`[${fileName.toLowerCase()}]`)
+					);
+				});
+				if (contextLine) message = contextLine.replace(/^\s*-\s*/, "").trim();
+			}
+			message = message.replace(/\[|\]/g, "");
+			filesByContext[moduleName] = { paths: [], message };
+		}
+		filesByContext[moduleName].paths.push(filePath);
+	}
+
+	console.log("🛠️ Performing semantic commits...");
+	try {
+		runCommand("git config user.name", { stdio: "ignore" });
+	} catch (_) {
+		console.log("ℹ️ Setting local git identity for the agent...");
+		runCommand('git config user.name "Hammer AI Agent"', { stdio: "inherit" });
+		runCommand('git config user.email "agent@hammer.ai"', { stdio: "inherit" });
+	}
+
+	for (const ctx in filesByContext) {
+		const { paths, message } = filesByContext[ctx];
+		console.log(`💬 Committing ${ctx}: ${message}`);
+		runCommand(`git add ${paths.join(" ")}`, { stdio: "inherit" });
+		runCommand(`git commit -m "${message}"`, { stdio: "inherit" });
+	}
+
+	console.log(`🚀 Pushing branch '${branchName}' to origin...`);
+	try {
+		runCommand(`git push -u origin ${branchName}`, { stdio: "inherit" });
+	} catch (pushError: any) {
+		console.error("\n❌ Push failed. This is often due to failing tests in the pre-push hook.");
+		throw pushError; // Bubble up for repair loop
+	}
+
+	console.log("🚀 Opening Pull Request to 'staging'...");
+	const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
+	await writeFile(tempDescPath, prDescription);
+
+	runCommand(
+		`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName} --fill || gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
+		{ stdio: "inherit" },
+	);
+	await unlink(tempDescPath);
+
+	console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
+
+	if (criticalNotesMatch) {
+		console.log("💬 Adding critical implementation comment...");
+		const criticalNotes = criticalNotesMatch[1].trim();
+		const commentBody = `### Implementation Notes\n\n${criticalNotes}`;
+		const tempCommentPath = join(process.cwd(), "temp-comment.md");
+		await writeFile(tempCommentPath, commentBody);
+		runCommand(`gh pr comment --body-file "${tempCommentPath}"`, { stdio: "inherit" });
+		await unlink(tempCommentPath);
+	}
+
+	runCommand("git checkout -", { stdio: "inherit" });
 }
 
 async function runAgent(agentName: string) {
@@ -105,7 +238,7 @@ async function runAgent(agentName: string) {
 	});
 
 	let hammerIssueContext = "";
-	let selectedIssue: { number: number; title: string; body: string } | null = null;
+	let selectedIssue: GitHubIssue | null = null;
 
 	if (agentName === "hammer") {
 		selectedIssue = await getIssueToSolve();
@@ -127,7 +260,7 @@ ${selectedIssue.body}
 	console.log(`🤖 Starting analysis with agent: ${agentName}...`);
 	const context = await getProjectContext(join(process.cwd(), "src"));
 
-	const fullPrompt = `
+	const initialPrompt = `
 PROJECT RULES AND STANDARDS:
 ${projectRules}
 
@@ -152,177 +285,82 @@ Instructions:
      CRITICAL_NOTES: [Technical description of critical logic, potential side effects, or architectural decisions.]
 
      COMMIT_PLAN:
-     - [tipo](contexto): [A humanized, technical message describing the change. DO NOT just say 'update context'.]
-     (IMPORTANT: DO NOT USE BRACKETS [] AROUND THE TYPE OR CONTEXT IN THE ACTUAL COMMIT MESSAGE. EX: fix(core): message)
+     - [tipo](contexto): [A humanized, technical message. Use 'refactor' for optimizations. DO NOT just say 'update context'.]
+     (IMPORTANT: DO NOT USE BRACKETS [] AROUND THE TYPE OR CONTEXT IN THE ACTUAL COMMIT MESSAGE. EX: refactor(cache): optimize scan)
      
      FILE: src/path/to/file.ts
      [Complete file content here]
      ENDFILE
 `;
 
-	console.log("Sending prompt to Gemini...");
-	console.log(fullPrompt);
+	try {
+		console.log("Sending prompt to Gemini...");
+		const result = await model.generateContent(initialPrompt);
+		const responseText = result.response.text();
 
-	const result = await model.generateContent(fullPrompt);
-	const responseText = result.response.text();
-
-	console.log("Response from Gemini:");
-	console.log(responseText);
-
-	if (responseText.toUpperCase().includes("NO_ISSUES_FOUND")) {
-		console.log("✅ No issues identified by the agent.");
-		return;
-	}
-
-	if (agentName === "hammer" && selectedIssue) {
+		console.log("Response from Gemini:");
 		console.log(responseText);
-		console.log("🛠️ Hammer analysis complete. Processing implementation...");
 
-		const branchMatch = responseText.match(/BRANCH:\s*(.*)/i);
-		const titleMatch = responseText.match(/TITLE:\s*(.*)/i);
-		const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=CRITICAL_NOTES:|COMMIT_PLAN:|FILE:|$)/i);
-		const criticalNotesMatch = responseText.match(/CRITICAL_NOTES:\s*([\s\S]*?)(?=COMMIT_PLAN:|FILE:|$)/i);
-		const commitPlanMatch = responseText.match(/COMMIT_PLAN:\s*([\s\S]*?)(?=FILE:|$)/i);
-
-		const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/hammer-fix-issue-${selectedIssue.number}`;
-		const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || "fix/hammer-fix";
-
-		let prTitle = titleMatch ? titleMatch[1].trim() : `fix(core): ${selectedIssue.title}`;
-		if (!prTitle.includes("(") || !prTitle.includes("):")) {
-			prTitle = `fix(core): ${prTitle.replace(/^fix\s*:\s*/i, "").replace(/^feat\s*:\s*/i, "")}`;
+		if (responseText.toUpperCase().includes("NO_ISSUES_FOUND")) {
+			console.log("✅ No issues identified by the agent.");
+			return;
 		}
 
-		const prDescription = descMatch ? descMatch[1].trim() : selectedIssue.body;
-
-		const fileBlocks = responseText.split(/FILE:\s*/i).slice(1);
-
-		if (fileBlocks.length > 0) {
+		if (agentName === "hammer" && selectedIssue) {
 			try {
-				console.log(`📦 Creating branch: ${branchName}`);
-				try {
-					execSync(`git branch -D ${branchName}`, { stdio: "ignore" });
-				} catch (_) {}
-				execSync(`git checkout -b ${branchName}`, { stdio: "inherit" });
+				await applyImplementation(responseText, selectedIssue);
+			} catch (error: any) {
+				console.log("\n🧪 Entering Self-Repair Loop...");
+				console.log("🔍 Analyzing test failures...");
 
-				const filesByContext: Record<string, { paths: string[]; message: string }> = {};
+				const errorLogs = error.message;
+				const repairPrompt = `
+REPAIR TICKET:
+The previous implementation for Issue #${selectedIssue.number} FAILED the quality checks (tests).
 
-				for (const block of fileBlocks) {
-					const [pathPart, ...contentParts] = block
-						.split(/ENDFILE/i)[0]
-						.trim()
-						.split("\n");
-					const filePath = pathPart.trim();
-					const fileContent = contentParts.join("\n").trim();
+ORIGINAL IMPLEMENTATION:
+${responseText}
 
-					console.log(`📝 Applying changes to: ${filePath}`);
-					const absolutePath = join(process.cwd(), filePath);
-					await writeFile(absolutePath, fileContent);
+ERROR LOGS FROM TESTS:
+${errorLogs}
 
-					// Determine context for commit grouping
-					let contextName = "core";
-					if (filePath.startsWith("src/domain/")) {
-						contextName = filePath.split("/")[2]?.replace(/\.ts$|\.spec\.ts$/, "") || "domain";
-					} else if (filePath.startsWith("src/infrastructure/")) {
-						const parts = filePath.split("/");
-						contextName = (parts[3] || parts[2] || "infra").replace(/\.ts$|\.spec\.ts$/, "");
-					}
+INSTRUCTIONS:
+1. Analyze the ERROR LOGS and identify why the code failed.
+2. Provide a FIXED implementation.
+3. Keep the SAME BRANCH, TITLE, and DESCRIPTION unless explicitly wrong.
+4. Output FULL FILES that need correction.
+5. Use the SAME 'FILE: ... ENDFILE' structure.
+6. Be brief in CRITICAL_NOTES about what you fixed.
+`;
+				console.log("Sending repair prompt to Gemini...");
+				const repairResult = await model.generateContent(repairPrompt);
+				const repairResponse = repairResult.response.text();
 
-					if (!filesByContext[contextName]) {
-						// Try to find specific message from commit plan if available
-						let message = `fix(${contextName}): update ${contextName} implementation`;
-						if (commitPlanMatch) {
-							const planLines = commitPlanMatch[1].trim().split("\n");
-							const contextLine = planLines.find(
-								(l) =>
-									l.toLowerCase().includes(`(${contextName.toLowerCase()})`) ||
-									l.toLowerCase().includes(`[${contextName.toLowerCase()}]`),
-							);
-							if (contextLine) message = contextLine.replace(/^\s*-\s*/, "").trim();
-						}
-						// Sanitize message: Remove brackets []
-						message = message.replace(/\[|\]/g, "");
-						filesByContext[contextName] = { paths: [], message };
-					}
-					filesByContext[contextName].paths.push(filePath);
-				}
+				console.log("Repair Response from Gemini:");
+				console.log(repairResponse);
 
-				console.log("🛠️ Performing semantic commits...");
-				// Ensure git identity
-				try {
-					execSync("git config user.name", { stdio: "ignore" });
-				} catch (_) {
-					console.log("ℹ️ Setting local git identity for the agent...");
-					execSync('git config user.name "Hammer AI Agent"', { stdio: "inherit" });
-					execSync('git config user.email "agent@hammer.ai"', { stdio: "inherit" });
-				}
-
-				for (const ctx in filesByContext) {
-					const { paths, message } = filesByContext[ctx];
-					console.log(`💬 Committing ${ctx}: ${message}`);
-					execSync(`git add ${paths.join(" ")}`, { stdio: "inherit" });
-					execSync(`git commit -m "${message}"`, { stdio: "inherit" });
-				}
-
-				console.log(`🚀 Pushing branch '${branchName}' to origin...`);
-				execSync(`git push -u origin ${branchName}`, { stdio: "inherit" });
-
-				console.log("🚀 Opening Pull Request to 'staging'...");
-				const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
-				await writeFile(tempDescPath, prDescription);
-
-				execSync(
-					`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName} --fill || gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
-					{
-						stdio: "inherit",
-					},
-				);
-				await unlink(tempDescPath);
-
-				console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
-
-				if (criticalNotesMatch) {
-					console.log("💬 Adding critical implementation comment...");
-					const criticalNotes = criticalNotesMatch[1].trim();
-					const commentBody = `### Implementation Notes\n\n${criticalNotes}`;
-					const tempCommentPath = join(process.cwd(), "temp-comment.md");
-					await writeFile(tempCommentPath, commentBody);
-					execSync(`gh pr comment --body-file "${tempCommentPath}"`, { stdio: "inherit" });
-					await unlink(tempCommentPath);
-				}
-
-				execSync("git checkout -", { stdio: "inherit" });
-			} catch (err: unknown) {
-				const msg = err instanceof Error ? err.message : String(err);
-				console.error("❌ Hammer encountered an error during PR creation:", msg);
+				console.log("🛠️ Attempting to apply fixes...");
+				await applyImplementation(repairResponse, selectedIssue);
 			}
 		} else {
-			console.log("⚠️ No specific 'FILE:' blocks found. Implementation printed below for manual review:");
-			console.log(responseText);
+			// Discovery Logic (Bolt/Sentinel)
+			console.log("📝 Generating GitHub Issue (Discovery)...");
+			const issueBodyPath = join(process.cwd(), "temp-issue-body.md");
+			const lines = responseText.split("\n");
+			const title =
+				lines[0]
+					.replace(/^#+\s*/, "")
+					.substring(0, 100)
+					.trim() || "Agent Discovery";
+			await writeFile(issueBodyPath, responseText);
+			const issueUrl = runCommand(`gh issue create --title "${title}" --body-file "${issueBodyPath}"`, {
+				stdio: "pipe",
+			}).trim();
+			console.log(`🚀 Issue created: ${issueUrl}`);
+			await unlink(issueBodyPath);
 		}
-		return;
-	}
-
-	console.log("📝 Generating GitHub Issue (Discovery)...");
-	const issueBodyPath = join(process.cwd(), "temp-issue-body.md");
-	const lines = responseText.split("\n");
-	const title =
-		lines[0]
-			.replace(/^#+\s*/, "")
-			.substring(0, 100)
-			.trim() || `Agent Discovery: ${agentName}`;
-	const body = responseText;
-
-	await writeFile(issueBodyPath, body);
-
-	try {
-		const issueUrl = execSync(`gh issue create --title "${title}" --body-file "${issueBodyPath}"`, {
-			encoding: "utf-8",
-		}).trim();
-		console.log(`🚀 Issue created: ${issueUrl}`);
-	} catch (error) {
-		console.error("❌ Failed to create issue via gh CLI:", (error as Error).message);
-	} finally {
-		await unlink(issueBodyPath);
+	} catch (error: any) {
+		console.error("❌ Hammer critical failure:", error.message);
 	}
 }
 
