@@ -91,14 +91,15 @@ export async function verifyIdToken(provider: providers, token: string) {
 
 	if (!header?.kid || !payload) throw new Error("Invalid token content");
 
-	if (payload.iss !== config.issuer) throw new Error("Invalid token issuer");
+	const normalize = (url: string) => url.replace(/\/$/, "");
+	if (normalize(payload.iss) !== normalize(config.issuer)) throw new Error("Invalid token issuer");
 	if (payload.aud !== config.clientId) throw new Error("Invalid token audience");
 
 	const jwks = await getProviderJwks(config.jwksUri);
-	const jwk = jwks.keys.find((k) => k.kid === header.kid);
+	const jwk = jwks.keys?.find((k) => k.kid === header.kid);
 	if (!jwk) throw new Error("Matching JWK not found");
 
-	const publicKey = createPublicKey({ key: jwk as JsonWebKey, format: "jwk" });
+	const publicKey = createPublicKey({ key: jwk as unknown as import("node:crypto").JsonWebKey, format: "jwk" });
 	const signature = Buffer.from(parts[2], "base64url");
 	const data = `${parts[0]}.${parts[1]}`;
 
