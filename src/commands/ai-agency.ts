@@ -6,10 +6,23 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const SKIP_VERIFY = process.env.SKIP_VERIFY !== "false"; // Default to true
+const DRY_RUN = process.env.DRY_RUN === "true"; // Default to false
 
 // Use GH_AGENCY_TOKEN as GitHub PAT if available
 if (process.env.GH_AGENCY_TOKEN) {
 	process.env.GH_TOKEN = process.env.GH_AGENCY_TOKEN;
+	try {
+		console.log("👤 Syncing git identity with GitHub PAT...");
+		const name = runCommand('gh api user --jq ".name // .login"', { stdio: "pipe" }).trim();
+		const login = runCommand("gh api user --jq .login", { stdio: "pipe" }).trim();
+		const email = `${login}@users.noreply.github.com`;
+
+		runCommand(`git config user.name "${name}"`, { stdio: "inherit" });
+		runCommand(`git config user.email "${email}"`, { stdio: "inherit" });
+		console.log(`✅ Identity synced: ${name} <${email}>`);
+	} catch (_) {
+		console.log("⚠️ Could not sync identity from PAT. Using default/existing config.");
+	}
 }
 
 if (!API_KEY) {
@@ -131,10 +144,14 @@ async function applyImplementation(responseText: string, selectedIssue: GitHubIs
 	}
 
 	console.log(`📦 Creating branch: ${branchName}`);
-	try {
-		runCommand(`git branch -D ${branchName}`, { stdio: "ignore" });
-	} catch (_) {}
-	runCommand(`git checkout -b ${branchName}`, { stdio: "inherit" });
+	if (!DRY_RUN) {
+		try {
+			runCommand(`git branch -D ${branchName}`, { stdio: "ignore" });
+		} catch (_) {}
+		runCommand(`git checkout -b ${branchName}`, { stdio: "inherit" });
+	} else {
+		console.log("🧪 DRY_RUN: skipping 'git checkout'...");
+	}
 
 	const filesByContext: Record<string, { paths: string[]; message: string }> = {};
 
@@ -147,8 +164,15 @@ async function applyImplementation(responseText: string, selectedIssue: GitHubIs
 		const fileContent = contentParts.join("\n").trim();
 
 		console.log(`📝 Applying changes to: ${filePath}`);
-		const absolutePath = join(process.cwd(), filePath);
-		await writeFile(absolutePath, fileContent);
+		if (!DRY_RUN) {
+			const absolutePath = join(process.cwd(), filePath);
+			await writeFile(absolutePath, fileContent);
+		} else {
+			console.log(`🧪 DRY_RUN: skipping writeFile to ${filePath}...`);
+			console.log("--- START CODE ---");
+			console.log(fileContent);
+			console.log("--- END CODE ---");
+		}
 
 		// Determine context for commit grouping
 		const parts = filePath.split("/");
@@ -182,60 +206,74 @@ async function applyImplementation(responseText: string, selectedIssue: GitHubIs
 	}
 
 	console.log("🛠️ Performing semantic commits...");
-	try {
-		runCommand("git config user.name", { stdio: "ignore" });
-	} catch (_) {
-		console.log("ℹ️ Setting local git identity for the agent...");
-		runCommand('git config user.name "Hammer AI Agent"', { stdio: "inherit" });
-		runCommand('git config user.email "agent@hammer.ai"', { stdio: "inherit" });
-	}
-
-	for (const ctx in filesByContext) {
-		const { paths, message } = filesByContext[ctx];
-		console.log(`💬 Committing ${ctx}: ${message}`);
-		const verifyFlag = SKIP_VERIFY ? " --no-verify" : "";
-		runCommand(`git add ${paths.join(" ")}`, { stdio: "inherit" });
-		runCommand(`git commit -m "${message}"${verifyFlag}`, { stdio: "inherit" });
-	}
-
-	console.log(`🚀 Pushing branch '${branchName}' to origin...`);
-	try {
-		const verifyFlag = SKIP_VERIFY ? " --no-verify" : "";
-		runCommand(`git push -u origin ${branchName}${verifyFlag}`, { stdio: "inherit" });
-	} catch (pushError: unknown) {
-		if (!SKIP_VERIFY) {
-			console.error("\n❌ Push failed. This is often due to failing tests in the pre-push hook.");
-			throw pushError; // Bubble up for repair loop
+	if (!DRY_RUN) {
+		try {
+			runCommand("git config user.name", { stdio: "ignore" });
+		} catch (_) {
+			console.log("ℹ️ Setting local git identity for the agent...");
+			runCommand('git config user.name "Hammer AI Agent"', { stdio: "inherit" });
+			runCommand('git config user.email "agent@hammer.ai"', { stdio: "inherit" });
 		}
-		// If SKIP_VERIFY is true, push shouldn't fail due to hooks,
-		// but if it fails for other reasons, we log it.
-		console.error("\n❌ Push failed even with --no-verify:", (pushError as Error).message);
-		throw pushError;
+
+		for (const ctx in filesByContext) {
+			const { paths, message } = filesByContext[ctx];
+			console.log(`💬 Committing ${ctx}: ${message}`);
+			const verifyFlag = SKIP_VERIFY ? " --no-verify" : "";
+			runCommand(`git add ${paths.join(" ")}`, { stdio: "inherit" });
+			runCommand(`git commit -m "${message}"${verifyFlag}`, { stdio: "inherit" });
+		}
+
+		console.log(`🚀 Pushing branch '${branchName}' to origin...`);
+		try {
+			const verifyFlag = SKIP_VERIFY ? " --no-verify" : "";
+			runCommand(`git push -u origin ${branchName}${verifyFlag}`, { stdio: "inherit" });
+		} catch (pushError: unknown) {
+			if (!SKIP_VERIFY) {
+				console.error("\n❌ Push failed. This is often due to failing tests in the pre-push hook.");
+				throw pushError; // Bubble up for repair loop
+			}
+			// If SKIP_VERIFY is true, push shouldn't fail due to hooks,
+			// but if it fails for other reasons, we log it.
+			console.error("\n❌ Push failed even with --no-verify:", (pushError as Error).message);
+			throw pushError;
+		}
+
+		console.log("🚀 Opening Pull Request to 'staging'...");
+		const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
+		await writeFile(tempDescPath, prDescription);
+
+		runCommand(
+			`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName} --fill || gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
+			{ stdio: "inherit" },
+		);
+		await unlink(tempDescPath);
+
+		console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
+
+		if (criticalNotesMatch) {
+			console.log("💬 Adding critical implementation comment...");
+			const criticalNotes = criticalNotesMatch[1].trim();
+			const commentBody = `### Implementation Notes\n\n${criticalNotes}`;
+			const tempCommentPath = join(process.cwd(), "temp-comment.md");
+			await writeFile(tempCommentPath, commentBody);
+			runCommand(`gh pr comment --body-file "${tempCommentPath}"`, { stdio: "inherit" });
+			await unlink(tempCommentPath);
+		}
+
+		runCommand("git checkout -", { stdio: "inherit" });
+	} else {
+		console.log("🧪 DRY_RUN: skipping commits, push, and PR creation...");
+		for (const ctx in filesByContext) {
+			const { message } = filesByContext[ctx];
+			console.log(`💬 DRY_RUN: would commit ${ctx} as: ${message}`);
+		}
+		console.log(`🧪 DRY_RUN: would push branch '${branchName}' to origin...`);
+		console.log(`🧪 DRY_RUN: would open PR with title "${prTitle}" and description:\n${prDescription}`);
+		if (criticalNotesMatch) {
+			console.log(`🧪 DRY_RUN: would add critical implementation comment:\n${criticalNotesMatch[1].trim()}`);
+		}
+		console.log("🧪 DRY_RUN: would checkout previous branch.");
 	}
-
-	console.log("🚀 Opening Pull Request to 'staging'...");
-	const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
-	await writeFile(tempDescPath, prDescription);
-
-	runCommand(
-		`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName} --fill || gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
-		{ stdio: "inherit" },
-	);
-	await unlink(tempDescPath);
-
-	console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
-
-	if (criticalNotesMatch) {
-		console.log("💬 Adding critical implementation comment...");
-		const criticalNotes = criticalNotesMatch[1].trim();
-		const commentBody = `### Implementation Notes\n\n${criticalNotes}`;
-		const tempCommentPath = join(process.cwd(), "temp-comment.md");
-		await writeFile(tempCommentPath, commentBody);
-		runCommand(`gh pr comment --body-file "${tempCommentPath}"`, { stdio: "inherit" });
-		await unlink(tempCommentPath);
-	}
-
-	runCommand("git checkout -", { stdio: "inherit" });
 }
 
 async function runAgent(agentName: string) {
