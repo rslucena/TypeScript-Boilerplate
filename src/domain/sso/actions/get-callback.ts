@@ -14,6 +14,16 @@ export default async function getCallback(request: container) {
 	const valid = await schema.actions.callback.safeParseAsync(request.query());
 	if (!valid.success) throw request.badRequest(request.language(), tag("sso", "callback/schema"));
 
+	const cookieHeader = request.headers().cookie as string | undefined;
+	const stateCookie = cookieHeader
+		?.split(";")
+		.find((c) => c.trim().startsWith("sso_state="))
+		?.split("=")[1];
+
+	if (!stateCookie || stateCookie !== valid.data.state) {
+		throw request.badRequest(request.language(), "Invalid authentication state");
+	}
+
 	const tokens = await exchangeToken(valid.data.provider, valid.data.code);
 	const user = await getNormalizedUser(valid.data.provider, tokens);
 
