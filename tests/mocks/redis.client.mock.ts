@@ -4,13 +4,17 @@ export const createRedisClientMock = () => {
 	const redisMock = {
 		isOpen: true,
 		get: mock((..._args: unknown[]) => Promise.resolve(null as unknown)),
+		mGet: mock((..._args: unknown[]) => Promise.resolve([] as unknown[])),
 		set: mock((..._args: unknown[]) => Promise.resolve("OK")),
 		del: mock((..._args: unknown[]) => Promise.resolve(1)),
 		scan: mock((..._args: unknown[]) => Promise.resolve({ cursor: "0", keys: [] as unknown[] })),
+		sMembers: mock((..._args: unknown[]) => Promise.resolve([] as unknown[])),
+		sAdd: mock((..._args: unknown[]) => Promise.resolve(1)),
 		expire: mock((..._args: unknown[]) => Promise.resolve(true)),
 		incr: mock((..._args: unknown[]) => Promise.resolve(1)),
 		json: {
 			get: mock((..._args: unknown[]) => Promise.resolve(null as unknown)),
+			mGet: mock((..._args: unknown[]) => Promise.resolve([] as unknown[])),
 			set: mock((..._args: unknown[]) => Promise.resolve("OK")),
 			del: mock((..._args: unknown[]) => Promise.resolve(1)),
 		},

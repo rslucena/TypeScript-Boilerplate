@@ -62,11 +62,17 @@ Develop and deliver robust, efficient, and secure code based on existing GitHub 
 
 ### 3. PR Content Requirements
 Follow the `.github/pull_request_template.md` structure:
+- **Branch**: Must be the first thing you output, formatted as `BRANCH: type/description`.
 - **Changes**: Technical summary of the implementation and a **Mermaid diagram**.
 - **Motivation / Context**: Link to the issue and summarize the problem.
 - **Benefits**: Expected performance/security gains.
 - **Type of change**: Mark appropriately.
 - **Checklist**: Complete all items.
+- **Issues Section**: YOU MUST populate the `## Issues` section with the link to the implemented issue using the format `- #NUMBER`. e.g.:
+  ```markdown
+  ## Issues
+  - #123
+  ```
 
 ---
 
