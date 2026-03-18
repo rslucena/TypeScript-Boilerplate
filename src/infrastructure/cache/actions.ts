@@ -9,12 +9,18 @@ const cache: actions = {
 	text: {
 		del: (hash) => del({ type: "text", hash } as setmode),
 		get: <t>(hash: string, force?: boolean) => get<t>({ hash, type: "text" } as setmode, force),
-		set: (hash, vals, ttl) => set({ type: "text", hash, vals, ttl }).catch(() => ""),
+		set: (hash, vals, ttl) =>
+			set({ type: "text", hash, vals, ttl })
+				.then((res) => res ?? "")
+				.catch(() => ""),
 	},
 	json: {
 		del: (hash) => del({ type: "json", hash } as setmode),
 		get: <t>(hash: string, force?: boolean) => get<t>({ hash, type: "json" } as setmode, force),
-		set: (hash, vals, ttl, key) => set({ type: "json", hash, vals, ttl, key }).catch(() => ""),
+		set: (hash, vals, ttl, key) =>
+			set({ type: "json", hash, vals, ttl, key })
+				.then((res) => res ?? "")
+				.catch(() => ""),
 	},
 	status: () => client.isOpen,
 	ping: () => (client.isOpen ? client.ping() : Promise.resolve("PONG")),
