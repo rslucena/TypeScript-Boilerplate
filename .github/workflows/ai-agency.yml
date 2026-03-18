@@ -47,7 +47,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event.inputs.agent == 'bolt'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
           GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
           GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
           GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}
@@ -58,7 +58,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event.inputs.agent == 'sentinel'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
           GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
           GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
           GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}
@@ -94,7 +94,7 @@ jobs:
       - name: Run Execution Agent (Hammer)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_AGENCY_TOKEN || secrets.GITHUB_TOKEN }}
           GH_PROJECT_NUMBER: ${{ secrets.GH_PROJECT_NUMBER }}
           GH_PROJECT_OWNER: ${{ secrets.GH_PROJECT_OWNER }}
           GH_STATUS_FIELD_ID: ${{ secrets.GH_STATUS_FIELD_ID }}

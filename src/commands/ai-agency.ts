@@ -235,12 +235,19 @@ Instructions:
 		}).trim();
 		console.log(`🚀 Issue created: ${issueUrl}`);
 
-		execSync(`gh project item-add ${PROJECT_NUMBER} --owner ${OWNER} --url ${issueUrl}`, {
-			stdio: "inherit",
-		});
-		console.log(`🚀 Issue added to Project board #${PROJECT_NUMBER}!`);
-	} catch (_) {
-		console.error("❌ Failed to create issue or add to project via gh CLI.");
+		try {
+			execSync(`gh project item-add ${PROJECT_NUMBER} --owner ${OWNER} --url ${issueUrl}`, {
+				stdio: "inherit",
+			});
+			console.log(`🚀 Issue added to Project board #${PROJECT_NUMBER}!`);
+		} catch (projectError) {
+			console.error(`❌ Failed to add issue to project board. 
+              Tip: If your project is an Organization project, ensure GITHUB_TOKEN has 'project' write permissions or use a PAT (Personal Access Token) saved as GH_AGENCY_TOKEN secret.`);
+			console.error("Technical details:", (projectError as Error).message);
+		}
+	} catch (issueError) {
+		console.error("❌ Failed to create issue via gh CLI.");
+		console.error("Technical details:", (issueError as Error).message);
 	} finally {
 		await unlink(issueBodyPath);
 	}
