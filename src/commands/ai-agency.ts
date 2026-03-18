@@ -152,16 +152,22 @@ Instructions:
      CRITICAL_NOTES: [Technical description of critical logic, potential side effects, or architectural decisions.]
 
      COMMIT_PLAN:
-     - [context]: [Message for files in this context]
-     (IMPORTANT: DO NOT USE BRACKETS [] AROUND THE TYPE OR CONTEXT IN THE ACTUAL COMMIT MESSAGE. EX: core: message)
+     - [tipo](contexto): [A humanized, technical message describing the change. DO NOT just say 'update context'.]
+     (IMPORTANT: DO NOT USE BRACKETS [] AROUND THE TYPE OR CONTEXT IN THE ACTUAL COMMIT MESSAGE. EX: fix(core): message)
      
      FILE: src/path/to/file.ts
      [Complete file content here]
      ENDFILE
 `;
 
+	console.log("Sending prompt to Gemini...");
+	console.log(fullPrompt);
+
 	const result = await model.generateContent(fullPrompt);
 	const responseText = result.response.text();
+
+	console.log("Response from Gemini:");
+	console.log(responseText);
 
 	if (responseText.toUpperCase().includes("NO_ISSUES_FOUND")) {
 		console.log("✅ No issues identified by the agent.");
@@ -169,6 +175,7 @@ Instructions:
 	}
 
 	if (agentName === "hammer" && selectedIssue) {
+		console.log(responseText);
 		console.log("🛠️ Hammer analysis complete. Processing implementation...");
 
 		const branchMatch = responseText.match(/BRANCH:\s*(.*)/i);
@@ -214,14 +221,15 @@ Instructions:
 					// Determine context for commit grouping
 					let contextName = "core";
 					if (filePath.startsWith("src/domain/")) {
-						contextName = filePath.split("/")[2] || "domain";
+						contextName = filePath.split("/")[2]?.replace(/\.ts$|\.spec\.ts$/, "") || "domain";
 					} else if (filePath.startsWith("src/infrastructure/")) {
-						contextName = filePath.split("/")[3] || filePath.split("/")[2] || "infra";
+						const parts = filePath.split("/");
+						contextName = (parts[3] || parts[2] || "infra").replace(/\.ts$|\.spec\.ts$/, "");
 					}
 
 					if (!filesByContext[contextName]) {
 						// Try to find specific message from commit plan if available
-						let message = `${contextName}: update ${contextName} implementation`;
+						let message = `fix(${contextName}): update ${contextName} implementation`;
 						if (commitPlanMatch) {
 							const planLines = commitPlanMatch[1].trim().split("\n");
 							const contextLine = planLines.find(
@@ -239,12 +247,24 @@ Instructions:
 				}
 
 				console.log("🛠️ Performing semantic commits...");
+				// Ensure git identity
+				try {
+					execSync("git config user.name", { stdio: "ignore" });
+				} catch (_) {
+					console.log("ℹ️ Setting local git identity for the agent...");
+					execSync('git config user.name "Hammer AI Agent"', { stdio: "inherit" });
+					execSync('git config user.email "agent@hammer.ai"', { stdio: "inherit" });
+				}
+
 				for (const ctx in filesByContext) {
 					const { paths, message } = filesByContext[ctx];
 					console.log(`💬 Committing ${ctx}: ${message}`);
 					execSync(`git add ${paths.join(" ")}`, { stdio: "inherit" });
 					execSync(`git commit -m "${message}"`, { stdio: "inherit" });
 				}
+
+				console.log(`🚀 Pushing branch '${branchName}' to origin...`);
+				execSync(`git push -u origin ${branchName}`, { stdio: "inherit" });
 
 				console.log("🚀 Opening Pull Request to 'staging'...");
 				const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
