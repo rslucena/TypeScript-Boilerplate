@@ -91,6 +91,9 @@ export async function verifyIdToken(provider: providers, token: string) {
 
 	if (!header?.kid || !payload) throw new Error("Invalid token content");
 
+	if (payload.iss !== config.issuer) throw new Error("Invalid token issuer");
+	if (payload.aud !== config.clientId) throw new Error("Invalid token audience");
+
 	const jwks = await getProviderJwks(config.jwksUri);
 	const jwk = jwks.keys.find((k) => k.kid === header.kid);
 	if (!jwk) throw new Error("Matching JWK not found");
