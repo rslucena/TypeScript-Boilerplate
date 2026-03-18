@@ -3,6 +3,7 @@ import type { IncomingMessage } from "node:http";
 import Logs from "@infrastructure/logs/handler";
 import { messages } from "@infrastructure/messages/actions";
 import { safeParse } from "@infrastructure/pipes/safe-parse";
+import { env } from "@infrastructure/settings/environment";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import authentication from "./authentication";
 import { container } from "./interface";
@@ -25,8 +26,16 @@ export default function websocket(Params: WebSocketServer["options"]) {
 }
 
 function connection(link: WebSocket, request: IncomingMessage) {
-	const ip = request.socket.remoteAddress ?? randomUUID();
-	const id = Buffer.from(ip).toString("base64");
+	const origin = request.headers.origin;
+	const allowedOrigins = env.PROCESS_CORS_ORIGIN.split(",").map((o) => o.trim());
+	const isAllowed = allowedOrigins.includes("*") || (origin && allowedOrigins.includes(origin));
+
+	if (env.NODE_ENV === "production" && !isAllowed) {
+		link.terminate();
+		return;
+	}
+
+	const id = randomUUID();
 	clients.set(id, { link, authenticated: false });
 
 	const heartbeat = setInterval(() => {
@@ -51,8 +60,8 @@ async function message(id: string, data: RawData) {
 	if (!decoded || !client) return disconnect(id);
 
 	const { action, context, session } = decoded as payload;
-	if (!action || !context || !session) disconnect(id);
-	if (session !== id) disconnect(id);
+	if (!action || !context || !session) return disconnect(id);
+	if (session !== id) return disconnect(id);
 
 	switch (action) {
 		case "authorization":
@@ -75,7 +84,7 @@ async function message(id: string, data: RawData) {
 		}
 
 		default:
-			disconnect(id);
+			return disconnect(id);
 	}
 }
 
@@ -89,8 +98,12 @@ async function disconnect(id: string) {
 	}
 	const client = clients.get(id);
 	if (!client) return;
-	client.link.send(mdisconnect);
-	client.link.close();
+	try {
+		client.link.send(mdisconnect);
+		client.link.close();
+	} catch (e) {
+		logger.error(`Error during disconnect for ${id}: ${e}`);
+	}
 	clients.delete(id);
 }
 
@@ -128,7 +141,13 @@ async function broadcast(snapshot: unknown, topic?: string) {
 	if (subscribers) {
 		for (const id of subscribers) {
 			const client = clients.get(id);
-			if (client && client.link.readyState === 1) client.link.send(message);
+			if (client && client.link.readyState === 1) {
+				try {
+					client.link.send(message);
+				} catch {
+					disconnect(id);
+				}
+			}
 		}
 	}
 }
