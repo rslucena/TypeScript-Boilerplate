@@ -14,10 +14,11 @@ export default async function getCallback(request: container) {
 	const valid = await schema.actions.callback.safeParseAsync(request.query());
 	if (!valid.success) throw request.badRequest(request.language(), tag("sso", "callback/schema"));
 
-	const cookieHeader = request.headers().cookie as string | undefined;
-	const savedState = cookieHeader
+	const cookies = request.headers().cookie as string | undefined;
+	const savedState = cookies
 		?.split(";")
-		.find((c) => c.trim().startsWith("sso_state="))
+		.map((c) => c.trim())
+		.find((c) => c.startsWith("sso_state="))
 		?.split("=")[1];
 
 	if (!savedState || savedState !== valid.data.state) {
