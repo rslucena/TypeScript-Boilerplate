@@ -145,9 +145,15 @@ Instructions:
    - Analyze the SELECTED ISSUE and the code context.
    - Follow ALL PR and Implementation rules from the PROJECT RULES.
    - Output your implementation in a structured format:
-     BRANCH: [type/short-description, e.g., feat/optimize-cache or fix/sanitize-input. NO NUMBERS.]
-     TITLE: [PR Title]
-     DESCRIPTION: [Detailed PR Description. YOU MUST populate the '## Issues' section of the template with '- #${selectedIssue?.number}' to link the issue.]
+     BRANCH: [tipo/descricao-curta. NO NUMBERS.]
+     TITLE: [tipo(contexto): implementacao. EX: fix(cache): optimize scan]
+     DESCRIPTION: [Detailed PR Description. MUST follow the structure of .github/pull_request_template.md. POPULATE the '## Issues' section with '- #${selectedIssue?.number}'.]
+     
+     CRITICAL_NOTES: [Technical description of critical logic, potential side effects, or architectural decisions.]
+
+     COMMIT_PLAN:
+     - [context]: [Message for files in this context]
+     (IMPORTANT: DO NOT USE BRACKETS [] AROUND THE TYPE OR CONTEXT IN THE ACTUAL COMMIT MESSAGE. EX: core: message)
      
      FILE: src/path/to/file.ts
      [Complete file content here]
@@ -157,7 +163,7 @@ Instructions:
 	const result = await model.generateContent(fullPrompt);
 	const responseText = result.response.text();
 
-	if (responseText.includes("NO_ISSUES_FOUND")) {
+	if (responseText.toUpperCase().includes("NO_ISSUES_FOUND")) {
 		console.log("✅ No issues identified by the agent.");
 		return;
 	}
@@ -165,17 +171,23 @@ Instructions:
 	if (agentName === "hammer" && selectedIssue) {
 		console.log("🛠️ Hammer analysis complete. Processing implementation...");
 
-		const branchMatch = responseText.match(/BRANCH:\s*(.*)/);
-		const titleMatch = responseText.match(/TITLE:\s*(.*)/);
-		const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=FILE:|$)/);
+		const branchMatch = responseText.match(/BRANCH:\s*(.*)/i);
+		const titleMatch = responseText.match(/TITLE:\s*(.*)/i);
+		const descMatch = responseText.match(/DESCRIPTION:\s*([\s\S]*?)(?=CRITICAL_NOTES:|COMMIT_PLAN:|FILE:|$)/i);
+		const criticalNotesMatch = responseText.match(/CRITICAL_NOTES:\s*([\s\S]*?)(?=COMMIT_PLAN:|FILE:|$)/i);
+		const commitPlanMatch = responseText.match(/COMMIT_PLAN:\s*([\s\S]*?)(?=FILE:|$)/i);
 
-		const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/issue-${selectedIssue.number || Date.now()}`;
-		const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || `fix/automated-fix`;
+		const prBranchRaw = branchMatch ? branchMatch[1].trim() : `fix/hammer-fix-issue-${selectedIssue.number}`;
+		const branchName = prBranchRaw.replace(/\d+/g, "").replace(/-+$/g, "").replace(/\/+$/g, "") || "fix/hammer-fix";
 
-		const prTitle = titleMatch ? titleMatch[1].trim() : `Fix: ${selectedIssue.title}`;
+		let prTitle = titleMatch ? titleMatch[1].trim() : `fix(core): ${selectedIssue.title}`;
+		if (!prTitle.includes("(") || !prTitle.includes("):")) {
+			prTitle = `fix(core): ${prTitle.replace(/^fix\s*:\s*/i, "").replace(/^feat\s*:\s*/i, "")}`;
+		}
+
 		const prDescription = descMatch ? descMatch[1].trim() : selectedIssue.body;
 
-		const fileBlocks = responseText.split("FILE:").slice(1);
+		const fileBlocks = responseText.split(/FILE:\s*/i).slice(1);
 
 		if (fileBlocks.length > 0) {
 			try {
@@ -185,31 +197,83 @@ Instructions:
 				} catch (_) {}
 				execSync(`git checkout -b ${branchName}`, { stdio: "inherit" });
 
+				const filesByContext: Record<string, { paths: string[]; message: string }> = {};
+
 				for (const block of fileBlocks) {
-					const [pathPart, ...contentParts] = block.split("ENDFILE")[0].trim().split("\n");
+					const [pathPart, ...contentParts] = block
+						.split(/ENDFILE/i)[0]
+						.trim()
+						.split("\n");
 					const filePath = pathPart.trim();
 					const fileContent = contentParts.join("\n").trim();
 
 					console.log(`📝 Applying changes to: ${filePath}`);
 					const absolutePath = join(process.cwd(), filePath);
 					await writeFile(absolutePath, fileContent);
+
+					// Determine context for commit grouping
+					let contextName = "core";
+					if (filePath.startsWith("src/domain/")) {
+						contextName = filePath.split("/")[2] || "domain";
+					} else if (filePath.startsWith("src/infrastructure/")) {
+						contextName = filePath.split("/")[3] || filePath.split("/")[2] || "infra";
+					}
+
+					if (!filesByContext[contextName]) {
+						// Try to find specific message from commit plan if available
+						let message = `${contextName}: update ${contextName} implementation`;
+						if (commitPlanMatch) {
+							const planLines = commitPlanMatch[1].trim().split("\n");
+							const contextLine = planLines.find(
+								(l) =>
+									l.toLowerCase().includes(`(${contextName.toLowerCase()})`) ||
+									l.toLowerCase().includes(`[${contextName.toLowerCase()}]`),
+							);
+							if (contextLine) message = contextLine.replace(/^\s*-\s*/, "").trim();
+						}
+						// Sanitize message: Remove brackets []
+						message = message.replace(/\[|\]/g, "");
+						filesByContext[contextName] = { paths: [], message };
+					}
+					filesByContext[contextName].paths.push(filePath);
+				}
+
+				console.log("🛠️ Performing semantic commits...");
+				for (const ctx in filesByContext) {
+					const { paths, message } = filesByContext[ctx];
+					console.log(`💬 Committing ${ctx}: ${message}`);
+					execSync(`git add ${paths.join(" ")}`, { stdio: "inherit" });
+					execSync(`git commit -m "${message}"`, { stdio: "inherit" });
 				}
 
 				console.log("🚀 Opening Pull Request to 'staging'...");
 				const tempDescPath = join(process.cwd(), "temp-pr-desc.md");
 				await writeFile(tempDescPath, prDescription);
+
 				execSync(
-					`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
+					`gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName} --fill || gh pr create --title "${prTitle}" --body-file "${tempDescPath}" --base staging --head ${branchName}`,
 					{
 						stdio: "inherit",
 					},
 				);
 				await unlink(tempDescPath);
 
-				execSync("git checkout -", { stdio: "inherit" });
 				console.log(`✨ Hammer successfully opened PR for Issue #${selectedIssue.number}!`);
-			} catch (error) {
-				console.error("❌ Hammer encountered an error during PR creation:", (error as Error).message);
+
+				if (criticalNotesMatch) {
+					console.log("💬 Adding critical implementation comment...");
+					const criticalNotes = criticalNotesMatch[1].trim();
+					const commentBody = `### Implementation Notes\n\n${criticalNotes}`;
+					const tempCommentPath = join(process.cwd(), "temp-comment.md");
+					await writeFile(tempCommentPath, commentBody);
+					execSync(`gh pr comment --body-file "${tempCommentPath}"`, { stdio: "inherit" });
+					await unlink(tempCommentPath);
+				}
+
+				execSync("git checkout -", { stdio: "inherit" });
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err);
+				console.error("❌ Hammer encountered an error during PR creation:", msg);
 			}
 		} else {
 			console.log("⚠️ No specific 'FILE:' blocks found. Implementation printed below for manual review:");
