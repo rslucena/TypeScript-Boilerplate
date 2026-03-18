@@ -3,6 +3,7 @@ import type { IncomingMessage } from "node:http";
 import Logs from "@infrastructure/logs/handler";
 import { messages } from "@infrastructure/messages/actions";
 import { safeParse } from "@infrastructure/pipes/safe-parse";
+import { env } from "@infrastructure/settings/environment";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import authentication from "./authentication";
 import { container } from "./interface";
@@ -25,8 +26,16 @@ export default function websocket(Params: WebSocketServer["options"]) {
 }
 
 function connection(link: WebSocket, request: IncomingMessage) {
-	const ip = request.socket.remoteAddress ?? randomUUID();
-	const id = Buffer.from(ip).toString("base64");
+	const origin = request.headers.origin;
+	const allowedOrigins = env.PROCESS_CORS_ORIGIN.split(",").map((o) => o.trim());
+
+	if (!env.isDev && origin && !allowedOrigins.some((ao) => origin.startsWith(ao))) {
+		logger.warn(`Rejected websocket connection from unauthorized origin: ${origin}`);
+		link.close();
+		return;
+	}
+
+	const id = randomUUID();
 	clients.set(id, { link, authenticated: false });
 
 	const heartbeat = setInterval(() => {
