@@ -89,7 +89,7 @@ async function getIssueToSolve(): Promise<{ number: number; title: string; body:
 		for (const pr of prs) {
 			const matches = pr.body.matchAll(issueRegex);
 			for (const match of matches) {
-				linkedIssues.add(Number.parseInt(match[1]));
+				linkedIssues.add(Number.parseInt(match[1], 10));
 			}
 		}
 

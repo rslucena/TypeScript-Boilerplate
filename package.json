@@ -27,9 +27,9 @@
 	"scripts": {
 		"gen:domain": "bun src/commands/generate-domain.ts",
 		"gen:keys": "bun src/commands/generate-keys.ts",
-		"format": "bunx @biomejs/biome format --write --config-path ./biome.json .",
-		"lint": "bunx @biomejs/biome check --config-path ./biome.json .",
-		"lint:fix": "bunx @biomejs/biome check --write --config-path ./biome.json .",
+		"format": "bun x @biomejs/biome format --write --config-path ./biome.json .",
+		"lint": "bun x @biomejs/biome check --config-path ./biome.json .",
+		"lint:fix": "bun x @biomejs/biome check --write --config-path ./biome.json .",
 		"pb:health": "bun outdated",
 		"tests": "bun test --coverage",
 		"tests:ci": "./bin/act pull_request -W .github/workflows/ci.yml -P ubuntu-latest=catthehacker/ubuntu:act-latest",
