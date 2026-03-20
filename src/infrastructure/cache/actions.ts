@@ -42,12 +42,12 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 		return (safeParse<t>(action as string) ?? action) as t;
 	}
 
-	const namespace = hash.replace("*", "");
+	const namespace = hash.replace("*", "").replace(/\/$/, "");
 	const setKey = `${namespace}:keys`;
 	const keys = await client.sMembers(setKey).catch(() => []);
 	if (!keys.length) return null;
 
-	let results: (string | null | unknown)[];
+	let results: unknown[];
 	if (useStackJson) {
 		const mget = await client.json.mGet(keys, "$").catch(() => []);
 		results = mget.map((item) => (Array.isArray(item) ? item[0] : item));
@@ -70,10 +70,9 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
 	if (!client.isOpen) return null;
 
-	const namespace = hash.split("{")[0];
-	if (namespace && namespace !== hash) {
-		await client.sAdd(`${namespace}:keys`, hash).catch(() => null);
-	}
+	const namespace = hash.includes("{") ? hash.split("{")[0].replace(/\/$/, "") : hash;
+	const setKey = `${namespace}:keys`;
+	if (hash !== setKey) await client.sAdd(setKey, hash).catch(() => null);
 
 	const useStackJson = isStack() && type === "json";
 	const data = useStackJson ? JSON.parse(JSON.stringify(vals)) : typeof vals === "string" ? vals : JSON.stringify(vals);
@@ -90,7 +89,7 @@ async function del({ hash }: setmode): Promise<number> {
 	if (!client.isOpen) return 0;
 
 	if (hash.endsWith("*")) {
-		const namespace = hash.replace("*", "");
+		const namespace = hash.replace("*", "").replace(/\/$/, "");
 		const setKey = `${namespace}:keys`;
 		const keys = await client.sMembers(setKey).catch(() => []);
 		if (!keys.length) return 0;
@@ -99,8 +98,7 @@ async function del({ hash }: setmode): Promise<number> {
 		return keys.length;
 	}
 
-	const result = await client.del(hash).catch(() => 0);
-	return result;
+	return await client.del(hash).catch(() => 0);
 }
 
 export default cache;
