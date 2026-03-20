@@ -42,7 +42,7 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 		return (safeParse<t>(action as string) ?? action) as t;
 	}
 
-	const namespace = hash.replace("*", "");
+	const namespace = hash.replace("*", "").replace(/\/$/, "");
 	const setKey = `${namespace}:keys`;
 	const keys = await client.sMembers(setKey).catch(() => []);
 	if (!keys.length) return null;
@@ -70,10 +70,8 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | null> {
 	if (!client.isOpen) return null;
 
-	const namespace = hash.split("{")[0];
-	if (namespace && namespace !== hash) {
-		await client.sAdd(`${namespace}:keys`, hash).catch(() => null);
-	}
+	const namespace = hash.includes("{") ? hash.split("{")[0].replace(/\/$/, "") : hash;
+	if (namespace) await client.sAdd(`${namespace}:keys`, hash).catch(() => null);
 
 	const useStackJson = isStack() && type === "json";
 	const data = useStackJson ? JSON.parse(JSON.stringify(vals)) : typeof vals === "string" ? vals : JSON.stringify(vals);
@@ -82,7 +80,11 @@ async function set({ type, hash, vals, ttl, key }: setmode): Promise<string | nu
 		? await client.json.set(hash, key ?? "$", data).catch(() => null)
 		: await client.set(hash, data as string).catch(() => null);
 
-	if (ttl) await client.expire(hash, ttl).catch(() => null);
+	if (ttl) {
+		await client.expire(hash, ttl).catch(() => null);
+		if (namespace) await client.expire(`${namespace}:keys`, ttl).catch(() => null);
+	}
+
 	return action as string | null;
 }
 
@@ -90,7 +92,7 @@ async function del({ hash }: setmode): Promise<number> {
 	if (!client.isOpen) return 0;
 
 	if (hash.endsWith("*")) {
-		const namespace = hash.replace("*", "");
+		const namespace = hash.replace("*", "").replace(/\/$/, "");
 		const setKey = `${namespace}:keys`;
 		const keys = await client.sMembers(setKey).catch(() => []);
 		if (!keys.length) return 0;
@@ -98,6 +100,9 @@ async function del({ hash }: setmode): Promise<number> {
 		await client.del([...keys, setKey]).catch(() => null);
 		return keys.length;
 	}
+
+	const namespace = hash.includes("{") ? hash.split("{")[0].replace(/\/$/, "") : hash;
+	if (namespace) await client.sRem(`${namespace}:keys`, hash).catch(() => null);
 
 	const result = await client.del(hash).catch(() => 0);
 	return result;
