@@ -1,17 +1,15 @@
 import { execSync } from "node:child_process";
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const API_KEY = process.env.GEMINI_API_KEY;
-
-if (!API_KEY) {
+if (!process.env.GEMINI_API_KEY) {
 	console.error("❌ GEMINI_API_KEY not set");
 	process.exit(1);
 }
 
-const genAI = new GoogleGenerativeAI(API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 const prompts = (rules: string, agentPrompt: string, context: string) => `
@@ -32,7 +30,7 @@ STRICT INSTRUCTIONS:
 - If nothing relevant, output EXACTLY: NO_ISSUES_FOUND
 
 OUTPUT FORMAT:
-# [bolt] <short-title>
+# <short-title>
 
 ## Problem
 ...
@@ -47,7 +45,7 @@ OUTPUT FORMAT:
 ...
 `;
 
-function run(command: string): string {
+function runExec(command: string): string {
 	return execSync(command, { encoding: "utf-8" }).trim();
 }
 
@@ -57,34 +55,46 @@ function safe(str: string) {
 
 async function getRelevantContext(): Promise<string> {
 	const base = join(process.cwd(), "src");
-	const files = readdirSync(base);
 	let context = "";
+	const MAX_TOTAL_SIZE = 100000;
 	const MAX_FILE_SIZE = 5000;
 
-	for (const file of files) {
-		const full = join(base, file);
+	async function walk(dir: string) {
+		const entries = readdirSync(dir, { withFileTypes: true });
 
-		if (statSync(full).isDirectory()) continue;
-		if (!file.match(/\.(ts|js)$/)) continue;
+		for (const entry of entries) {
+			const fullPath = join(dir, entry.name);
 
-		const content = (await readFile(full, "utf-8")).slice(0, MAX_FILE_SIZE);
+			if (context.length > MAX_TOTAL_SIZE) break;
 
-		context += `\n--- FILE: ${file} ---\n${content}\n`;
+			if (entry.isDirectory()) {
+				await walk(fullPath);
+				continue;
+			}
+
+			if (!entry.name.match(/\.(ts|js)$/)) continue;
+
+			const relativePath = fullPath.replace(process.cwd(), "");
+			const content = (await readFile(fullPath, "utf-8")).slice(0, MAX_FILE_SIZE);
+
+			context += `\n--- FILE: ${relativePath} ---\n${content}\n`;
+		}
 	}
 
+	await walk(base);
 	return context;
 }
 
 async function buildPrompt(): Promise<string> {
 	const rules = await readFile(".agent/rules.md", "utf-8").catch(() => "");
-	const agentPrompt = await readFile(".agent/prompts/bolt.md", "utf-8");
+	const agentPrompt = await readFile(".agent/prompts/performance.md", "utf-8");
 	const context = await getRelevantContext();
 	return prompts(rules, agentPrompt, context);
 }
 
 function issueExists(): boolean {
 	try {
-		const result = run(`gh issue list --state open --search "[bolt]" --json title`);
+		const result = runExec(`gh issue list --state open --label "automations" --json title`);
 		const issues = JSON.parse(result);
 		return issues.length > 0;
 	} catch {
@@ -94,10 +104,13 @@ function issueExists(): boolean {
 
 function getLabels(content: string): string[] {
 	const lower = content.toLowerCase();
+	const labels = ["automations"];
 	if (lower.includes("bug") || lower.includes("leak")) {
-		return ["fix", "core"];
+		labels.push("fix");
+	} else {
+		labels.push("chore");
 	}
-	return ["chore", "core"];
+	return labels;
 }
 
 async function createIssue(content: string) {
@@ -116,15 +129,15 @@ async function createIssue(content: string) {
 
 	await writeFile(tempPath, content);
 
-	const url = run(`gh issue create --title "${safe(title)}" --body-file "${tempPath}" --label "${labels}"`);
+	const url = runExec(`gh issue create --title "${safe(title)}" --body-file "${tempPath}" --label "${labels}"`);
 
 	console.log("🚀 Issue created:", url);
 
 	await unlink(tempPath);
 }
 
-async function runBolt() {
-	console.log("⚡ Bolt starting (performance discovery)...");
+async function run() {
+	console.log("⚡ Agent Performance starting (performance discovery)...");
 
 	const prompt = await buildPrompt();
 
@@ -148,6 +161,6 @@ async function runBolt() {
 	await createIssue(response);
 }
 
-runBolt().catch((err) => {
-	console.error("❌ Bolt failed:", err.message);
+run().catch((err) => {
+	console.error("❌ Agent Performance failed:", err.message);
 });

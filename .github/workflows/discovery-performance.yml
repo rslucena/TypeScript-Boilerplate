@@ -27,8 +27,8 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Run Bolt Agent
+      - name: Run Performance Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun src/automations/discovery-bolt.ts
+        run: bun src/automations/discovery-performance.ts
