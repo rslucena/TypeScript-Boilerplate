@@ -15,7 +15,14 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 function runExec(cmd: string): string {
-	return execSync(cmd, { encoding: "utf-8" }).trim();
+	try {
+		return execSync(cmd, { encoding: "utf-8", stdio: "pipe" }).trim();
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err.message : String(err);
+		const output = (err as { stdout?: Buffer })?.stdout?.toString() || "";
+		const stderr = (err as { stderr?: Buffer })?.stderr?.toString() || "";
+		throw new Error(`${output}\n${stderr}\n${error}`);
+	}
 }
 
 function safe(str: string) {
@@ -72,6 +79,16 @@ async function getContext(): Promise<string> {
 	return context;
 }
 
+function hasAutomationComment(issueNumber: number): boolean {
+	try {
+		const raw = runExec(`gh issue view ${issueNumber} --json comments`);
+		const data = JSON.parse(raw);
+		return data.comments.some((c: { body: string }) => c.body.includes("<!-- hammer:fix-applied -->"));
+	} catch {
+		return false;
+	}
+}
+
 function pickIssue(): { number: number; title: string; body: string } | null {
 	try {
 		const raw = runExec(`gh issue list --state open --label "automations" --json number,title,body`);
@@ -80,8 +97,13 @@ function pickIssue(): { number: number; title: string; body: string } | null {
 
 		if (!issues.length) return null;
 
-		// Pick the oldest one
-		return issues[0];
+		for (const issue of issues) {
+			if (!hasAutomationComment(issue.number)) {
+				return issue;
+			}
+		}
+
+		return null;
 	} catch {
 		return null;
 	}
@@ -128,54 +150,122 @@ ENDFILE
 `;
 }
 
-async function apply(response: string) {
-	const branchRaw = response.match(/BRANCH:\s*(.*)/i)?.[1]?.trim();
-	if (!branchRaw) throw new Error("No BRANCH found in response");
+async function verify(): Promise<{ success: boolean; error?: string }> {
+	try {
+		console.log("🔍 Running Quality Gate (Lint, Build, Test)...");
 
-	// Ensure branch name has no numbers as per rules
-	const branch = branchRaw.replace(/[0-9]/g, "");
+		console.log("   - [1/3] Checking Lint/Format (biome)...");
+		runExec("bun run check");
 
-	const title = response.match(/TITLE:\s*(.*)/i)?.[1]?.trim() || "fix(core): auto fix";
+		console.log("   - [2/3] Checking Types/Build (typescript)...");
+		runExec("bun run build");
 
-	const description = response.match(/DESCRIPTION:\s*([\s\S]*?)(?=COMMIT:|FILE:|$)/i)?.[1]?.trim() || "auto fix";
+		console.log("   - [3/3] Running Unit Tests (bun:test)...");
+		runExec("bun run test");
 
-	const commitRaw = response.match(/COMMIT:\s*(.*)/i)?.[1]?.trim() || "fix: auto";
-	const commit = commitRaw.replace(/"/g, "'");
+		return { success: true };
+	} catch (err: unknown) {
+		return { success: false, error: err instanceof Error ? err.message : String(err) };
+	}
+}
 
+function buildRetryPrompt(originalPrompt: string, response: string, error: string) {
+	return `
+${originalPrompt}
+
+---
+YOUR PREVIOUS ATTEMPT FAILED WITH THESE ERRORS:
+${error}
+
+YOUR PREVIOUS RESPONSE:
+${response}
+
+STRICT INSTRUCTIONS:
+- Analyze the errors above and fix them.
+- Ensure the code follows ALL project rules.
+- Output the COMPLETELY CORRECTED files.
+`;
+}
+
+async function writeFiles(response: string) {
 	const fileBlocks = response.split(/FILE:\s*/i).slice(1);
-
-	if (!fileBlocks.length) throw new Error("No files returned");
-
-	console.log(`🌿 Creating branch: ${branch}`);
-	runExec(`git checkout -b ${branch}`);
+	if (!fileBlocks.length) throw new Error("No files returned in response");
 
 	for (const block of fileBlocks) {
 		const [path, ...rest] = block
 			.split(/ENDFILE/i)[0]
 			.trim()
 			.split("\n");
-
 		const filePath = path.trim();
 		const content = rest.join("\n");
 
 		console.log(`📝 Writing file: ${filePath}`);
 		await writeFile(join(process.cwd(), filePath), content);
-		runExec(`git add ${filePath}`);
+	}
+}
+
+async function commitAndPush(response: string, issue: Issue, error?: string) {
+	const branchRaw = response.match(/BRANCH:\s*(.*)/i)?.[1]?.trim();
+	if (!branchRaw) throw new Error("No BRANCH found in response");
+	const branch = branchRaw.replace(/[0-9]/g, "");
+
+	const title = response.match(/TITLE:\s*(.*)/i)?.[1]?.trim() || "fix(core): auto fix";
+	const description = response.match(/DESCRIPTION:\s*([\s\S]*?)(?=COMMIT:|FILE:|$)/i)?.[1]?.trim() || "auto fix";
+	const commitRaw = response.match(/COMMIT:\s*(.*)/i)?.[1]?.trim() || "fix: auto";
+	const commit = commitRaw.replace(/"/g, "'");
+
+	const fileBlocks = response.split(/FILE:\s*/i).slice(1);
+	for (const block of fileBlocks) {
+		const path = block.split("\n")[0].trim();
+		runExec(`git add ${path}`);
 	}
 
+	console.log(`🌿 Creating branch: ${branch}`);
+	runExec(`git checkout -b ${branch}`);
+
 	console.log(`💾 Committing changes...`);
-	runExec(`git commit -m "${commit}"`);
+	runExec(`git commit -m "${commit}" --no-verify`);
 
 	console.log(`⬆️ Pushing to origin...`);
 	runExec(`git push -u origin ${branch}`);
 
-	const tempPath = join(process.cwd(), "pr.md");
-	await writeFile(tempPath, description);
+	if (!error) {
+		const tempPath = join(process.cwd(), "pr.md");
+		await writeFile(tempPath, description);
 
-	console.log(`🚀 Creating Pull Request...`);
-	runExec(`gh pr create --title "${safe(title)}" --body-file "${tempPath}" --base staging --head ${branch}`);
+		console.log(`🚀 Creating Pull Request...`);
+		const prUrl = runExec(
+			`gh pr create --title "${safe(title)}" --body-file "${tempPath}" --base staging --head ${branch}`,
+		);
 
-	await unlink(tempPath);
+		console.log(`💬 Adding success comment to issue #${issue.number}...`);
+		const commentBody = `
+Hello! I've implemented an automated fix for this issue. 
+The Pull Request with the changes is now open: ${prUrl}
+
+All local quality checks (lint, build, tests) passed. 
+<!-- hammer:fix-applied -->
+`.trim();
+
+		runExec(`gh issue comment ${issue.number} --body "${safe(commentBody)}"`);
+		await unlink(tempPath);
+	} else {
+		console.log(`💬 Adding failure comment to issue #${issue.number}...`);
+		const commentBody = `
+Hello! I attempted to fix this issue automatically, but the generated code failed local quality checks (lint, build, or tests) after multiple attempts.
+
+The changes have been pushed to the branch \`${branch}\` for human review. 
+Please perform a deep analysis of the code and the tests.
+
+**Error Details:**
+\`\`\`
+${error}
+\`\`\`
+<!-- hammer:fix-applied -->
+`.trim();
+
+		runExec(`gh issue comment ${issue.number} --body "${safe(commentBody)}"`);
+	}
 }
 
 async function run() {
@@ -184,7 +274,6 @@ async function run() {
 	await setupGitConfig();
 
 	const issue = pickIssue();
-
 	if (!issue) {
 		console.log("😴 No issues available with 'automations' label.");
 		return;
@@ -196,15 +285,44 @@ async function run() {
 	const agentPrompt = await readFile(".agent/prompts/hammer.md", "utf-8");
 	const context = await getContext();
 
-	console.log("🤖 Calling Gemini for the fix...");
-	const prompt = buildPrompt(issue, rules, context, agentPrompt);
-	const result = await model.generateContent(prompt);
-	const response = result.response.text();
+	let currentPrompt = buildPrompt(issue, rules, context, agentPrompt);
+	let attempts = 0;
+	const MAX_ATTEMPTS = 3;
+	let lastResponse = "";
+	let lastError = "";
 
-	console.log("📄 Response received. Applying fix...");
-	console.log(response);
+	while (attempts < MAX_ATTEMPTS) {
+		attempts++;
+		console.log(`🤖 [Attempt ${attempts}/${MAX_ATTEMPTS}] Calling Gemini...`);
 
-	await apply(response);
+		const result = await model.generateContent(currentPrompt);
+		const response = result.response.text();
+		lastResponse = response;
+
+		try {
+			await writeFiles(response);
+
+			const resultGate = await verify();
+			if (resultGate.success) {
+				console.log("✨ Quality Gate PASSED!");
+				await commitAndPush(response, issue);
+				return;
+			}
+
+			console.warn(`❌ Quality Gate FAILED on attempt ${attempts}.`);
+			lastError = resultGate.error || "Unknown error";
+			console.log(lastError);
+
+			currentPrompt = buildRetryPrompt(currentPrompt, response, lastError);
+		} catch (err: unknown) {
+			lastError = err instanceof Error ? err.message : String(err);
+			console.error(`❌ Error during application on attempt ${attempts}:`, lastError);
+			currentPrompt = buildRetryPrompt(currentPrompt, response, lastError);
+		}
+	}
+
+	console.error("💀 Maximum attempts reached. Pushing anyway for human review.");
+	await commitAndPush(lastResponse, issue, lastError);
 }
 
 run().catch((err) => {
