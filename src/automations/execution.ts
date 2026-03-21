@@ -155,13 +155,13 @@ async function verify(): Promise<{ success: boolean; error?: string }> {
 		console.log("🔍 Running Quality Gate (Lint, Build, Test)...");
 
 		console.log("   - [1/3] Checking Lint/Format (biome)...");
-		runExec("bun run check");
+		runExec("bun run lint");
 
 		console.log("   - [2/3] Checking Types/Build (typescript)...");
 		runExec("bun run build");
 
 		console.log("   - [3/3] Running Unit Tests (bun:test)...");
-		runExec("bun run test");
+		runExec("bun run tests");
 
 		return { success: true };
 	} catch (err: unknown) {
@@ -230,12 +230,13 @@ async function commitAndPush(response: string, issue: Issue, error?: string) {
 	runExec(`git push -u origin ${branch}`);
 
 	if (!error) {
-		const tempPath = join(process.cwd(), "pr.md");
-		await writeFile(tempPath, description);
+		const prPath = join(process.cwd(), `pr-${issue.number}.md`);
+		const commentPath = join(process.cwd(), `comment-${issue.number}.md`);
+		await writeFile(prPath, description);
 
 		console.log(`🚀 Creating Pull Request...`);
 		const prUrl = runExec(
-			`gh pr create --title "${safe(title)}" --body-file "${tempPath}" --base staging --head ${branch}`,
+			`gh pr create --title "${safe(title)}" --body-file "${prPath}" --base staging --head ${branch}`,
 		);
 
 		console.log(`💬 Adding success comment to issue #${issue.number}...`);
@@ -247,9 +248,13 @@ All local quality checks (lint, build, tests) passed.
 <!-- hammer:fix-applied -->
 `.trim();
 
-		runExec(`gh issue comment ${issue.number} --body "${safe(commentBody)}"`);
-		await unlink(tempPath);
+		await writeFile(commentPath, commentBody);
+		runExec(`gh issue comment ${issue.number} --body-file "${commentPath}"`);
+
+		await unlink(prPath);
+		await unlink(commentPath);
 	} else {
+		const failurePath = join(process.cwd(), `failure-${issue.number}.md`);
 		console.log(`💬 Adding failure comment to issue #${issue.number}...`);
 		const commentBody = `
 Hello! I attempted to fix this issue automatically, but the generated code failed local quality checks (lint, build, or tests) after multiple attempts.
@@ -264,7 +269,9 @@ ${error}
 <!-- hammer:fix-applied -->
 `.trim();
 
-		runExec(`gh issue comment ${issue.number} --body "${safe(commentBody)}"`);
+		await writeFile(failurePath, commentBody);
+		runExec(`gh issue comment ${issue.number} --body-file "${failurePath}"`);
+		await unlink(failurePath);
 	}
 }
 
