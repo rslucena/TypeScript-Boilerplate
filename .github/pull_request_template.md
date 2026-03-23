@@ -36,3 +36,13 @@
 - [ ] Both new and old tests are passing locally.
 - [ ] Public APIs were documented or updated (if applicable).
 - [ ] No sensitive data (tokens, secrets, credentials) was introduced.
+
+## Issues
+
+<!-- 
+Add issues that this PR resolves. 
+
+- #57
+- #42
+
+-->
