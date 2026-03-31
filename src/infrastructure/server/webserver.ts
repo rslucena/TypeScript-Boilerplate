@@ -10,7 +10,7 @@ import helmet from "@infrastructure/settings/helmet";
 import { SettingOptions, SettingOptionsUI } from "@infrastructure/settings/swagger";
 import fastify from "fastify";
 import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-import { err, type server } from "./interface";
+import { AppError, err, type server } from "./interface";
 import { rateLimit } from "./rate-limit";
 import { convertRequestTypes } from "./request";
 
@@ -51,6 +51,10 @@ async function webserver(): Promise<server> {
 	instance.setErrorHandler((error: unknown, request, reply) => {
 		const lang = request.headers["accept-language"];
 		logger.error(error);
+
+		if (error instanceof AppError) {
+			return reply.headers(request.headers).code(error.statusCode).send(error);
+		}
 
 		const errorMessage = error instanceof Error ? error.message : String(error);
 

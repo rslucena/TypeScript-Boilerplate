@@ -114,7 +114,7 @@ export class err {
 		return new AppError(401, "ERR_UNAUTHORIZED", "Unauthorized", translate("ERR_UNAUTHORIZED", language));
 	}
 	notFound(language?: string, resource?: string) {
-		return new AppError(404, "ERR_NOT_FOUND", "Not Found", translate("ERR_NOT_FOUND", language));
+		return new AppError(404, "ERR_NOT_FOUND", `Not Found ${resource || ""}`, translate("ERR_NOT_FOUND", language));
 	}
 	badRequest(language?: string, resource?: string) {
 		return new AppError(400, "ERR_REQUEST", `Bad Request ${resource ?? ""}`, translate("ERR_REQUEST", language));
