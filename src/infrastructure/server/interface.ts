@@ -88,54 +88,55 @@ type JWT = { typ: string; alg: string; exp: number };
 
 type AnyType = string | object | boolean | number | null | undefined;
 
+export class AppError extends Error {
+	constructor(
+		public statusCode: number,
+		public code: string,
+		public error: string,
+		public override message: string,
+	) {
+		super(message);
+		Object.setPrototypeOf(this, AppError.prototype);
+	}
+
+	toJSON() {
+		return {
+			statusCode: this.statusCode,
+			code: this.code,
+			error: this.error,
+			message: this.message,
+		};
+	}
+}
+
 export class err {
 	unauthorized(language?: string) {
-		return {
-			statusCode: 401,
-			code: "ERR_UNAUTHORIZED",
-			error: "Unauthorized",
-			message: translate("ERR_UNAUTHORIZED", language),
-		};
+		return new AppError(401, "ERR_UNAUTHORIZED", "Unauthorized", translate("ERR_UNAUTHORIZED", language));
 	}
 	notFound(language?: string, resource?: string) {
-		return {
-			statusCode: 404,
-			code: "ERR_NOT_FOUND",
-			error: `Not Found ${resource || ""}`,
-			message: translate("ERR_NOT_FOUND", language),
-		};
+		return new AppError(404, "ERR_NOT_FOUND", "Not Found", translate("ERR_NOT_FOUND", language));
 	}
 	badRequest(language?: string, resource?: string) {
-		return {
-			statusCode: 400,
-			code: "ERR_REQUEST",
-			error: `Bad Request ${resource ?? ""}`,
-			message: translate("ERR_REQUEST", language),
-		};
+		return new AppError(400, "ERR_REQUEST", `Bad Request ${resource ?? ""}`, translate("ERR_REQUEST", language));
 	}
 	unprocessableEntity(language?: string, resource?: string) {
-		return {
-			statusCode: 422,
-			code: "UNPROCESSABLE_ENTITY",
-			error: `Unprocessable Entity ${resource ?? ""}`,
-			message: translate("UNPROCESSABLE_ENTITY", language),
-		};
+		return new AppError(
+			422,
+			"UNPROCESSABLE_ENTITY",
+			`Unprocessable Entity ${resource ?? ""}`,
+			translate("UNPROCESSABLE_ENTITY", language),
+		);
 	}
 	conflict(language?: string, resource?: string) {
-		return {
-			statusCode: 409,
-			code: "CONFLICT",
-			error: `Conflict ${resource ?? ""}`,
-			message: translate("CONFLICT", language),
-		};
+		return new AppError(409, "CONFLICT", `Conflict ${resource ?? ""}`, translate("CONFLICT", language));
 	}
 	internalServerError(language?: string) {
-		return {
-			statusCode: 500,
-			code: "ERR_INTERNAL_SERVER_ERROR",
-			error: "Internal Server Error",
-			message: translate("ERR_INTERNAL_SERVER_ERROR", language),
-		};
+		return new AppError(
+			500,
+			"ERR_INTERNAL_SERVER_ERROR",
+			"Internal Server Error",
+			translate("ERR_INTERNAL_SERVER_ERROR", language),
+		);
 	}
 }
 
