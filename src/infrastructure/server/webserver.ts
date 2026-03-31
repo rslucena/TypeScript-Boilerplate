@@ -52,11 +52,22 @@ async function webserver(): Promise<server> {
 		const lang = request.headers["accept-language"];
 		logger.error(error);
 
-		if (error instanceof AppError) {
+		// Robust check for AppError (instanceof + property check as fallback)
+		const isAppError = (err: unknown): err is AppError =>
+			err instanceof AppError ||
+			(err !== null && typeof err === "object" && "statusCode" in err && "code" in err && "error" in err);
+
+		if (isAppError(error)) {
 			return reply.headers(request.headers).code(error.statusCode).send(error);
 		}
 
-		const errorMessage = error instanceof Error ? error.message : String(error);
+		// Robust message extraction
+		const errorMessage =
+			error instanceof Error
+				? error.message
+				: error !== null && typeof error === "object" && "message" in error
+					? String((error as { message: unknown }).message)
+					: String(error);
 
 		if (errorMessage.startsWith("Unsupported Media Type")) {
 			const er = new err().badRequest(lang);
@@ -66,9 +77,9 @@ async function webserver(): Promise<server> {
 		}
 
 		if (
-			error &&
+			error !== null &&
 			typeof error === "object" &&
-			("validation" in error || ("statusCode" in error && error.statusCode === 400))
+			("validation" in error || ("statusCode" in error && (error as { statusCode: unknown }).statusCode === 400))
 		) {
 			const er = new err().badRequest(lang);
 			er.message = errorMessage;

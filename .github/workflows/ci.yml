@@ -60,6 +60,34 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      APP_NAME: TypeScript-Boilerplate
+      APP_DESCRIPTION: CI Test Environment
+      APP_VERSION: 1.0.0
+      PROCESS_DOMAIN: http://localhost
+      PROCESS_PORT: 3000
+      PROCESS_CORS_ORIGIN: "*"
+      REDIS_SERVER: localhost
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_SSL: "false"
+      REDIS_STACK: "false"
+      POSTGRES_SERVER: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DATABASE: test
+      POSTGRES_POOL: 10
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_WINDOW: 60000
+      AUTH_SALT: test_salt
+      SHOW_LOG: "false"
+      LOG_LEVEL: info
+      APP_FOLDER_KEY: keys
+      APP_HTTP2: "false"
+      APP_CERT: keys/cert.pem
+      APP_KEY: keys/private.pem
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Setup Bun
