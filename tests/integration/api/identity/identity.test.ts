@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesModuleMock, referencesMock } from "@tests/mocks/references.mock";
-import { repositoryMock } from "@tests/mocks/repository.mock";
+import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
 
 const redisClientMock = createRedisClientMock();
+const repositoryMock = createRepositoryMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
@@ -33,7 +34,9 @@ describe("Identity API Routes", () => {
 		server.setSerializerCompiler(serializerCompiler);
 		server.register(identityRoutes, { prefix: "/api/v1/identities" });
 
-		repositoryMock.execute.mockResolvedValue([createIdentityBuilder()]);
+		repositoryMock.execute.mockReset();
+		repositoryMock.execute.mockImplementation(() => Promise.resolve([createIdentityBuilder()]));
+		repositoryMock.returning.mockReset();
 		repositoryMock.returning.mockResolvedValue([createIdentityBuilder()]);
 		redisClientMock.json.get.mockClear();
 		redisClientMock.json.set.mockClear();

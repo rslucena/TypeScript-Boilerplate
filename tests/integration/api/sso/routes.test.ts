@@ -35,9 +35,11 @@ beforeEach(() => {
 		google.redirectUri = "http://localhost/callback";
 	}
 
-	repositoryMock.execute.mockClear();
-	repositoryMock.insert.mockClear();
-	repositoryMock.returning.mockClear();
+	repositoryMock.execute.mockReset();
+	repositoryMock.execute.mockImplementation(() => Promise.resolve([]));
+	repositoryMock.insert.mockReset();
+	repositoryMock.returning.mockReset();
+	repositoryMock.returning.mockResolvedValue([]);
 	repositoryMock.where.mockReturnValue(repositoryMock);
 	repositoryMock.select.mockReturnValue(repositoryMock);
 	repositoryMock.values.mockReturnValue(repositoryMock);
