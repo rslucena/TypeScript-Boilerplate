@@ -4,12 +4,13 @@ import * as jwt from "@infrastructure/authentication/jwt";
 import * as references from "@infrastructure/repositories/references";
 import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
-import { createEnvMock } from "@tests/mocks/environment.mock";
+import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 
 const repositoryMock = createRepositoryMock();
 
+mock.module("node:fs", () => fsMock);
 mock.module("@infrastructure/settings/environment", () => createEnvMock());
 mock.module("@infrastructure/repositories/repository", () => ({ default: repositoryMock }));
 mock.module("@infrastructure/cache/connection", () => ({ default: createRedisClientMock() }));
