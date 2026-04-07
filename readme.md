@@ -25,6 +25,15 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 > [!TIP]
 > **Check out our official documentation for deep dives, architecture diagrams, and more:**  
 > 🌐 **[https://rslucena.github.io/TypeScript-Boilerplate/](https://rslucena.github.io/TypeScript-Boilerplate/)**
+>
+> **Have questions? Ask our AI assistant about:**
+> 1. How do I scaffold a new CRUD domain with `bun gen:domain`?
+> 2. How does the CI/CD pipeline handle automated releases?
+> 3. What are the key features of the Smart Caching system with Redis?
+> 4. How do I configure and run database migrations in production?
+> 5. How does this boilerplate achieve Go-like performance with Bun?
+>
+> 🤖 **[Access AI Assistant](https://deepwiki.com/rslucena/TypeScript-Boilerplate)**
 
 ---
 

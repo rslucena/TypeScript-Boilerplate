@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 import { readFile, unlink, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -79,7 +79,7 @@ async function getRelevantContext(): Promise<string> {
 
 			if (!entry.name.match(/\.(ts|js)$/)) continue;
 
-			const relativePath = fullPath.replace(process.cwd(), "");
+			const relativePath = relative(process.cwd(), fullPath);
 			const content = (await readFile(fullPath, "utf-8")).slice(0, MAX_FILE_SIZE);
 
 			context += `\n--- FILE: ${relativePath} ---\n${content}\n`;

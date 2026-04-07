@@ -61,7 +61,7 @@ Develop and deliver robust, efficient, and secure code based on existing GitHub 
 - **No Comments**: Hammer must **NEVER** add comments to a Pull Request.
 
 ### 3. PR Content Requirements
-Follow the `.github/pull_request_template.md` structure:
+Use natural, human-like technical language. Follow the `.github/pull_request_template.md` structure:
 - **Branch**: Must be the first thing you output, formatted as `BRANCH: type/description`.
 - **Changes**: Technical summary of the implementation and a **Mermaid diagram**.
 - **Motivation / Context**: Link to the issue and summarize the problem.
