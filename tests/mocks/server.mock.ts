@@ -40,13 +40,13 @@ export const createServerRequestMock = () => ({
 				return currentStatus;
 			},
 		};
-		try {
-			const result = await fn(container);
-			return reply.send(result);
-		} catch (error: unknown) {
-			const statusCode = (error as { statusCode?: number }).statusCode || 500;
-			return reply.code(statusCode).send(error);
-		}
+
+		return await fn(container)
+			.then((result: unknown) => reply.send(result))
+			.catch((error: { statusCode?: number }) => {
+				const statusCode = error.statusCode || 500;
+				return reply.code(statusCode).send(error);
+			});
 	},
 	noRestricted: (fn: CallableFunction) => async (req: FastifyRequest, reply: FastifyReply) => {
 		let currentStatus = 200;
@@ -65,13 +65,13 @@ export const createServerRequestMock = () => ({
 				return currentStatus;
 			},
 		};
-		try {
-			const result = await fn(container);
-			return reply.send(result);
-		} catch (error: unknown) {
-			const statusCode = (error as { statusCode?: number }).statusCode || 500;
-			return reply.code(statusCode).send(error);
-		}
+
+		return await fn(container)
+			.then((result: unknown) => reply.send(result))
+			.catch((error: { statusCode?: number }) => {
+				const statusCode = error.statusCode || 500;
+				return reply.code(statusCode).send(error);
+			});
 	},
 });
 
