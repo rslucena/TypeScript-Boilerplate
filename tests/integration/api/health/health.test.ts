@@ -3,7 +3,6 @@ import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesModuleMock, referencesMock } from "@tests/mocks/references.mock";
 import { repositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
-import { z } from "zod";
 
 const redisClientMock = createRedisClientMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
@@ -11,12 +10,7 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 	withPagination: referencesMock.withPagination,
 }));
-mock.module("@infrastructure/repositories/references", () =>
-	createReferencesModuleMock({
-		identifier: { id: mock(() => "test-id") } as never,
-		zodIdentifier: { id: z.string() } as never,
-	}),
-);
+mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
 
 import * as requestModule from "@infrastructure/server/request";
 

@@ -1,16 +1,14 @@
 import type { Mock } from "bun:test";
 import { mock } from "bun:test";
-import type { Column } from "@tests/builders/column.builders";
-import { columnBuilder } from "@tests/builders/column.builders";
-import { z } from "zod";
+import { identifier, pgIndex, withPagination, zodIdentifier } from "@infrastructure/repositories/references";
 
 export interface ReferencesMockType {
 	tag: Mock<(domain: string, method: string, conditions?: Record<string, string>) => string>;
 	hash: Mock<(val: string) => string>;
-	pgIndex: Mock<() => unknown[]>;
-	identifier: Record<string, Column>;
-	zodIdentifier: Record<string, z.ZodTypeAny>;
-	withPagination: { shape: { "req.page": z.ZodTypeAny } };
+	pgIndex: Mock<typeof pgIndex>;
+	identifier: typeof identifier;
+	zodIdentifier: typeof zodIdentifier;
+	withPagination: typeof withPagination;
 }
 
 export const createReferencesMock = (): ReferencesMockType => ({
@@ -22,26 +20,10 @@ export const createReferencesMock = (): ReferencesMockType => ({
 		return collection.toLowerCase().trim();
 	}),
 	hash: mock((val) => `hashed-${val}`),
-	pgIndex: mock(() => []),
-	identifier: {
-		id: columnBuilder(),
-		activated: columnBuilder(),
-		createdAt: columnBuilder(),
-		updatedAt: columnBuilder(),
-		deletedAt: columnBuilder(),
-	},
-	zodIdentifier: {
-		id: z.uuid(),
-		activated: z.boolean(),
-		createdAt: z.date(),
-		updatedAt: z.date().nullable(),
-		deletedAt: z.date().nullable(),
-	},
-	withPagination: {
-		shape: {
-			"req.page": z.array(z.number()),
-		},
-	},
+	pgIndex: mock(pgIndex),
+	identifier,
+	zodIdentifier,
+	withPagination,
 });
 
 export const referencesMock: ReferencesMockType = createReferencesMock();
