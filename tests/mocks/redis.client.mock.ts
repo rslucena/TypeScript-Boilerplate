@@ -10,6 +10,7 @@ export const createRedisClientMock = () => {
 		scan: mock((..._args: unknown[]) => Promise.resolve({ cursor: "0", keys: [] as unknown[] })),
 		sMembers: mock((..._args: unknown[]) => Promise.resolve([] as unknown[])),
 		sAdd: mock((..._args: unknown[]) => Promise.resolve(1)),
+		sRem: mock((..._args: unknown[]) => Promise.resolve(1)),
 		expire: mock((..._args: unknown[]) => Promise.resolve(true)),
 		incr: mock((..._args: unknown[]) => Promise.resolve(1)),
 		json: {
