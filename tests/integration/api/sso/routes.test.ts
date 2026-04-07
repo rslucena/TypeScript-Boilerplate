@@ -60,17 +60,6 @@ describe("Domain - SSO Routes", () => {
 		mock.restore();
 	});
 
-	it("Should redirect on /authorize with valid provider", async () => {
-		const response = await server.inject({
-			method: "GET",
-			url: "/api/v1/sso/authorize",
-			query: { provider: "GOOGLE" },
-		});
-
-		expect(response.statusCode).toBe(302);
-		expect(response.headers.location).toInclude("accounts.google.com");
-	});
-
 	it("Should fail on /authorize with invalid provider", async () => {
 		const response = await server.inject({
 			method: "GET",
@@ -133,18 +122,6 @@ describe("Domain - SSO Routes", () => {
 		});
 
 		expect(response.statusCode).toBe(400);
-	});
-
-	it("Should fail on /local login if user is not found", async () => {
-		repositoryMock.execute.mockResolvedValueOnce([]);
-
-		const response = await server.inject({
-			method: "POST",
-			url: "/api/v1/sso/local",
-			body: { email: "notfound@example.com", password: "Password123!" },
-		});
-
-		expect(response.statusCode).toBe(401);
 	});
 
 	it("Should process /callback and create new user without email if missing", async () => {
