@@ -38,6 +38,7 @@ describe("Webserver Security: Error Handling", () => {
 		const response = await server.inject({
 			method: "GET",
 			url: "/unsupported-media",
+			headers: { "accept-language": "en" },
 		});
 
 		const payload = JSON.parse(response.payload);

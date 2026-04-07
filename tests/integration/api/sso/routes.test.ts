@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
+import { beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { referencesMock } from "@tests/mocks/references.mock";
@@ -25,21 +25,23 @@ import { oidcProviders } from "@infrastructure/sso/providers";
 let exchangeSpy: Mock<typeof oidc.exchangeToken>;
 let userSpy: Mock<typeof oidc.getNormalizedUser>;
 
-beforeAll(() => {
+beforeEach(() => {
 	const google = oidcProviders[providers.GOOGLE];
 	if (google) {
 		google.clientId = "mock-client-id";
 		google.clientSecret = "mock-client-secret";
 		google.redirectUri = "http://localhost/callback";
 	}
-});
 
-afterEach(() => {
-	if (exchangeSpy) exchangeSpy.mockRestore();
-	if (userSpy) userSpy.mockRestore();
 	repositoryMock.execute.mockClear();
 	repositoryMock.insert.mockClear();
 	repositoryMock.returning.mockClear();
+	repositoryMock.where.mockReturnValue(repositoryMock);
+	repositoryMock.select.mockReturnValue(repositoryMock);
+	repositoryMock.values.mockReturnValue(repositoryMock);
+
+	if (exchangeSpy) exchangeSpy.mockRestore();
+	if (userSpy) userSpy.mockRestore();
 });
 
 describe("Domain - SSO Routes", () => {
