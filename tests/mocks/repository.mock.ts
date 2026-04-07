@@ -39,5 +39,3 @@ export const createRepositoryMock = (): RepositoryMock => {
 	};
 	return mockObj;
 };
-
-export const repositoryMock = createRepositoryMock();
