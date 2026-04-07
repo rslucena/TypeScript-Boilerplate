@@ -60,6 +60,49 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis/redis-stack-server:latest
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      PROCESS_PORT: 3000
+      REDIS_SERVER: localhost
+      REDIS_PORT: 6379
+      REDIS_STACK: true
+      POSTGRES_SERVER: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: db
+      APP_NAME: "Test App"
+      APP_DESCRIPTION: "Test Description"
+      APP_VERSION: "0.0.1"
+      PROCESS_CORS_ORIGIN: "*"
+      PROCESS_DOMAIN: "http://localhost:3000"
+      APP_FOLDER_KEY: "./keys"
+      APP_HTTP2: "false"
+      APP_CERT: "./keys/cert.pem"
+      APP_KEY: "./keys/private.pem"
+      AUTH_SALT: "salt"
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_WINDOW: 60
+      SHOW_LOG: false
+      LOG_LEVEL: info
     steps:
       - uses: actions/checkout@v6
       - name: Setup Bun
@@ -77,8 +120,23 @@ jobs:
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+      - name: Generate Keys
+        run: |
+          mkdir -p ./keys
+          openssl genrsa -out ./keys/private.pem 2048
+          openssl rsa -in ./keys/private.pem -pubout -out ./keys/public.pem
+          openssl req -x509 -new -nodes -key ./keys/private.pem -sha256 -days 1 \
+            -out ./keys/cert.pem \
+            -subj "/C=BR/ST=SP/L=SaoPaulo/O=CI/CN=localhost"
+      - name: Debug Environment
+        run: |
+          echo "NODE_ENV=$NODE_ENV"
+          echo "APP_CERT=$APP_CERT"
+          echo "APP_KEY=$APP_KEY"
+          ls -la ./keys/ || echo "no keys dir"
+          bun --version
       - name: Run Tests
-        run: bun run tests
+        run: bun test --coverage
 
   build:
     runs-on: ubuntu-latest

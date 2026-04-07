@@ -61,12 +61,16 @@ function execute(
 			context = await callback(receiver);
 			receiver.body(context);
 		} catch (err: unknown) {
-			context = receiver.badRequest(receiver.language());
-			context = typeof err === "string" ? { ...(context as Record<string, unknown>), message: err } : err;
+			const status =
+				err && typeof err === "object" && "statusCode" in err ? (err as { statusCode: number }).statusCode : 200;
+			context = typeof err === "string" ? { message: err } : err;
+			receiver.status(status);
 			receiver.body(context);
 		}
 
-		if (context && typeof context === "object" && "statusCode" in context) receiver.status(Number(context.statusCode));
+		if (context && typeof context === "object" && "statusCode" in context) {
+			receiver.status(Number(context.statusCode));
+		}
 
 		return reply
 			.headers(receiver.headers())
