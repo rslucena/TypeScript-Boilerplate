@@ -15,9 +15,15 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 	withPagination: localReferencesMock.withPagination,
 }));
+
 mock.module("@infrastructure/repositories/references", () => ({
 	...localReferencesMock,
 	pgIndex: mock(() => []),
+}));
+
+mock.module("@infrastructure/authentication/jwt", () => ({
+	create: mock(() => "mock-jwt-token"),
+	session: mock(() => Promise.resolve({ id: "123", name: "Mock" })),
 }));
 
 mock.module("@infrastructure/sso/providers", () => ({
@@ -28,7 +34,7 @@ mock.module("@infrastructure/sso/providers", () => ({
 			redirectUri: "http://localhost/callback",
 			authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
 			tokenEndpoint: "https://oauth2.googleapis.com/token",
-			jwksUri: "https://www.googleapis.com/oauth2/v3/certs", // REQUIRED for nonce and verifyIdToken
+			jwksUri: "https://www.googleapis.com/oauth2/v3/certs",
 			userinfoEndpoint: "https://openidconnect.googleapis.com/v1/userinfo",
 			issuer: "https://accounts.google.com",
 			scopes: ["openid", "profile", "email"],
@@ -169,9 +175,14 @@ describe("Domain - SSO Routes", () => {
 
 	it("Should process /local login successfully with valid credentials", async () => {
 		repositoryMock.execute.mockResolvedValueOnce([
-			{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Local User", email: "local@example.com" },
+			{
+				id: "123e4567-e89b-12d3-a456-426614174000",
+				name: "Local User",
+				secret: "OK",
+			},
 		]);
-		repositoryMock.execute.mockResolvedValueOnce([{ provider: providers.LOCAL, secret: "hashed_secret" }]);
+
+		localReferencesMock.hash.mockReturnValueOnce("OK");
 
 		const server = await webserver.create();
 		await server.register(ssoRoutes, { prefix: "/api/v1/sso" });
@@ -187,7 +198,9 @@ describe("Domain - SSO Routes", () => {
 			headers: { "accept-language": "en" },
 		});
 
-		expect([200, 401]).toContain(response.statusCode);
+		expect(response.statusCode).toBe(200);
+		const body = response.json();
+		expect(body.token).toBe("mock-jwt-token");
 	});
 
 	it("Should fail on /local login if missing body", async () => {
