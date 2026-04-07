@@ -1,3 +1,4 @@
+import cache from "@infrastructure/cache/actions";
 import { hash, tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
 import { container } from "@infrastructure/server/interface";
@@ -28,6 +29,8 @@ export default async function putUpdateEntity(request: container) {
 		.returning();
 
 	if (!content.length) throw request.notFound(request.language(), tag("credentials", "update{id}"));
+
+	await cache.json.del(tag("credentials", "find*"));
 
 	return getById(new container({ params: { id: content[0].id } }));
 }
