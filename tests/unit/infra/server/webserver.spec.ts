@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { createMutableEnvMock, fsMock } from "@tests/mocks/environment.mock";
-import { redisClientMock } from "@tests/mocks/redis.client.mock";
+import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 
 const { env: mockEnv, reset: resetEnv } = createMutableEnvMock();
+const redisClientMock = createRedisClientMock();
 
 mock.module("@infrastructure/settings/environment", () => ({ env: mockEnv }));
 mock.module("node:fs", () => fsMock);

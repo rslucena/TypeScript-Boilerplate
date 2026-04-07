@@ -1,9 +1,11 @@
-import { afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
+import { afterAll, afterEach, beforeAll, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { providers } from "@domain/credentials/constants";
 import { exchangeToken, getAuthorizationUrl, getNormalizedUser, verifyIdToken } from "@infrastructure/sso/oidc";
 import { oidcProviders } from "@infrastructure/sso/providers";
 
 let fetchSpy: Mock<typeof fetch>;
+
+const originalOidcProviders = JSON.parse(JSON.stringify(oidcProviders));
 
 beforeAll(() => {
 	const google = oidcProviders[providers.GOOGLE];
@@ -21,8 +23,15 @@ beforeAll(() => {
 	}
 });
 
+afterAll(() => {
+	Object.assign(oidcProviders, originalOidcProviders);
+});
+
 afterEach(() => {
-	if (fetchSpy) fetchSpy.mockRestore();
+	if (fetchSpy) {
+		fetchSpy.mockRestore();
+		fetchSpy = undefined as unknown as Mock<typeof fetch>;
+	}
 });
 
 describe("Infrastructure - SSO Connect", () => {

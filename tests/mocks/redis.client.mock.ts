@@ -28,11 +28,3 @@ export const createRedisClientMock = () => {
 	};
 	return redisMock;
 };
-
-const globalMock = globalThis as unknown as { redisMockSingleton: ReturnType<typeof createRedisClientMock> };
-
-if (!globalMock.redisMockSingleton) {
-	globalMock.redisMockSingleton = createRedisClientMock();
-}
-
-export const redisClientMock = globalMock.redisMockSingleton;

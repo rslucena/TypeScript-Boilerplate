@@ -1,5 +1,7 @@
 import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
-import { redisClientMock } from "@tests/mocks/redis.client.mock";
+import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
+
+const redisClientMock = createRedisClientMock();
 
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 
