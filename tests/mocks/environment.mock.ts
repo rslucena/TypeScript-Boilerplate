@@ -46,7 +46,7 @@ export const fsMock = {
 	readFileSync: mock((path: string, ...args: unknown[]) => {
 		if (path.includes("private.pem")) return privateKey;
 		if (path.includes("public.pem")) return publicKey;
-		if (path.includes("metadata.json")) return JSON.stringify({ kid: "test-kid" });
+		if (path.includes("metadata.json")) return JSON.stringify({ kid: "mock-kid-123" });
 		if (path.includes("cert.pem")) return "fake-cert";
 		return originalReadFileSync(path, ...(args as [BufferEncoding]));
 	}),
