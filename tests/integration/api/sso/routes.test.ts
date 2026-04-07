@@ -4,6 +4,7 @@ import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
 import { createReferencesMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 
+// --- 1. PRE-MOCK ALL INFRASTRUCTURE (ABSOLUTE TOP) ---
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
 const localReferencesMock = createReferencesMock();
@@ -15,17 +16,12 @@ mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
 	withPagination: localReferencesMock.withPagination,
 }));
-
 mock.module("@infrastructure/repositories/references", () => ({
 	...localReferencesMock,
 	pgIndex: mock(() => []),
 }));
 
-mock.module("@infrastructure/authentication/jwt", () => ({
-	create: mock(() => "mock-jwt-token"),
-	session: mock(() => Promise.resolve({ id: "123", name: "Mock" })),
-}));
-
+// --- 2. PRE-MOCK SSO PROVIDERS (ENRICHED TO BE GLOBALLY COMPATIBLE) ---
 mock.module("@infrastructure/sso/providers", () => ({
 	oidcProviders: {
 		GOOGLE: {
@@ -56,11 +52,13 @@ mock.module("@infrastructure/sso/providers", () => ({
 // --- 3. IMPORT APP CODE ONLY AFTER MOCKS ARE REGISTERED ---
 import { providers } from "@domain/credentials/constants";
 import ssoRoutes from "@domain/sso/routes";
+import * as jwt from "@infrastructure/authentication/jwt";
 import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
 
 let exchangeSpy: Mock<typeof oidc.exchangeToken>;
 let userSpy: Mock<typeof oidc.getNormalizedUser>;
+let jwtCreateSpy: Mock<typeof jwt.create>;
 
 beforeEach(() => {
 	repositoryMock.execute.mockReset();
@@ -72,11 +70,15 @@ beforeEach(() => {
 	repositoryMock.select.mockReturnValue(repositoryMock);
 	repositoryMock.values.mockReturnValue(repositoryMock);
 	repositoryMock.prepare.mockReturnValue(repositoryMock);
+
+	// JWT Mocking via spy to avoid global mock.module leaks
+	jwtCreateSpy = spyOn(jwt, "create").mockReturnValue("mock-jwt-token");
 });
 
 afterEach(() => {
 	if (exchangeSpy) exchangeSpy.mockRestore();
 	if (userSpy) userSpy.mockRestore();
+	if (jwtCreateSpy) jwtCreateSpy.mockRestore();
 	mock.restore();
 });
 
