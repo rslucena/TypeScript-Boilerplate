@@ -128,6 +128,13 @@ jobs:
           openssl req -x509 -new -nodes -key ./keys/private.pem -sha256 -days 1 \
             -out ./keys/cert.pem \
             -subj "/C=BR/ST=SP/L=SaoPaulo/O=CI/CN=localhost"
+      - name: Debug Environment
+        run: |
+          echo "NODE_ENV=$NODE_ENV"
+          echo "APP_CERT=$APP_CERT"
+          echo "APP_KEY=$APP_KEY"
+          ls -la ./keys/ || echo "no keys dir"
+          bun --version
       - name: Run Tests
         run: bun test --coverage
 
