@@ -129,7 +129,7 @@ jobs:
             -out ./keys/cert.pem \
             -subj "/C=BR/ST=SP/L=SaoPaulo/O=CI/CN=localhost"
       - name: Run Tests
-        run: bun test --concurrency 1 --coverage
+        run: bun test --concurrency=1 --coverage
 
   build:
     runs-on: ubuntu-latest
