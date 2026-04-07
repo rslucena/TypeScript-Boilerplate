@@ -20,11 +20,31 @@ mock.module("@infrastructure/repositories/references", () => ({
 	pgIndex: mock(() => []),
 }));
 
-import { oidcProviders as sourceOidcProviders } from "@infrastructure/sso/providers";
+// --- 2. PRE-MOCK SSO PROVIDERS (NO REAL IMPORT TO AVOID CACHE RACE) ---
+mock.module("@infrastructure/sso/providers", () => ({
+	oidcProviders: {
+		GOOGLE: {
+			clientId: "mock-client-id",
+			clientSecret: "mock-client-secret",
+			redirectUri: "http://localhost/callback",
+			authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+			tokenEndpoint: "https://oauth2.googleapis.com/token",
+			issuer: "https://accounts.google.com",
+			scopes: ["openid", "profile", "email"],
+		},
+		GITHUB: {
+			clientId: "mock-github-id",
+			clientSecret: "mock-github-secret",
+			redirectUri: "http://localhost/callback/github",
+			authorizationEndpoint: "https://github.com/login/oauth/authorize",
+			tokenEndpoint: "https://github.com/login/oauth/access_token",
+			issuer: "https://github.com",
+			scopes: ["read:user", "user:email"],
+		},
+	},
+}));
 
-const oidcProviders = JSON.parse(JSON.stringify(sourceOidcProviders));
-mock.module("@infrastructure/sso/providers", () => ({ oidcProviders }));
-
+// --- 3. IMPORT APP CODE ONLY AFTER MOCKS ARE REGISTRED ---
 import { providers } from "@domain/credentials/constants";
 import ssoRoutes from "@domain/sso/routes";
 import webserver from "@infrastructure/server/webserver";
@@ -33,16 +53,7 @@ import * as oidc from "@infrastructure/sso/oidc";
 let exchangeSpy: Mock<typeof oidc.exchangeToken>;
 let userSpy: Mock<typeof oidc.getNormalizedUser>;
 
-const originalOidcProviders = JSON.parse(JSON.stringify(oidcProviders));
-
 beforeEach(() => {
-	const google = oidcProviders[providers.GOOGLE];
-	if (google) {
-		google.clientId = "mock-client-id";
-		google.clientSecret = "mock-client-secret";
-		google.redirectUri = "http://localhost/callback";
-	}
-
 	repositoryMock.execute.mockReset();
 	repositoryMock.execute.mockImplementation(() => Promise.resolve([]));
 	repositoryMock.insert.mockReset();
@@ -51,15 +62,13 @@ beforeEach(() => {
 	repositoryMock.where.mockReturnValue(repositoryMock);
 	repositoryMock.select.mockReturnValue(repositoryMock);
 	repositoryMock.values.mockReturnValue(repositoryMock);
-});
-
-afterAll(() => {
-	Object.assign(oidcProviders, originalOidcProviders);
+	repositoryMock.prepare.mockReturnValue(repositoryMock);
 });
 
 afterEach(() => {
 	if (exchangeSpy) exchangeSpy.mockRestore();
 	if (userSpy) userSpy.mockRestore();
+	mock.restore();
 });
 
 describe("Domain - SSO Routes", () => {
