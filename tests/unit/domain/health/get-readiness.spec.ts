@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import type { container } from "@infrastructure/server/interface";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { repositoryMock } from "@tests/mocks/repository.mock";
+import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { createContainerMock } from "@tests/mocks/server.mock";
 
 const redisClientMock = createRedisClientMock();
+const repositoryMock = createRepositoryMock();
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 mock.module("@infrastructure/repositories/repository", () => ({ default: repositoryMock }));
 
