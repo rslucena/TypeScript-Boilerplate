@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from "bun:te
 import ssoRoutes from "@domain/sso/routes";
 import * as jwt from "@infrastructure/authentication/jwt";
 import * as references from "@infrastructure/repositories/references";
+import type { server } from "@infrastructure/server/interface";
 import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
 import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
@@ -43,7 +44,7 @@ mock.module("@infrastructure/sso/providers", () => ({
 }));
 
 describe("Domain - SSO Routes", () => {
-	let server: any;
+	let server: server;
 
 	beforeEach(async () => {
 		server = await webserver.create();

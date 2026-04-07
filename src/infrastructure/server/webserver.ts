@@ -63,7 +63,7 @@ async function webserver(): Promise<server> {
 
 		const er =
 			error && typeof error === "object" && "statusCode" in error
-				? (error as any)
+				? (error as { statusCode: number; message: string })
 				: new err().internalServerError(lang);
 
 		if (env.isDev && error instanceof Error) {

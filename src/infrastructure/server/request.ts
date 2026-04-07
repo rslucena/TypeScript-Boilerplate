@@ -61,7 +61,8 @@ function execute(
 			context = await callback(receiver);
 			receiver.body(context);
 		} catch (err: unknown) {
-			const status = err && typeof err === "object" && "statusCode" in err ? (err as any).statusCode : 200;
+			const status =
+				err && typeof err === "object" && "statusCode" in err ? (err as { statusCode: number }).statusCode : 200;
 			context = typeof err === "string" ? { message: err } : err;
 			receiver.status(status);
 			receiver.body(context);
