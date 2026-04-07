@@ -1,19 +1,16 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
+import healthRoutes from "@domain/health/routes";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { createReferencesMock, createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
+import fastify, { type FastifyInstance } from "fastify";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
-const localReferencesMock = createReferencesMock();
 
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
-mock.module("@infrastructure/repositories/repository", () => ({
-	default: repositoryMock,
-	withPagination: localReferencesMock.withPagination,
-}));
-mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
+mock.module("@infrastructure/repositories/repository", () => ({ default: repositoryMock }));
 
 import * as requestModule from "@infrastructure/server/request";
 
@@ -22,35 +19,28 @@ mock.module("@infrastructure/server/request", () => ({
 	default: serverRequestMock,
 }));
 
-import healthRoutes from "@domain/health/routes";
-import fastify, { type FastifyInstance } from "fastify";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-
 describe("Health API Routes", () => {
-	let server: FastifyInstance;
+	let instance: FastifyInstance;
 
 	beforeEach(async () => {
-		server = fastify().withTypeProvider<ZodTypeProvider>();
-		server.setValidatorCompiler(validatorCompiler);
-		server.setSerializerCompiler(serializerCompiler);
-		server.register(healthRoutes, { prefix: "/api/v1/health" });
+		instance = fastify().withTypeProvider<ZodTypeProvider>();
+		instance.setValidatorCompiler(validatorCompiler);
+		instance.setSerializerCompiler(serializerCompiler);
+		instance.register(healthRoutes, { prefix: "/api/v1/health" });
 
 		repositoryMock.execute.mockClear();
-		repositoryMock.select.mockClear();
-		repositoryMock.from.mockClear();
-		repositoryMock.limit.mockClear();
 		redisClientMock.ping.mockClear();
 		redisClientMock.info.mockClear();
 		redisClientMock.isOpen = true;
 		redisClientMock.ping.mockResolvedValue("PONG");
 		redisClientMock.info.mockResolvedValue("redis_version:7.0.0");
 
-		await server.ready();
+		await instance.ready();
 	});
 
 	describe("GET /api/v1/health/liveness", () => {
 		it("should return 200 and liveness data", async () => {
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/health/liveness",
 			});
@@ -70,7 +60,7 @@ describe("Health API Routes", () => {
 			redisClientMock.get.mockResolvedValue("true");
 			redisClientMock.isOpen = true;
 
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/health/readiness",
 				headers: {
@@ -95,7 +85,7 @@ describe("Health API Routes", () => {
 			redisClientMock.isOpen = true;
 			redisClientMock.ping.mockResolvedValue("PONG");
 
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/health/readiness",
 				headers: {
@@ -113,7 +103,7 @@ describe("Health API Routes", () => {
 			redisClientMock.isOpen = true;
 			redisClientMock.ping.mockRejectedValueOnce(new Error("Cache Error"));
 
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/health/readiness",
 				headers: {

@@ -1,19 +1,17 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
+import identityRoutes from "@domain/identity/routes";
+import { createIdentityBuilder } from "@tests/builders/identity.builder";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { createReferencesMock, createReferencesModuleMock } from "@tests/mocks/references.mock";
 import { createRepositoryMock } from "@tests/mocks/repository.mock";
 import { serverRequestMock } from "@tests/mocks/server.mock";
+import fastify, { type FastifyInstance } from "fastify";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 
 const redisClientMock = createRedisClientMock();
 const repositoryMock = createRepositoryMock();
-const localReferencesMock = createReferencesMock();
 
 mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
-mock.module("@infrastructure/repositories/repository", () => ({
-	default: repositoryMock,
-	withPagination: localReferencesMock.withPagination,
-}));
-mock.module("@infrastructure/repositories/references", () => createReferencesModuleMock());
+mock.module("@infrastructure/repositories/repository", () => ({ default: repositoryMock }));
 
 import * as requestModule from "@infrastructure/server/request";
 
@@ -22,19 +20,14 @@ mock.module("@infrastructure/server/request", () => ({
 	default: serverRequestMock,
 }));
 
-import identityRoutes from "@domain/identity/routes";
-import { createIdentityBuilder } from "@tests/builders/identity.builder";
-import fastify, { type FastifyInstance } from "fastify";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-
 describe("Identity API Routes", () => {
-	let server: FastifyInstance;
+	let instance: FastifyInstance;
 
 	beforeEach(async () => {
-		server = fastify().withTypeProvider<ZodTypeProvider>();
-		server.setValidatorCompiler(validatorCompiler);
-		server.setSerializerCompiler(serializerCompiler);
-		server.register(identityRoutes, { prefix: "/api/v1/identities" });
+		instance = fastify().withTypeProvider<ZodTypeProvider>();
+		instance.setValidatorCompiler(validatorCompiler);
+		instance.setSerializerCompiler(serializerCompiler);
+		instance.register(identityRoutes, { prefix: "/api/v1/identities" });
 
 		repositoryMock.execute.mockReset();
 		repositoryMock.execute.mockImplementation(() => Promise.resolve([createIdentityBuilder()]));
@@ -43,12 +36,12 @@ describe("Identity API Routes", () => {
 		redisClientMock.json.get.mockClear();
 		redisClientMock.json.set.mockClear();
 
-		await server.ready();
+		await instance.ready();
 	});
 
 	describe("GET /api/v1/identities/:id", () => {
 		it("should return 401 if unauthorized", async () => {
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/identities/550e8400-e29b-41d4-a716-446655440000",
 				headers: {
@@ -59,7 +52,7 @@ describe("Identity API Routes", () => {
 		});
 
 		it("should return identity if authorized", async () => {
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "GET",
 				url: "/api/v1/identities/550e8400-e29b-41d4-a716-446655440000",
 				headers: {
@@ -78,7 +71,7 @@ describe("Identity API Routes", () => {
 				lastName: "Doe",
 				email: "john@example.com",
 			};
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "POST",
 				url: "/api/v1/identities/",
 				headers: {
@@ -91,7 +84,7 @@ describe("Identity API Routes", () => {
 		});
 
 		it("should return 400 if validation fails", async () => {
-			const response = await server.inject({
+			const response = await instance.inject({
 				method: "POST",
 				url: "/api/v1/identities/",
 				body: { name: "" },

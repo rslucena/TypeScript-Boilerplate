@@ -40,8 +40,13 @@ export const createServerRequestMock = () => ({
 				return currentStatus;
 			},
 		};
-		const result = await fn(container);
-		return reply.send(result);
+		try {
+			const result = await fn(container);
+			return reply.send(result);
+		} catch (error: unknown) {
+			const statusCode = (error as { statusCode?: number }).statusCode || 500;
+			return reply.code(statusCode).send(error);
+		}
 	},
 	noRestricted: (fn: CallableFunction) => async (req: FastifyRequest, reply: FastifyReply) => {
 		let currentStatus = 200;
@@ -60,8 +65,13 @@ export const createServerRequestMock = () => ({
 				return currentStatus;
 			},
 		};
-		const result = await fn(container);
-		return reply.send(result);
+		try {
+			const result = await fn(container);
+			return reply.send(result);
+		} catch (error: unknown) {
+			const statusCode = (error as { statusCode?: number }).statusCode || 500;
+			return reply.code(statusCode).send(error);
+		}
 	},
 });
 
