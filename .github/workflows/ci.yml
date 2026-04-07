@@ -94,7 +94,7 @@ jobs:
       APP_VERSION: "0.0.1"
       PROCESS_CORS_ORIGIN: "*"
       PROCESS_DOMAIN: "http://localhost:3000"
-      APP_FOLDER_KEY: "test-folder-key"
+      APP_FOLDER_KEY: "./keys"
       APP_HTTP2: "false"
       APP_CERT: "./keys/cert.pem"
       APP_KEY: "./keys/private.pem"
@@ -120,6 +120,14 @@ jobs:
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+      - name: Generate Keys
+        run: |
+          mkdir -p ./keys
+          openssl genrsa -out ./keys/private.pem 2048
+          openssl rsa -in ./keys/private.pem -pubout -out ./keys/public.pem
+          openssl req -x509 -new -nodes -key ./keys/private.pem -sha256 -days 1 \
+            -out ./keys/cert.pem \
+            -subj "/C=BR/ST=SP/L=SaoPaulo/O=CI/CN=localhost"
       - name: Run Tests
         run: bun test --concurrency 1 --coverage
 
