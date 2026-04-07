@@ -191,6 +191,32 @@ describe("Cache Service", () => {
     expect(redisMock.json.get).toHaveBeenCalledWith(key);
   });
 });
+
+### Preventing Mock Leaks (Parallel Execution)
+
+In a parallel test environment (like Bun's runner), global mocks can "leak" between files or even between tests in the same file if not handled carefully.
+
+#### 1. Functional Catch Pattern
+To avoid contaminating the global server instance, use a functional catch pattern in your mocks. This ensures that the mock is registered and cleared within the scope of the test:
+
+```typescript
+// tests/mocks/server.mock.ts
+export const catchRoute = (server: Awaited<ReturnType<typeof webserver.create>>) => {
+  const mockAction = mock((..._args: unknown[]) => Promise.resolve({}));
+  
+  server.addHook('onResponse', () => {
+    mockAction.mockClear(); // Self-cleaning
+  });
+
+  return mockAction;
+};
+```
+
+#### 2. Localized Mocks
+Prefer creating fresh mock instances in `beforeEach` instead of sharing a single global mock object. This guarantees that `mock.calls` and `mock.results` are always specific to the current test case.
+
+#### 3. Module Identity (?v=unit)
+As mentioned in [Test Isolation](#test-isolation-and-mocks-bun-specific), always use a query parameter when importing files under test to bypass global `mock.module` registrations from other test files.
 ```
 
 ## Running Tests

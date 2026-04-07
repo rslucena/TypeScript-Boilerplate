@@ -46,6 +46,7 @@ Once the IDP redirects the user back to the application (`/callback`), this cont
 - Validates the `state` to ensure the session wasn't hijacked.
 - Calls the underlying `exchangeToken` infrastructure to swap the `code` for an `access_token` (and `id_token` if applicable).
 - Generates or updates the internal `Identity` and `Credential`.
+- **Cache Invalidation**: Triggers an automatic deletion of `identity:find*` and `credentials:find*` cache namespaces to ensure subsequent requests fetch the most up-to-date user data.
 - Finally, it provides the internal `JWT` used by the application for subsequent requests.
 
 ### 3. `oidc.ts` (The Infrastructure Hook)
