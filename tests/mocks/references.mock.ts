@@ -26,8 +26,6 @@ export const createReferencesMock = (): ReferencesMockType => ({
 	withPagination,
 });
 
-export const referencesMock: ReferencesMockType = createReferencesMock();
-
 /**
  * Returns the module shape expected by mock.module("@infrastructure/repositories/references").
  * Accepts an optional overrides to allow per-test customization (e.g. custom identifier).

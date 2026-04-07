@@ -1,26 +1,34 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { createEnvMock, fsMock } from "@tests/mocks/environment.mock";
 import { createRedisClientMock } from "@tests/mocks/redis.client.mock";
-import { referencesMock } from "@tests/mocks/references.mock";
-import { repositoryMock } from "@tests/mocks/repository.mock";
+import { createReferencesMock } from "@tests/mocks/references.mock";
+import { createRepositoryMock } from "@tests/mocks/repository.mock";
+
+const redisClientMock = createRedisClientMock();
+const repositoryMock = createRepositoryMock();
+const localReferencesMock = createReferencesMock();
 
 mock.module("@infrastructure/settings/environment", () => createEnvMock());
 mock.module("node:fs", () => fsMock);
-mock.module("@infrastructure/cache/connection", () => ({ default: createRedisClientMock() }));
+mock.module("@infrastructure/cache/connection", () => ({ default: redisClientMock }));
 mock.module("@infrastructure/repositories/repository", () => ({
 	default: repositoryMock,
-	withPagination: referencesMock.withPagination,
+	withPagination: localReferencesMock.withPagination,
 }));
 mock.module("@infrastructure/repositories/references", () => ({
-	...referencesMock,
+	...localReferencesMock,
 	pgIndex: mock(() => []),
 }));
+
+import { oidcProviders as sourceOidcProviders } from "@infrastructure/sso/providers";
+
+const oidcProviders = JSON.parse(JSON.stringify(sourceOidcProviders));
+mock.module("@infrastructure/sso/providers", () => ({ oidcProviders }));
 
 import { providers } from "@domain/credentials/constants";
 import ssoRoutes from "@domain/sso/routes";
 import webserver from "@infrastructure/server/webserver";
 import * as oidc from "@infrastructure/sso/oidc";
-import { oidcProviders } from "@infrastructure/sso/providers";
 
 let exchangeSpy: Mock<typeof oidc.exchangeToken>;
 let userSpy: Mock<typeof oidc.getNormalizedUser>;
