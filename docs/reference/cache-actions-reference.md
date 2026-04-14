@@ -109,10 +109,24 @@ cache.json.get<MyType>('json_key')
 ### Deletes values from the cache. `del`
 The `del` function removes data entries based on provided keys. It returns a promise resolving to the number of deleted entries.
 
-**Parameters**:
-- `hash`: The key for the cache entry (supports patterns like `user/*`).
-
 **Returns**: A `Promise<number>` resolving to the number of deleted entries.
+
+#### Pattern-Based Deletion (Namespaces)
+The cache system uses **Redis Sets** (`namespace:keys`) to efficiently track and delete groups of keys. When you call `del('namespace/*')`:
+1. It retrieves all keys associated with that namespace from a specialized set.
+2. It deletes all those keys along with the set itself in a single operation.
+3. This is significantly more performant than using `KEYS *` or `SCAN`.
+
+> [!WARNING]
+> Keys that expire via **TTL** will remain in the Namespace Set until a pattern-based `del` is executed. The `get` method automatically handles these "stale" references by verifying key existence.
+
+```typescript
+import cache from '@infrastructure/cache/actions';
+
+// Delete all keys under the 'user' namespace
+cache.json.del('user/*')
+  .then((count) => console.log(`Deleted ${count} user-related entries`));
+```
 
 ```typescript
 import cache from '@infrastructure/cache/actions';

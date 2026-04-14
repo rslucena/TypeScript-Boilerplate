@@ -4,6 +4,7 @@ import credentialsEntity from "@domain/credentials/entity";
 import getByEmail from "@domain/identity/actions/get-by-email";
 import identityEntity from "@domain/identity/entity";
 import * as jwt from "@infrastructure/authentication/jwt";
+import cache from "@infrastructure/cache/actions";
 import { tag } from "@infrastructure/repositories/references";
 import repository from "@infrastructure/repositories/repository";
 import type { container } from "@infrastructure/server/interface";
@@ -50,6 +51,9 @@ export default async function getCallback(request: container) {
 			login: user.email,
 		})
 		.execute();
+
+	await cache.json.del(tag("identity", "find*"));
+	await cache.json.del(tag("credentials", "find*"));
 
 	const session = { id: identity.id, name: user.name || "User" };
 	const token = jwt.create(session);

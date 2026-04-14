@@ -17,6 +17,9 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/rslucena/TypeScript-Boilerplate
+    - theme: alt
+      text: AI Assistant
+      link: https://deepwiki.com/rslucena/TypeScript-Boilerplate
 
 features:
   - icon: ⚡
@@ -38,3 +41,16 @@ features:
     title: Smart Caching
     details: Built-in Redis integration featuring automatic cache invalidation and graceful degradation for high availability.
 ---
+
+## 🤖 AI Documentation Assistant
+
+Have questions about how to use the Boilerplate or how the CI/CD works? Ask our AI assistant!
+
+**Try asking:**
+- How do I scaffold a new CRUD domain with `bun gen:domain`?
+- How does the CI/CD pipeline handle automated releases?
+- What are the key features of the Smart Caching system with Redis?
+- How do I configure and run database migrations in production?
+- How does this boilerplate achieve Go-like performance with Bun?
+
+👉 **[Access AI Assistant](https://deepwiki.com/rslucena/TypeScript-Boilerplate)**
