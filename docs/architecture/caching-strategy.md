@@ -65,4 +65,4 @@ When a key expires via **TTL**, it remains in the Redis Set until the next patte
 
 **See Also:**
 - [Cache Actions Reference](/reference/cache-actions-reference) - API documentation
-- [Infrastructure Setup](/infra/setup) - How to configure Redis
+- [Getting Started](/guide/getting-started) - How to configure Redis

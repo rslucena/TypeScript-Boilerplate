@@ -33,26 +33,29 @@ jobs:
           bun-version: latest
 
       - name: Install documentation dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
         working-directory: docs
 
       - name: Set version
         id: set_version
         run: |
           if [ "${{ github.event_name }}" == "release" ]; then
-            VERSION="${{ github.event.release.tag_name }}"
+            VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
           else
             LATEST_RELEASE=$(curl -s https://api.github.com/repos/rslucena/TypeScript-Boilerplate/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-            VERSION=${LATEST_RELEASE:-"1.0.0"}
+            VERSION=$(echo ${LATEST_RELEASE:-"1.0.0"} | sed 's/^v//')
           fi
+          # Capitalize environment name (e.g. main -> Main)
+          ENV_NAME=$(echo "${{ github.ref_name }}" | sed 's/.*/\u&/')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "ENV_NAME=$ENV_NAME" >> $GITHUB_ENV
 
       - name: Build VitePress docs
         run: bun run build
         working-directory: docs
         env:
           VITE_APP_VERSION: ${{ env.VERSION }}
-          VITE_APP_ENV: ${{ github.ref_name }}
+          VITE_APP_ENV: ${{ env.ENV_NAME }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4.0.0

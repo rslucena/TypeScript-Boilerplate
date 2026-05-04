@@ -5,8 +5,7 @@ import { computed } from 'vue'
 const { site, theme } = useData()
 
 const version = computed(() => theme.value.version || '1.0.0')
-
-const currentEnv = 'Main'
+const currentEnv = computed(() => theme.value.environment || 'Main')
 
 const goToReleases = () => {
   if (typeof window !== 'undefined') {
