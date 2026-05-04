@@ -4,6 +4,7 @@ import { vitepressMermaidPreview } from 'vitepress-mermaid-preview';
 import pkg from '../../package.json'
 
 const version = process.env.VITE_APP_VERSION || pkg.version
+const environment = process.env.VITE_APP_ENV || 'Main'
 
 export default defineConfig({
     base: '/TypeScript-Boilerplate/',
@@ -22,6 +23,7 @@ export default defineConfig({
     lastUpdated: true,
     themeConfig: {
         version,
+        environment,
         search: {
             provider: "local"
         },
@@ -104,5 +106,5 @@ export default defineConfig({
         ],
 
         socialLinks: [{ icon: "github", link: "https://github.com/rslucena/TypeScript-Boilerplate" }],
-    } as DefaultTheme.Config & { version?: string },
+    } as DefaultTheme.Config & { version?: string; environment?: string },
 });
