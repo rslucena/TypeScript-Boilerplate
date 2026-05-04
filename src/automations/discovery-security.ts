@@ -55,7 +55,7 @@ function runExec(command: string): string {
 }
 
 function safe(str: string) {
-	return str.replace(/"/g, '\\"');
+	return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 async function getRelevantContext(): Promise<string> {

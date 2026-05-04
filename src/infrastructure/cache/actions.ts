@@ -42,7 +42,7 @@ async function get<t>({ type, hash }: setmode, force = false): Promise<null | t>
 		return (safeParse<t>(action as string) ?? action) as t;
 	}
 
-	const namespace = hash.replace("*", "").replace(/\/$/, "");
+	const namespace = hash.replaceAll("*", "").replace(/\/$/, "");
 	const setKey = `${namespace}:keys`;
 	const keys = await client.sMembers(setKey).catch(() => []);
 	if (!keys.length) return null;
@@ -89,7 +89,7 @@ async function del({ hash }: setmode): Promise<number> {
 	if (!client.isOpen) return 0;
 
 	if (hash.endsWith("*")) {
-		const namespace = hash.replace("*", "").replace(/\/$/, "");
+		const namespace = hash.replaceAll("*", "").replace(/\/$/, "");
 		const setKey = `${namespace}:keys`;
 		const keys = await client.sMembers(setKey).catch(() => []);
 		if (!keys.length) return 0;
