@@ -26,7 +26,7 @@ function runExec(cmd: string): string {
 }
 
 function safe(str: string) {
-	return str.replace(/"/g, '\\"');
+	return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 async function setupGitConfig() {

@@ -50,7 +50,7 @@ function tag(domain: refer["domain"], method: refer["method"], conditions?: refe
 	let collection = `${domain}/${method}`;
 	if (!conditions) return collection.toLowerCase().trim();
 	collection += "/";
-	for (const [key, value] of Object.entries(conditions)) collection += `{${key.replace("_", "")}:${value}}`;
+	for (const [key, value] of Object.entries(conditions)) collection += `{${key.replaceAll("_", "")}:${value}}`;
 	return collection.toLowerCase().trim();
 }
 
