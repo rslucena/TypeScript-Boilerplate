@@ -94,4 +94,4 @@ console.log(`[INFO] Location: src/domain/${name}`);
 console.log(`\n[FORMATTER] Running code format validation...`);
 Bun.spawn(["bunx", "biome", "check", "--write", domainPath, webserverPath]);
 
-console.log(`\n[DONE] Generation complete.`);
+console.log(`\n[DONE] Generation complete.\n`);
