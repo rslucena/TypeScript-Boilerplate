@@ -1,7 +1,5 @@
 <div align="center">
   <img src="https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png" alt="TypeScript Boilerplate" width="100%" />
-
-  <h1>TypeScript Boilerplate</h1>
   
   <p><b>A modern, modular, and scalable TypeScript foundation for versatile Server-Side Applications.</b></p>
 
