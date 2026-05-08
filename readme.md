@@ -1,7 +1,12 @@
 <div align="center">
-  <img src="https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png" alt="TypeScript Boilerplate" width="100%" />
+  <img src="https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png" alt="Praxis Framework" width="100%" />
+
+  <h1>Praxis</h1>
   
   <p><b>A modern, modular, and scalable TypeScript foundation for versatile Server-Side Applications.</b></p>
+  
+  > *"Praxis (noun): The process by which a theory, lesson, or skill is enacted."* <br>
+  > **Less magic, more engineering.**
 
   <p>
     <a href="https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml"><img src="https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg" alt="CodeQL" /></a>
@@ -93,7 +98,11 @@ bun dev --workers=primary-webserver
 
 ## 🎨 The CLI Magic (`bun gen:domain`)
 
-Why write boilerplate code when you can generate it? Create complete CRUD modules instantly:
+Why write boilerplate code when you can generate it? Create complete CRUD modules instantly with the Praxis CLI:
+
+<div align="center">
+  <img src="docs/public/praxis-demo.gif" alt="Praxis CLI Generation Demo" width="100%" />
+</div>
 
 ```bash
 bun gen:domain product
