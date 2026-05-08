@@ -1,5 +1,6 @@
 import request from "@infrastructure/server/request";
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import deleteEntity from "./actions/delete-entity";
 import getById from "./actions/get-by-id";
 import getFindByParams from "./actions/get-find-by-params";
@@ -75,7 +76,7 @@ export default async function __name__Routes(api: FastifyInstance) {
 				summary: "Delete __name__",
 				params: schema.actions.id,
 				headers: schema.actions.headers,
-				response: { 204: {}, ...request.reply.schemas },
+				response: { 204: z.null(), ...request.reply.schemas },
 			},
 		},
 		request.restricted(deleteEntity),
