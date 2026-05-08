@@ -31,20 +31,69 @@ const repoEdges = [
 ]
 </script>
 
-# 🎯 Quick Navigation
+# Quick Navigation
 
-**New here?** → [Getting Started](/guide/getting-started) | [Complete Example](/guide/complete-example)
-**Building features?** → [Domain Generator](/development/domain-scaffolding) | [Template System](/development/template-system-architecture)
-**Understanding the code?** → [Architecture](/architecture/) | [Best Practices](/development/best-practices) | [Repository Pattern](/development/base-repository-pattern)
-**Security & Infrastructure?** → [Environment](/development/environment-configuration) | [Security & Keys](/development/security-and-keys) | [Database Migrations](/development/database-migrations)
-**API & Auth?** → [Identity, Credentials & SSO](/api/identity-credentials-sso) | [Health Check](/api/health-check)
-**Testing?** → [Testing Guide](/development/testing-guide)
-**Deploying?** → [CI/CD Pipeline](/devops/ci-cd-pipeline) | [Deployment Guide](/devops/deployment) | [Process Manager](/devops/process-manager-reference)
-**Need help?** → [Troubleshooting](/reference/troubleshooting)
+### The Praxis Identity
+Understand the philosophy and core values behind our enterprise architecture.
+**[Read the Branding Manifesto](/architecture/branding)**
+
+---
+
+### Documentation Map
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin: 2rem 0;">
+
+  <div>
+    <h4 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">🚀 Foundations</h4>
+    <ul style="list-style: none; padding-left: 0; font-size: 0.95rem; line-height: 1.8;">
+      <li><a href="/TypeScript-Boilerplate/guide/getting-started">Getting Started</a></li>
+      <li><a href="/TypeScript-Boilerplate/guide/complete-example">Complete Example</a></li>
+      <li><a href="/TypeScript-Boilerplate/architecture/">Architecture Overview</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/best-practices">Best Practices</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/base-repository-pattern">Repository Pattern</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h4 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">🛠️ Development</h4>
+    <ul style="list-style: none; padding-left: 0; font-size: 0.95rem; line-height: 1.8;">
+      <li><a href="/TypeScript-Boilerplate/development/domain-scaffolding">Domain Generator</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/template-system-architecture">Template System</a></li>
+      <li><a href="/TypeScript-Boilerplate/api/introduction">API Reference</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/testing-guide">Testing Guide</a></li>
+      <li><a href="/TypeScript-Boilerplate/api/health-check">Health Check</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h4 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">⚙️ Infrastructure</h4>
+    <ul style="list-style: none; padding-left: 0; font-size: 0.95rem; line-height: 1.8;">
+      <li><a href="/TypeScript-Boilerplate/development/environment-configuration">Environment Config</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/security-and-keys">Security & Keys</a></li>
+      <li><a href="/TypeScript-Boilerplate/development/database-migrations">DB Migrations</a></li>
+      <li><a href="/TypeScript-Boilerplate/devops/ci-cd-pipeline">CI/CD Pipeline</a></li>
+      <li><a href="/TypeScript-Boilerplate/devops/deployment">Deployment Guide</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h4 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">🆘 Support</h4>
+    <ul style="list-style: none; padding-left: 0; font-size: 0.95rem; line-height: 1.8;">
+      <li><a href="/TypeScript-Boilerplate/reference/troubleshooting">Troubleshooting</a></li>
+      <li><a href="/TypeScript-Boilerplate/devops/process-manager-reference">Process Manager</a></li>
+      <li><a href="/TypeScript-Boilerplate/reference/logs-actions-reference">Logs Reference</a></li>
+      <li><a href="/TypeScript-Boilerplate/reference/cache-actions-reference">Cache Reference</a></li>
+    </ul>
+  </div>
+
+</div>
+
+
+
 
 ## The Web Development "Sweet Spot"
 
-This boilerplate is designed to be the perfect middle ground between high-performance low-level languages and complex enterprise frameworks:
+The Praxis framework is designed to be the perfect middle ground between high-performance low-level languages and complex enterprise frameworks:
 
 - **Performance**: Near Go-like speeds thanks to the **Bun** runtime.
 - **Productivity**: Full "batteries-included" experience with CLI scaffolding, i18n, and integrated caching.

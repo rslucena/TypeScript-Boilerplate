@@ -64,6 +64,10 @@ We'll create a complete domain with:
 
 ## Step 1: Generate the Domain
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-content-create-demo.gif" alt="Praxis CLI Generation Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
 ::: code-group
 
 ```bash [bun]

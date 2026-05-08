@@ -1,5 +1,10 @@
 # Branding: The Praxis Framework
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-logo.png" alt="Praxis Framework Logo" width="400" />
+</div>
+
+
 ## Naming Concept: "Praxis"
 "Praxis" represents the process by which a theory, lesson, or skill is enacted. In software engineering, we often spend too much time theorizing about architecture and too little time building. Praxis is the application of solid engineering principles into actual, high-performance code. **Less magic, more engineering.**
 
@@ -16,3 +21,8 @@ The core differentiator of the logo is the **Arrow** integrated directly into th
 
 ### Typography
 The geometric and bold structure of the letters conveys **solidity and type-safety** (Zod + Drizzle). It is a framework you can trust for banking, fintech, and enterprise-grade applications.
+
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-server-startup.gif" alt="Praxis Framework Terminal Identity" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+

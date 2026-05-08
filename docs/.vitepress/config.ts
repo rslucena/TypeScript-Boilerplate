@@ -18,14 +18,13 @@ export default defineConfig({
         plugins: [groupIconVitePlugin()],
     },
     head: [
-        ['link', { rel: 'icon', type: 'image/png', href: '/TypeScript-Boilerplate/praxis-logo.png' }]
+        ['link', { rel: 'icon', type: 'image/png', href: '/TypeScript-Boilerplate/praxis-icon.png' }]
     ],
     lang: 'en-US',
-    title: "Praxis",
+    title: "PRAXIS",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
     lastUpdated: true,
     themeConfig: {
-        logo: '/praxis-logo.png',
         version,
         environment,
         search: {
@@ -38,7 +37,13 @@ export default defineConfig({
         ],
         sidebar: [
             {
-                text: "🚀 Getting Started",
+                text: "The Praxis",
+                items: [
+                    { text: "Identity", link: "/architecture/branding" },
+                ],
+            },
+            {
+                text: "Getting Started",
                 items: [
                     { text: "Getting Started", link: "/guide/getting-started" },
                     { text: "Complete Example", link: "/guide/complete-example" },
@@ -58,7 +63,7 @@ export default defineConfig({
                 ]
             },
             {
-                text: "🌐 Servers",
+                text: "Servers",
                 items: [
                     { text: "HTTP/2", link: "/servers/http2" },
                     { text: "HTTP Server", link: "/servers/http-server" },
@@ -66,7 +71,7 @@ export default defineConfig({
                 ]
             },
             {
-                text: "🛠️ Development",
+                text: "Development",
                 items: [
                     { text: "Domain Scaffolding", link: "/development/domain-scaffolding" },
                     { text: "Template System", link: "/development/template-system-architecture" },
@@ -77,18 +82,17 @@ export default defineConfig({
                 ],
             },
             {
-                text: "🏗️ Architecture",
+                text: "Architecture",
                 items: [
                     { text: "Overview", link: "/architecture/" },
                     { text: "Architecture Decisions", link: "/architecture/architecture-decisions" },
-                    { text: "Branding", link: "/architecture/branding" },
                     { text: "Identity vs Credentials", link: "/architecture/identity-vs-credentials" },
                     { text: "SSO Flow", link: "/architecture/sso-flow" },
                     { text: "Plugin System", link: "/architecture/plugin-system" },
                 ],
             },
             {
-                text: "🚀 DevOps",
+                text: "DevOps",
                 items: [
                     { text: "CI/CD Pipeline", link: "/devops/ci-cd-pipeline" },
                     { text: "Deployment Guide", link: "/devops/deployment" },
@@ -96,7 +100,7 @@ export default defineConfig({
                 ],
             },
             {
-                text: "📚 Internal Reference",
+                text: "Internal Reference",
                 items: [
                     { text: "Container Object", link: "/reference/container-object" },
                     { text: "Base Repository", link: "/reference/repository-api" },
