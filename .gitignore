@@ -90,6 +90,7 @@ api/_assets*
 # Docs
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/public/*.gif
 
 # Keys
 keys

@@ -36,6 +36,20 @@ jobs:
         run: bun install
         working-directory: docs
 
+      - name: Install VHS & Dependencies
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/keyrings/charm.list
+          sudo apt-get update && sudo apt-get install -y vhs ffmpeg ttyd
+
+      - name: Generate Visual Assets (GIFs)
+        run: |
+          for tape in .agent/*.tape; do
+            echo "🎥 Processing $tape..."
+            vhs < "$tape"
+          done
+
       - name: Set version
         id: set_version
         run: |

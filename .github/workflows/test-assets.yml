@@ -1,0 +1,32 @@
+name: Generate Assets (Test)
+
+on: [push, workflow_dispatch]
+
+jobs:
+  vhs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2.0.1
+        
+      - name: Install project dependencies
+        run: bun install
+        
+      - name: Install VHS
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/keyrings/charm.list
+          sudo apt-get update && sudo apt-get install -y vhs ffmpeg ttyd
+          
+      - name: Generate GIFs
+        run: |
+          for tape in .agent/*.tape; do
+            echo "Processing $tape..."
+            vhs < "$tape"
+          done
+        
+      - name: Check generated files
+        run: ls -lh docs/public/*.gif
