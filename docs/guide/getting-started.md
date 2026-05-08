@@ -5,19 +5,29 @@ description: Complete guide to setting up and creating your first feature with T
 
 # Getting Started
 
-Welcome to the TypeScript Boilerplate! This guide will walk you through creating your first feature from scratch.
+Welcome to the Praxis Framework! This guide will walk you through creating your first feature from scratch.
 
 ## Prerequisites
 
 Before starting, ensure you have:
-- ✅ Bun installed (`curl -fsSL https://bun.sh/install | bash`)
-- ✅ Docker and Docker Compose
-- ✅ PostgreSQL and Redis running (via `docker-compose up -d`)
-- ✅ Database migrations applied (`bun db:migrate:push`)
+- Bun installed (`curl -fsSL https://bun.sh/install | bash`)
+- Docker and Docker Compose
+- PostgreSQL and Redis running (via `docker-compose up -d`)
+- Database migrations applied (`bun db:migrate:push`)
+- **Security keys generated** (`bun gen:keys`)
+
+<div align="center" style="margin: 1.5rem 0;">
+  <img src="/praxis-gen-keys.gif" alt="Praxis Security Setup" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);" />
+</div>
+
 
 ## Tutorial: Building a Blog Post API (5 minutes)
 
 ### Step 1: Generate the Domain
+
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-content-create-demo.gif" alt="Praxis CLI Generation Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
 
 ::: code-group
 
@@ -25,43 +35,72 @@ Before starting, ensure you have:
 bun gen:domain post
 
 # Output:
-# 🚀 Generating domain: post...
-# ✅ Domain post generated successfully!
-# 📍 Location: src/domain/post
-# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+# Praxis Framework v1.0.0
+# ────────────────────────────────────────
+#
+#   ℹ  Generating domain: post...
+#   ✔  Injected route into http-primary-webserver.ts
+#   ✔  Domain architecture scaffolded
+#   ℹ  Location: src/domain/post
+#
+#   ⚙  Running code format validation...
+#
+#   ✔  Generation complete.
 ```
 
 ```bash [npm]
 npm run gen:domain post
 
 # Output:
-# 🚀 Generating domain: post...
-# ✅ Domain post generated successfully!
-# 📍 Location: src/domain/post
-# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+# Praxis Framework v1.0.0
+# ────────────────────────────────────────
+#
+#   ℹ  Generating domain: post...
+#   ✔  Injected route into http-primary-webserver.ts
+#   ✔  Domain architecture scaffolded
+#   ℹ  Location: src/domain/post
+#
+#   ⚙  Running code format validation...
+#
+#   ✔  Generation complete.
 ```
 
 ```bash [yarn]
 yarn gen:domain post
 
 # Output:
-# 🚀 Generating domain: post...
-# ✅ Domain post generated successfully!
-# 📍 Location: src/domain/post
-# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+# Praxis Framework v1.0.0
+# ────────────────────────────────────────
+#
+#   ℹ  Generating domain: post...
+#   ✔  Injected route into http-primary-webserver.ts
+#   ✔  Domain architecture scaffolded
+#   ℹ  Location: src/domain/post
+#
+#   ⚙  Running code format validation...
+#
+#   ✔  Generation complete.
 ```
 
 ```bash [pnpm]
 pnpm gen:domain post
 
 # Output:
-# 🚀 Generating domain: post...
-# ✅ Domain post generated successfully!
-# 📍 Location: src/domain/post
-# 🧪 Test: tests/unit/domain/post/crud.spec.ts
+# Praxis Framework v1.0.0
+# ────────────────────────────────────────
+#
+#   ℹ  Generating domain: post...
+#   ✔  Injected route into http-primary-webserver.ts
+#   ✔  Domain architecture scaffolded
+#   ℹ  Location: src/domain/post
+#
+#   ⚙  Running code format validation...
+#
+#   ✔  Generation complete.
 ```
 
 :::
+
 
 ### Step 2: Customize the Entity
 
@@ -156,6 +195,11 @@ const migrationEdges = [
 
 ### Step 4: Generate and Apply Migration
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-migration.gif" alt="Praxis Database Migration Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
+
 ::: code-group
 
 ```bash [bun]
@@ -212,6 +256,11 @@ import postRoutes from "@domain/post/routes"; // Auto-added
 
 ### Step 6: Test Your API
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-server-startup.gif" alt="Praxis Server Startup Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
+
 ```bash
 # Start the server
 bun dev --workers=primary-webserver
@@ -236,6 +285,11 @@ open http://localhost:3000/docs
 ```
 
 ### Step 7: Write Tests
+
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-test-speed.gif" alt="Praxis Testing Speed Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
 
 Edit `tests/unit/domain/post/crud.spec.ts`:
 
@@ -287,10 +341,10 @@ pnpm test tests/unit/domain/post
 
 ## Next Steps
 
-- ✅ **Add business logic**: Implement custom validation in actions
-- ✅ **Add relationships**: Link posts to users via foreign keys
-- ✅ **Add authentication**: Protect routes with JWT middleware
-- ✅ **Add more features**: Comments, likes, tags, etc.
+- **Add business logic**: Implement custom validation in actions
+- **Add relationships**: Link posts to users via foreign keys
+- **Add authentication**: Protect routes with JWT middleware
+- **Add more features**: Comments, likes, tags, etc.
 
 ## Common Patterns
 

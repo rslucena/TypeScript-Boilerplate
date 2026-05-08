@@ -1,6 +1,7 @@
 import credentialsRoutes from "@domain/credentials/routes";
 import healthRoutes from "@domain/health/routes";
 import identityRoutes from "@domain/identity/routes";
+import invoiceRoutes from "@domain/invoice/routes";
 import ssoRoutes from "@domain/sso/routes";
 import Logs from "@infrastructure/logs/handler";
 import webserver from "@infrastructure/server/webserver";
@@ -14,6 +15,7 @@ const logger = Logs.handler("webserver");
 	server.register(identityRoutes, { prefix: "/api/v1/identities" });
 	server.register(credentialsRoutes, { prefix: "/api/v1/credentials" });
 	server.register(ssoRoutes, { prefix: "/api/v1/sso" });
+	server.register(invoiceRoutes, { prefix: "/api/v1/invoices" });
 	await webserver.start(server, env.PROCESS_PORT).catch((err) => {
 		logger.error("Server startup failed:", err);
 		process.exit(1);

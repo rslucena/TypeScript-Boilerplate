@@ -1,7 +1,18 @@
 import path from "node:path";
 
+const C = {
+	reset: "\x1b[0m",
+	green: "\x1b[32m",
+	blue: "\x1b[34m",
+	cyan: "\x1b[36m",
+	yellow: "\x1b[33m",
+	red: "\x1b[31m",
+	dim: "\x1b[2m",
+	bold: "\x1b[1m",
+};
+
 if (!process.argv[2]) {
-	console.error("Please provide a name: bun gen:domain <name>");
+	console.error(`${C.red}✖${C.reset} ${C.bold}Error:${C.reset} Please provide a name: bun gen:domain <name>`);
 	process.exit(1);
 }
 
@@ -33,7 +44,10 @@ const templates = {
 
 const vars = { name, capitalized };
 
-console.log(`🚀 Generating domain: ${name}...`);
+console.log(`\n${C.cyan}${C.bold}Praxis Framework${C.reset} ${C.dim}v1.0.0${C.reset}`);
+console.log(`${C.dim}────────────────────────────────────────${C.reset}\n`);
+
+console.log(`  ${C.blue}ℹ${C.reset}  Generating domain: ${C.bold}${name}${C.reset}...`);
 
 const writes = [
 	Bun.write(path.join(domainPath, "entity.ts"), render(templates.entity, vars)),
@@ -46,8 +60,8 @@ const writes = [
 	Bun.write(path.join(domainPath, "actions", "delete-entity.ts"), render(templates.actions.delete, vars)),
 ];
 
-Bun.spawn(["mkdir", "-p", path.join(domainPath, "actions")]);
-Bun.spawn(["mkdir", "-p", testsPath]);
+await Bun.spawn(["mkdir", "-p", path.join(domainPath, "actions")]).exited;
+await Bun.spawn(["mkdir", "-p", testsPath]).exited;
 
 await Promise.all(writes);
 
@@ -84,14 +98,18 @@ if (await webserverFile.exists()) {
 		}
 
 		await Bun.write(webserverPath, content);
-		console.log(`\n🔗 Injected route into http-primary-webserver.ts`);
+		console.log(`  ${C.green}✔${C.reset}  Injected route into ${C.bold}http-primary-webserver.ts${C.reset}`);
 	}
 }
 
-console.log(`\n✅ Domain "${name}" generated successfully!`);
-console.log(`\n📍 Location: src/domain/${name}`);
+console.log(`  ${C.green}✔${C.reset}  Domain architecture scaffolded`);
+console.log(`  ${C.blue}ℹ${C.reset}  Location: ${C.dim}src/domain/${name}${C.reset}\n`);
 
-console.log(`\n🎨 Running formatter...`);
-Bun.spawn(["bunx", "biome", "check", "--write", domainPath, webserverPath]);
+console.log(`  ${C.yellow}⚙${C.reset}  Running code format validation...`);
+const biomeProc = Bun.spawn(["bunx", "biome", "check", "--write", domainPath, webserverPath], {
+	stdout: "inherit",
+	stderr: "inherit",
+});
+await biomeProc.exited;
 
-console.log(`\n✨ Done!`);
+console.log(`\n  ${C.green}✔${C.reset}  ${C.bold}Generation complete.${C.reset}\n`);

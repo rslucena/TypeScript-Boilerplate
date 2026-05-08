@@ -63,6 +63,11 @@ Executes the generated SQL files against your target PostgreSQL database.
 bun db:migrate:push
 ```
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-migration.gif" alt="Praxis Database Migration Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
+
 ### 3. Visualizing the Data (Drizzle Studio)
 
 Drizzle comes with a built-in database visualizer. You can start it locally to inspect your tables and data directly from your browser.

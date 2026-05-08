@@ -19,6 +19,11 @@ We use the command `bun gen:keys` to automate this setup.
 bun gen:keys
 ```
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-gen-keys.gif" alt="Praxis Security Key Generation" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
+
+
 ### What happens when you run this command?
 
 1. **RSA Pair Generation**: It generates a 2048-bit RSA Public/Private key pair (`private.pem`, `public.pem`), essential for signing and validating JWTs asymmetrically.

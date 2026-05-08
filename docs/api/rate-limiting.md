@@ -89,4 +89,11 @@ When a client exceeds the `RATE_LIMIT_MAX`, the middleware intercepts the reques
 
 If you are writing a client application consuming this API:
 *   Always inspect the `X-RateLimit-Remaining` header.
-*   If you receive a `429` error, halt further requests. Wait for a duration (e.g., the value in `X-RateLimit-Reset` if treating it as a static delay, or implement exponential backoff) before retrying.
+## Real-world Resilience
+
+Proof that our rate-limiting and performance optimization work in tandem. Watch as we handle a brute-force load test with 100 concurrent connections. The system maintains stability and low latency even under intense pressure:
+
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-load-test.gif" alt="Praxis Load Test & Resilience" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+

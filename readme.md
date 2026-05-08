@@ -1,7 +1,10 @@
 <div align="center">
-  <img src="https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png" alt="TypeScript Boilerplate" width="100%" />
-  
+  <img src="docs/public/praxis-logo.png" alt="Praxis Framework" width="400" />
+
   <p><b>A modern, modular, and scalable TypeScript foundation for versatile Server-Side Applications.</b></p>
+  
+  > *"Praxis (noun): The process by which a theory, lesson, or skill is enacted."* <br>
+  > **Less magic, more engineering.**
 
   <p>
     <a href="https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml"><img src="https://github.com/rslucena/TypeScript-Boilerplate/actions/workflows/check.codeql.yml/badge.svg" alt="CodeQL" /></a>
@@ -68,7 +71,11 @@ cp .env.exemple .env
 
 ### 2️⃣ Start Infrastructure
 
-Start PostgreSQL and Redis via Docker, then apply the database schema:
+Start PostgreSQL and Redis via Docker, then apply the database schema. Watch how our interactive CLI guides you safely:
+
+<div align="center">
+  <img src="docs/public/praxis-migration.gif" alt="Interactive Database Migration" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
 
 ```bash
 podman compose up -d --build
@@ -93,14 +100,18 @@ bun dev --workers=primary-webserver
 
 ## 🎨 The CLI Magic (`bun gen:domain`)
 
-Why write boilerplate code when you can generate it? Create complete CRUD modules instantly:
+Why write boilerplate code when you can generate it? Create complete CRUD modules instantly with the Praxis CLI:
+
+<div align="center">
+  <img src="docs/public/praxis-content-create-demo.gif" alt="Praxis CLI Generation Demo" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
 
 ```bash
 bun gen:domain product
 ```
 
-**What happens?**
-You instantly get a Database table (Drizzle), Validation schemas (Zod), 5 REST endpoints, Business logic, Auto-registered routes, and a Test skeleton. **Zero `.hbs` or `.ejs` templates**—we use native TypeScript files for template generation!
+**What happens in that 1 second?**
+You instantly get a Database table (Drizzle), Validation schemas (Zod), 5 REST endpoints, Business logic, Auto-registered routes, and a Test skeleton. **Zero `.hbs` or `.ejs` templates**—we use native TypeScript files!
 
 ---
 
@@ -129,14 +140,27 @@ tests/                # Automated tests (Unit, Integration, Builders)
 
 ---
 
+## 🚀 Real-world Performance & Resilience
+
+Proof that Praxis isn't just about clean code—it's about raw, production-ready performance. Watch us generate a domain, create data, and handle a **brute-force load test** (100 concurrent connections) without breaking a sweat:
+
+<div align="center">
+  <img src="docs/public/praxis-load-test.gif" alt="Praxis Load Test & Resilience" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
+
+---
+
 ## 🧪 Testing & CI/CD
 
-We take quality seriously. The project comes with a comprehensive testing suite and a robust GitHub Actions pipeline.
+We take quality seriously, and performance even more so. Powered by Bun's blazing-fast test runner, watch how our entire test suite (160+ assertions) runs in **under 2 seconds**:
+
+<div align="center">
+  <img src="docs/public/praxis-test-speed.gif" alt="Blazing Fast Testing with Bun" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
 
 <details>
 <summary><b>Testing Commands</b></summary>
 
-Powered by Bun's blazing-fast test runner, aiming for >90% coverage:
 ```bash
 bun test              # Run all unit and integration tests
 bun test --watch      # Run in watch mode

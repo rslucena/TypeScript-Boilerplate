@@ -10,6 +10,11 @@ The project uses **Fastify** as the core HTTP framework, configured for maximum 
 - **Rate Limiting**: Built-in protection against abusive traffic.
 - **Global Error Handling**: Centralized error interceptor with standardized JSON responses.
 
+<div align="center" style="margin: 2rem 0;">
+  <img src="/praxis-server-startup.gif" alt="Praxis Server Startup Demo" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);" />
+</div>
+
+
 ## Setup & Configuration
 
 The server configuration resides in `src/infrastructure/server/webserver.ts`.
