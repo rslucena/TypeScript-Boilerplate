@@ -33,7 +33,7 @@ const templates = {
 
 const vars = { name, capitalized };
 
-console.log(`🚀 Generating domain: ${name}...`);
+console.log(`[INFO] Generating domain: ${name}...`);
 
 const writes = [
 	Bun.write(path.join(domainPath, "entity.ts"), render(templates.entity, vars)),
@@ -84,14 +84,14 @@ if (await webserverFile.exists()) {
 		}
 
 		await Bun.write(webserverPath, content);
-		console.log(`\n🔗 Injected route into http-primary-webserver.ts`);
+		console.log(`\n[SYSTEM] Injected route into http-primary-webserver.ts`);
 	}
 }
 
-console.log(`\n✅ Domain "${name}" generated successfully!`);
-console.log(`\n📍 Location: src/domain/${name}`);
+console.log(`\n[SUCCESS] Domain "${name}" generated successfully!`);
+console.log(`[INFO] Location: src/domain/${name}`);
 
-console.log(`\n🎨 Running formatter...`);
+console.log(`\n[FORMATTER] Running code format validation...`);
 Bun.spawn(["bunx", "biome", "check", "--write", domainPath, webserverPath]);
 
-console.log(`\n✨ Done!`);
+console.log(`\n[DONE] Generation complete.`);
