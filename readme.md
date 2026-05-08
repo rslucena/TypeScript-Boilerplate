@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.ibb.co/Ytg53xH/Screenshot-from-2024-03-01-23-25-11.png" alt="Praxis Framework" width="100%" />
+  <img src="docs/public/praxis-logo.png" alt="Praxis Framework" width="250" />
 
   <h1>Praxis</h1>
   

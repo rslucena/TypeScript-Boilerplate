@@ -19,6 +19,10 @@ Before starting, ensure you have:
 
 ### Step 1: Generate the Domain
 
+<div align="center">
+  <img src="/praxis-demo.gif" alt="Praxis CLI Generation Demo" width="100%" />
+</div>
+
 ::: code-group
 
 ```bash [bun]
