@@ -17,11 +17,15 @@ export default defineConfig({
     vite: {
         plugins: [groupIconVitePlugin()],
     },
+    head: [
+        ['link', { rel: 'icon', type: 'image/png', href: '/TypeScript-Boilerplate/praxis-logo.png' }]
+    ],
     lang: 'en-US',
-    title: "Boilerplate",
+    title: "Praxis",
     description: "Blazing-fast TS Boilerplate featuring a Zero-Dep Template Engine, Auto-CRUD Scaffolding, i18n, and Smart Caching. Optimized for Bun. Experience the speed of Go with the familiarity of TypeScript.",
     lastUpdated: true,
     themeConfig: {
+        logo: '/praxis-logo.png',
         version,
         environment,
         search: {
@@ -77,6 +81,7 @@ export default defineConfig({
                 items: [
                     { text: "Overview", link: "/architecture/" },
                     { text: "Architecture Decisions", link: "/architecture/architecture-decisions" },
+                    { text: "Branding", link: "/architecture/branding" },
                     { text: "Identity vs Credentials", link: "/architecture/identity-vs-credentials" },
                     { text: "SSO Flow", link: "/architecture/sso-flow" },
                     { text: "Plugin System", link: "/architecture/plugin-system" },
