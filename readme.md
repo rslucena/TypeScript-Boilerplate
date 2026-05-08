@@ -5,7 +5,7 @@
 A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server-Side Applications** (APIs, Functions, WebSockets, CLI) featuring:
 
 * **Runtime:** **Bun** (Speed ​​and Efficiency)
-* **Build Tool:** **Vite** (Quick builds and HMR)
+* **Build Tool:** **tsup / Bun Build** (Optimized backend bundling)
 * **Database ORM:** **Drizzle ORM** (Type-Safe data access)
 * **Containerization:** **Docker** e `docker-compose` (Environmental Consistency)
 
@@ -72,14 +72,11 @@ A modern, **modular and scalable** TypeScript Boilerplate for versatile **Server
 ### Step 1️⃣ - Clone & Install
 
 ```bash
-# Clone the repository
-git clone https://github.com/rslucena/TypeScript-Boilerplate.git my-api
+# Scaffold a new project seamlessly
+bun create rslucena/TypeScript-Boilerplate my-api
 
 # Navigate to directory
 cd my-api
-
-# Install dependencies with Bun
-bun install
 
 # Create environment file
 cp .env.exemple .env
@@ -252,6 +249,8 @@ bun run build
 
 ## 📚 Documentation
 
+Our documentation is powered by **VitePress** (Vite + Vue), providing a blazing-fast, static site generation experience with instant HMR for writing docs. This creates a clear separation of concerns: the core API uses native backend build tools (`tsup`/Bun), while the documentation utilizes Vite, the industry standard for frontend tooling.
+
 Comprehensive guides available in the [Official Documentation](https://rslucena.github.io/TypeScript-Boilerplate/):
 
 | Guide | Description |
@@ -275,7 +274,8 @@ Comprehensive guides available in the [Official Documentation](https://rslucena.
 
 - **Bun** as package manager and runtime for fast installs and execution
 - **TypeScript** for type-safe development
-- **Vite** for fast builds and hot-module replacement (HMR)
+- **tsup / Bun Build** for optimized backend compilation
+- **Vite(Press)** powering the documentation site with instant HMR
 - **Drizzle ORM** for modern and type-safe database access
 - **Docker** and `docker-compose` for containerized development and production
 - **Biome** for code linting and formatting
