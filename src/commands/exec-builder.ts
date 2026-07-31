@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { build, type Options } from "tsup";
-import ts from "typescript";
 import pm2Workspace from "./pm2-workspace";
 
 const [command] = process.argv.slice(2) as [string | undefined];
@@ -17,23 +16,18 @@ if (!jobs) {
 const rootdir = process.cwd();
 const tsPath = path.resolve(rootdir, "tsconfig.json");
 
-const config = ts.readConfigFile(tsPath, ts.sys.readFile).config;
-const commandline = ts.parseJsonConfigFileContent(
-	config,
-	{
-		fileExists: ts.sys.fileExists,
-		readFile: ts.sys.readFile,
-		readDirectory: ts.sys.readDirectory,
-		useCaseSensitiveFileNames: true,
-	},
-	path.dirname(tsPath),
-);
+function readJsonWithComments(filePath: string) {
+	const content = fs.readFileSync(filePath, "utf-8");
+	const clean = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, "");
+	return JSON.parse(clean);
+}
+
+const config = readJsonWithComments(tsPath);
+const excludes: string[] = (config.exclude || []).map((v: string) => v.replace("/**", "").replace("/*", ""));
 
 const outers = new Set<string>();
 const crossdependency = new Set<string>();
 const processed = new Set<string>();
-const excludes: string[] = config.exclude.map((v: string) => v.replace("/**", ""));
-const programTS = ts.createProgram(commandline.fileNames, commandline.options);
 
 const execution = path.resolve(rootdir, "./src/commands/exec-process.ts");
 dependencies(execution);
@@ -46,6 +40,56 @@ for (let i = 0; i < workspace.length; i++) {
 	crossdependency.add(job);
 }
 
+function resolveModule(moduleName: string, currentFileDir: string): string | null {
+	let targetPath: string;
+
+	if (moduleName.startsWith("@commands/")) {
+		targetPath = path.resolve(rootdir, "./src/commands", moduleName.slice("@commands/".length));
+	} else if (moduleName.startsWith("@domain/")) {
+		targetPath = path.resolve(rootdir, "./src/domain", moduleName.slice("@domain/".length));
+	} else if (moduleName.startsWith("@infrastructure/")) {
+		targetPath = path.resolve(rootdir, "./src/infrastructure", moduleName.slice("@infrastructure/".length));
+	} else if (moduleName.startsWith("@providers/")) {
+		targetPath = path.resolve(rootdir, "./src/functions", moduleName.slice("@providers/".length));
+	} else if (moduleName.startsWith("@tests/")) {
+		targetPath = path.resolve(rootdir, "./tests", moduleName.slice("@tests/".length));
+	} else if (moduleName.startsWith("@templates/")) {
+		targetPath = path.resolve(rootdir, "./src/templates", moduleName.slice("@templates/".length));
+	} else if (moduleName.startsWith(".")) {
+		targetPath = path.resolve(currentFileDir, moduleName);
+	} else {
+		return null;
+	}
+
+	const candidates = [
+		targetPath,
+		`${targetPath}.ts`,
+		`${targetPath}.tsx`,
+		path.join(targetPath, "index.ts"),
+		path.join(targetPath, "index.tsx"),
+	];
+
+	for (const cand of candidates) {
+		if (fs.existsSync(cand) && fs.statSync(cand).isFile()) {
+			return cand;
+		}
+	}
+
+	return null;
+}
+
+function getImports(content: string): string[] {
+	const results: string[] = [];
+	const regex = /(?:import|export)\s+[\s\S]*?\s+from\s+["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)/g;
+	for (const match of content.matchAll(regex)) {
+		const specifier = match[1] || match[2];
+		if (specifier) {
+			results.push(specifier);
+		}
+	}
+	return results;
+}
+
 function dependencies(entry: string) {
 	if (processed.has(entry)) return;
 
@@ -53,32 +97,30 @@ function dependencies(entry: string) {
 	if (exclude) return;
 
 	const directory = path.dirname(entry);
-	for (const file of fs.readdirSync(directory)) {
-		const fullPath = path.join(directory, file);
-		const status = fs.statSync(fullPath);
-		if (status.isFile() && path.extname(file) !== ".ts") outers.add(fullPath);
+	if (fs.existsSync(directory)) {
+		for (const file of fs.readdirSync(directory)) {
+			const fullPath = path.join(directory, file);
+			const status = fs.statSync(fullPath);
+			if (status.isFile() && path.extname(file) !== ".ts") outers.add(fullPath);
+		}
 	}
 
 	processed.add(entry);
-	const source = programTS.getSourceFile(entry);
-	if (!source) throw new Error("File not found");
+	if (!fs.existsSync(entry)) return;
 
-	source.forEachChild((node) => nodes(node, source));
-}
+	const content = fs.readFileSync(entry, "utf-8");
+	const moduleNames = getImports(content);
 
-function nodes(node: ts.Node, source: ts.SourceFile) {
-	const imports = ts.isImportDeclaration(node) || ts.isExportDeclaration(node);
-	if (!imports) return;
-	const specifier = node.moduleSpecifier;
-	if (!specifier || !ts.isStringLiteral(specifier)) return;
-	const moduleName = specifier.text;
-	const resolve = ts.resolveModuleName(moduleName, source.fileName, commandline.options, ts.sys);
-	if (!resolve.resolvedModule) return;
-	const resolvedFileName = resolve.resolvedModule.resolvedFileName;
-	const exclude = excludes.some((term) => resolvedFileName.includes(term.toString()));
-	if (exclude) return;
-	crossdependency.add(resolvedFileName);
-	dependencies(resolvedFileName);
+	for (const moduleName of moduleNames) {
+		const resolvedFileName = resolveModule(moduleName, directory);
+		if (resolvedFileName) {
+			const isEx = excludes.some((term) => resolvedFileName.includes(term.toString()));
+			if (!isEx) {
+				crossdependency.add(resolvedFileName);
+				dependencies(resolvedFileName);
+			}
+		}
+	}
 }
 
 async function execute(dependency: string[]) {
