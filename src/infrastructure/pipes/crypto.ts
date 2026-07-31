@@ -58,4 +58,4 @@ const rsaVerify = (data: string, signature: Buffer, publicKey: string) => {
 	return verifier.verify(publicKey, signature);
 };
 
-export { uuid, base64url, sha256, generateRSAKeyPair, createJWKS, pemToJWK, rsa, rsaVerify };
+export { base64url, createJWKS, generateRSAKeyPair, pemToJWK, rsa, rsaVerify, sha256, uuid };

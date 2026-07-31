@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
       - name: Run Linter
         run: bun run lint
 
@@ -119,7 +119,7 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
       - name: Generate Keys
         run: |
           mkdir -p ./keys
@@ -158,6 +158,6 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
       - name: Build Project
         run: bun run build

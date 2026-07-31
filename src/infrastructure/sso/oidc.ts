@@ -6,7 +6,7 @@ import { oidcProviders } from "./providers";
 
 export function getAuthorizationUrl(provider: providers, state: string): string {
 	const config = oidcProviders[provider];
-	if (!config || !config.clientId || !config.redirectUri) {
+	if (!config?.clientId || !config.redirectUri) {
 		throw new Error(`Provider ${provider} is not configured or missing environment variables`);
 	}
 
@@ -26,7 +26,7 @@ export function getAuthorizationUrl(provider: providers, state: string): string 
 
 export async function exchangeToken(provider: providers, code: string) {
 	const config = oidcProviders[provider];
-	if (!config || !config.clientId || !config.clientSecret || !config.redirectUri) {
+	if (!config?.clientId || !config.clientSecret || !config.redirectUri) {
 		throw new Error(`Provider ${provider} is not configured`);
 	}
 
@@ -79,7 +79,7 @@ export interface NormalizedUser {
 
 export async function verifyIdToken(provider: providers, token: string) {
 	const config = oidcProviders[provider];
-	if (!config || !config.jwksUri) throw new Error("OIDC JWKS not supported for this provider");
+	if (!config?.jwksUri) throw new Error("OIDC JWKS not supported for this provider");
 
 	const parts = token.split(".");
 	if (parts.length !== 3) throw new Error("Invalid token format");

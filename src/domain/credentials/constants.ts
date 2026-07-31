@@ -12,4 +12,4 @@ enum providers {
 	GITHUB = "GITHUB",
 }
 
-export { types, providers };
+export { providers, types };
