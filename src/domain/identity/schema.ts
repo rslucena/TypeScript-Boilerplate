@@ -14,7 +14,7 @@ const create = createInsertSchema(identity, {
 });
 
 const select = createSelectSchema(identity, {
-	email: (schema) => transform(schema.min(1).max(400)),
+	email: (schema) => schema.min(1).max(400),
 	...zodIdentifier,
 }).partial();
 

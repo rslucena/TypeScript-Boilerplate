@@ -33,7 +33,9 @@ async function webserver(): Promise<server> {
 		trustProxy: env.APP_TRUST_PROXY,
 		pluginTimeout: 20000,
 		requestTimeout: 20000,
-		disableRequestLogging: true,
+		logController: {
+			disableRequestLogging: true,
+		},
 		routerOptions: {
 			caseSensitive: false,
 			ignoreDuplicateSlashes: false,
